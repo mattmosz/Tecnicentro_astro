@@ -1,0 +1,534 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Panel Técnico - TecniCentro Ibarra Express">
+	<div class="navbar">
+		<div class="container">
+			<div class="logo">
+				<span class="logo-icon">🔧</span>
+				TecniCentro Ibarra Express
+			</div>
+			<div class="user-info">
+				<span id="userName">Técnico</span>
+				<button id="logoutBtn" class="btn btn-orange">Cerrar Sesión</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="grid grid-2">
+			<div class="card">
+				<h2>Nueva Orden de Trabajo</h2>
+				<p>Crear una nueva orden de servicio para un vehículo</p>
+				<button id="nuevaOrdenBtn" class="btn btn-success">Crear Nueva Orden</button>
+			</div>
+			
+			<div class="card">
+				<h2>Mis Órdenes</h2>
+				<p>Ver y gestionar las órdenes que he creado</p>
+				<button id="misOrdenesBtn" class="btn">Ver Mis Órdenes</button>
+			</div>
+		</div>
+
+		<!-- Modal Nueva Orden -->
+		<div id="nuevaOrdenModal" class="modal" style="display: none;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3>Nueva Orden de Trabajo</h3>
+					<button class="modal-close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<form id="nuevaOrdenForm">
+						<div class="form-group">
+							<label for="placaVehiculo">Placa del Vehículo:</label>
+							<div style="display: flex; gap: 10px;">
+								<input type="text" id="placaVehiculo" class="form-control" required>
+								<button type="button" id="buscarVehiculoBtn" class="btn">Buscar</button>
+							</div>
+						</div>
+						
+						<div id="vehiculoInfo" style="display: none;" class="card">
+							<h4>Información del Vehículo</h4>
+							<div id="vehiculoDetalles"></div>
+						</div>
+						
+						<div class="form-group">
+							<label for="observaciones">Observaciones:</label>
+							<textarea id="observaciones" class="form-control" rows="3"></textarea>
+						</div>
+						
+						<h4>Servicios y Repuestos</h4>
+						<div class="form-group">
+							<label for="tipoServicio">Tipo:</label>
+							<select id="tipoServicio" class="form-control">
+								<option value="">Seleccionar tipo</option>
+								<option value="servicio">Mano de Obra</option>
+								<option value="repuesto">Repuestos</option>
+								<option value="lubricante">Lubricantes</option>
+							</select>
+						</div>
+						
+						<div class="form-group">
+							<label for="buscarServicio">Buscar Servicio/Repuesto:</label>
+							<input type="text" id="buscarServicio" class="form-control" placeholder="Buscar por código o descripción">
+							<div id="serviciosEncontrados" class="servicios-list"></div>
+						</div>
+						
+						<h5>Servicios Agregados:</h5>
+						<table class="table" id="serviciosAgregados">
+							<thead>
+								<tr>
+									<th>Código</th>
+									<th>Descripción</th>
+									<th>Cantidad</th>
+									<th>Precio Unit.</th>
+									<th>Subtotal</th>
+									<th>Acción</th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+							<tfoot>
+								<tr>
+									<td colspan="4"><strong>Total:</strong></td>
+									<td><strong id="totalOrden">$0.00</strong></td>
+									<td></td>
+								</tr>
+							</tfoot>
+						</table>
+						
+						<div style="text-align: center; margin-top: 20px;">
+							<button type="submit" class="btn btn-success">Crear Orden</button>
+							<button type="button" class="modal-close btn">Cancelar</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- Lista de órdenes -->
+		<div id="ordenesContainer" style="display: none;">
+			<div class="card">
+				<h3>Mis Órdenes de Trabajo</h3>
+				<table class="table" id="tablaOrdenes">
+					<thead>
+						<tr>
+							<th>Número</th>
+							<th>Fecha</th>
+							<th>Vehículo</th>
+							<th>Cliente</th>
+							<th>Estado</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</Layout>
+
+<style>
+	.modal {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0,0,0,0.5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1000;
+	}
+	
+	.modal-content {
+		background: white;
+		border-radius: 8px;
+		max-width: 800px;
+		width: 90%;
+		max-height: 90vh;
+		overflow-y: auto;
+	}
+	
+	.modal-header {
+		padding: 20px;
+		border-bottom: 1px solid #eee;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	
+	.modal-close {
+		background: none;
+		border: none;
+		font-size: 24px;
+		cursor: pointer;
+		padding: 0;
+		width: 30px;
+		height: 30px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.modal-body {
+		padding: 20px;
+	}
+	
+	.servicios-list {
+		border: 1px solid #ddd;
+		border-radius: 4px;
+		max-height: 200px;
+		overflow-y: auto;
+		margin-top: 5px;
+		display: none;
+	}
+	
+	.servicio-item {
+		padding: 10px;
+		border-bottom: 1px solid #eee;
+		cursor: pointer;
+	}
+	
+	.servicio-item:hover {
+		background: #f5f5f5;
+	}
+	
+	.servicio-item:last-child {
+		border-bottom: none;
+	}
+	
+	.badge {
+		display: inline-block;
+		padding: 4px 8px;
+		border-radius: 4px;
+		font-size: 12px;
+		font-weight: bold;
+	}
+	
+	.badge-success {
+		background: #28a745;
+		color: white;
+	}
+	
+	.badge-warning {
+		background: #ffc107;
+		color: #212529;
+	}
+</style>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		// Verificar autenticación
+		const token = localStorage.getItem('token');
+		const user = localStorage.getItem('user');
+		
+		if (!token || !user) {
+			window.location.href = '/';
+			return;
+		}
+		
+		const userData = JSON.parse(user);
+		if (userData.rol !== 'tecnico') {
+			window.location.href = '/';
+			return;
+		}
+		
+		// Mostrar nombre del usuario
+		document.getElementById('userName').textContent = `${userData.nombre} ${userData.apellido}`;
+		
+		// Event listeners
+		document.getElementById('logoutBtn').addEventListener('click', logout);
+		document.getElementById('nuevaOrdenBtn').addEventListener('click', () => {
+			document.getElementById('nuevaOrdenModal').style.display = 'flex';
+		});
+		document.getElementById('misOrdenesBtn').addEventListener('click', cargarMisOrdenes);
+		
+		// Modal close buttons
+		document.querySelectorAll('.modal-close').forEach(btn => {
+			btn.addEventListener('click', () => {
+				document.getElementById('nuevaOrdenModal').style.display = 'none';
+			});
+		});
+		
+		// Buscar vehículo
+		document.getElementById('buscarVehiculoBtn').addEventListener('click', buscarVehiculo);
+		
+		// Buscar servicios
+		let searchTimeout;
+		document.getElementById('buscarServicio').addEventListener('input', function() {
+			clearTimeout(searchTimeout);
+			searchTimeout = setTimeout(buscarServicios, 300);
+		});
+		
+		// Filtro por tipo de servicio
+		document.getElementById('tipoServicio').addEventListener('change', buscarServicios);
+		
+		// Form submit
+		document.getElementById('nuevaOrdenForm').addEventListener('submit', crearOrden);
+		
+		let vehiculoSeleccionado = null;
+		let serviciosSeleccionados = [];
+		
+		function logout() {
+			localStorage.removeItem('token');
+			localStorage.removeItem('user');
+			window.location.href = '/';
+		}
+		
+		async function buscarVehiculo() {
+			const placa = document.getElementById('placaVehiculo').value.trim();
+			if (!placa) return;
+			
+			try {
+				const response = await fetch(`http://localhost:3001/api/vehiculos/buscar/${placa}`, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				});
+				
+				const result = await response.json();
+				
+				if (result.success && result.data.length > 0) {
+					vehiculoSeleccionado = result.data[0];
+					mostrarVehiculo(vehiculoSeleccionado);
+				} else {
+					alert('Vehículo no encontrado');
+					document.getElementById('vehiculoInfo').style.display = 'none';
+				}
+			} catch (error) {
+				console.error('Error buscando vehículo:', error);
+				alert('Error al buscar vehículo');
+			}
+		}
+		
+		function mostrarVehiculo(vehiculo) {
+			const detalles = `
+				<p><strong>Marca:</strong> ${vehiculo.marca}</p>
+				<p><strong>Modelo:</strong> ${vehiculo.modelo}</p>
+				<p><strong>Placa:</strong> ${vehiculo.placa}</p>
+				<p><strong>Cliente:</strong> ${vehiculo.cliente_nombre}</p>
+				<p><strong>Teléfono:</strong> ${vehiculo.telefono || 'N/A'}</p>
+			`;
+			document.getElementById('vehiculoDetalles').innerHTML = detalles;
+			document.getElementById('vehiculoInfo').style.display = 'block';
+		}
+		
+		async function buscarServicios() {
+			const termino = document.getElementById('buscarServicio').value.trim();
+			const tipo = document.getElementById('tipoServicio').value;
+			
+			if (!termino && !tipo) {
+				document.getElementById('serviciosEncontrados').style.display = 'none';
+				return;
+			}
+			
+			try {
+				let url = 'http://localhost:3001/api/servicios';
+				if (tipo && termino) {
+					url = `http://localhost:3001/api/servicios/buscar/${termino}`;
+				} else if (tipo) {
+					url = `http://localhost:3001/api/servicios/tipo/${tipo}`;
+				} else if (termino) {
+					url = `http://localhost:3001/api/servicios/buscar/${termino}`;
+				}
+				
+				const response = await fetch(url, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				});
+				
+				const result = await response.json();
+				
+				if (result.success) {
+					mostrarServicios(result.data);
+				}
+			} catch (error) {
+				console.error('Error buscando servicios:', error);
+			}
+		}
+		
+		function mostrarServicios(servicios) {
+			const container = document.getElementById('serviciosEncontrados');
+			
+			if (servicios.length === 0) {
+				container.style.display = 'none';
+				return;
+			}
+			
+			container.innerHTML = servicios.map(servicio => `
+				<div class="servicio-item" onclick="agregarServicio(${JSON.stringify(servicio).replace(/"/g, '&quot;')})">
+					<strong>${servicio.codigo}</strong> - ${servicio.descripcion}<br>
+					<small>Precio: $${servicio.precio_unitario} | Tipo: ${servicio.tipo}</small>
+				</div>
+			`).join('');
+			
+			container.style.display = 'block';
+		}
+		
+		window.agregarServicio = function(servicio) {
+			// Verificar si ya está agregado
+			if (serviciosSeleccionados.find(s => s.id === servicio.id)) {
+				alert('Este servicio ya está agregado');
+				return;
+			}
+			
+			const cantidad = prompt('Cantidad:', '1');
+			if (!cantidad || isNaN(cantidad) || cantidad <= 0) return;
+			
+			serviciosSeleccionados.push({
+				...servicio,
+				cantidad: parseInt(cantidad),
+				subtotal: servicio.precio_unitario * parseInt(cantidad)
+			});
+			
+			actualizarTablaServicios();
+			document.getElementById('serviciosEncontrados').style.display = 'none';
+			document.getElementById('buscarServicio').value = '';
+		};
+		
+		function actualizarTablaServicios() {
+			const tbody = document.querySelector('#serviciosAgregados tbody');
+			
+			tbody.innerHTML = serviciosSeleccionados.map((servicio, index) => `
+				<tr>
+					<td>${servicio.codigo}</td>
+					<td>${servicio.descripcion}</td>
+					<td>${servicio.cantidad}</td>
+					<td>$${servicio.precio_unitario}</td>
+					<td>$${servicio.subtotal.toFixed(2)}</td>
+					<td>
+						<button type="button" class="btn btn-danger" onclick="removerServicio(${index})">×</button>
+					</td>
+				</tr>
+			`).join('');
+			
+			const total = serviciosSeleccionados.reduce((sum, s) => sum + s.subtotal, 0);
+			document.getElementById('totalOrden').textContent = `$${total.toFixed(2)}`;
+		}
+		
+		window.removerServicio = function(index) {
+			serviciosSeleccionados.splice(index, 1);
+			actualizarTablaServicios();
+		};
+		
+		async function crearOrden(e) {
+			e.preventDefault();
+			
+			if (!vehiculoSeleccionado) {
+				alert('Debe buscar y seleccionar un vehículo');
+				return;
+			}
+			
+			if (serviciosSeleccionados.length === 0) {
+				alert('Debe agregar al menos un servicio');
+				return;
+			}
+			
+			try {
+				const ordenData = {
+					id_vehiculo: vehiculoSeleccionado.id,
+					observaciones: document.getElementById('observaciones').value,
+					servicios: serviciosSeleccionados.map(s => ({
+						id_servicio: s.id,
+						cantidad: s.cantidad,
+						precio_unitario: s.precio_unitario
+					}))
+				};
+				
+				const response = await fetch('http://localhost:3001/api/ordenes', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					},
+					body: JSON.stringify(ordenData)
+				});
+				
+				const result = await response.json();
+				
+				if (result.success) {
+					alert(`Orden creada exitosamente: ${result.numero_orden}`);
+					document.getElementById('nuevaOrdenModal').style.display = 'none';
+					
+					// Limpiar formulario
+					document.getElementById('nuevaOrdenForm').reset();
+					vehiculoSeleccionado = null;
+					serviciosSeleccionados = [];
+					document.getElementById('vehiculoInfo').style.display = 'none';
+					actualizarTablaServicios();
+				} else {
+					alert('Error al crear orden: ' + result.message);
+				}
+			} catch (error) {
+				console.error('Error creando orden:', error);
+				alert('Error al crear orden');
+			}
+		}
+		
+		async function cargarMisOrdenes() {
+			try {
+				const response = await fetch('http://localhost:3001/api/ordenes/mis-ordenes', {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				});
+				
+				const result = await response.json();
+				
+				if (result.success) {
+					mostrarOrdenes(result.data);
+					document.getElementById('ordenesContainer').style.display = 'block';
+				}
+			} catch (error) {
+				console.error('Error cargando órdenes:', error);
+			}
+		}
+		
+		function mostrarOrdenes(ordenes) {
+			const tbody = document.querySelector('#tablaOrdenes tbody');
+			
+			tbody.innerHTML = ordenes.map(orden => `
+				<tr>
+					<td>${orden.numero_orden}</td>
+					<td>${new Date(orden.fecha_ingreso).toLocaleString()}</td>
+					<td>${orden.marca} ${orden.modelo} (${orden.placa})</td>
+					<td>${orden.cliente_nombre}</td>
+					<td>
+						<span class="badge ${orden.estado === 'pendiente' ? 'badge-warning' : 'badge-success'}">
+							${orden.estado}
+						</span>
+					</td>
+					<td>
+						<button class="btn" onclick="verDetalleOrden(${orden.id})">Ver Detalle</button>
+					</td>
+				</tr>
+			`).join('');
+		}
+		
+		window.verDetalleOrden = async function(ordenId) {
+			try {
+				const response = await fetch(`http://localhost:3001/api/ordenes/${ordenId}/detalle`, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				});
+				
+				const result = await response.json();
+				
+				if (result.success) {
+					const detalle = result.data.map(item => `
+						${item.codigo} - ${item.descripcion}
+						Cantidad: ${item.cantidad} | Precio: $${item.precio_unitario} | Subtotal: $${item.subtotal}
+					`).join('\n');
+					
+					alert('Detalle de la orden:\n\n' + detalle);
+				}
+			} catch (error) {
+				console.error('Error cargando detalle:', error);
+			}
+		};
+	});
+</script>

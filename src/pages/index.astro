@@ -1,0 +1,405 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="TecniCentro Ibarra Express - Login">
+	<main>
+		<div class="login-container">
+			<div class="login-card">
+				<div class="logo-section">
+					<div class="logo-circle">
+						<span class="logo-icon">🔧</span>
+					</div>
+					<h1>TecniCentro</h1>
+					<h2>Ibarra Express</h2>
+					<p class="subtitle">Sistema de Gestión Automotriz</p>
+				</div>
+				
+				<form id="loginForm" class="login-form">
+					<div class="form-group">
+						<label for="usuario">Usuario</label>
+						<input type="text" id="usuario" name="usuario" class="form-control" required placeholder="Ingresa tu usuario">
+					</div>
+					
+					<div class="form-group">
+						<label for="clave">Contraseña</label>
+						<input type="password" id="clave" name="clave" class="form-control" required placeholder="Ingresa tu contraseña">
+					</div>
+					
+					<button type="submit" class="btn btn-login">
+						<span class="btn-text">Iniciar Sesión</span>
+						<span class="btn-loading" style="display: none;">Ingresando...</span>
+					</button>
+				</form>
+				
+				<div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+				
+				<div class="login-footer">
+					<p>Sistema exclusivo para personal autorizado</p>
+					<small>&copy; 2025 TecniCentro Ibarra Express</small>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<style>
+		main {
+			min-height: 100vh;
+			background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 50%, var(--primary-orange) 100%);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 20px;
+			position: relative;
+			overflow: hidden;
+		}
+		
+		main::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: 
+				radial-gradient(circle at 20% 80%, rgba(255, 69, 0, 0.1) 0%, transparent 50%),
+				radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+			pointer-events: none;
+		}
+		
+		.login-container {
+			width: 100%;
+			max-width: 420px;
+			z-index: 1;
+		}
+		
+		.login-card {
+			background: rgba(255, 255, 255, 0.95);
+			backdrop-filter: blur(20px);
+			border-radius: 20px;
+			padding: 40px 35px;
+			box-shadow: 
+				0 20px 40px rgba(30, 77, 139, 0.3),
+				0 0 0 1px rgba(255, 255, 255, 0.2);
+			border: 1px solid rgba(255, 255, 255, 0.3);
+			text-align: center;
+			animation: slideUp 0.6s ease-out;
+		}
+		
+		@keyframes slideUp {
+			from {
+				opacity: 0;
+				transform: translateY(30px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+		
+		.logo-section {
+			margin-bottom: 35px;
+		}
+		
+		.logo-circle {
+			width: 80px;
+			height: 80px;
+			background: linear-gradient(135deg, var(--primary-orange), #FF6B35);
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin: 0 auto 20px;
+			box-shadow: 0 10px 30px rgba(255, 69, 0, 0.3);
+			animation: pulse 2s ease-in-out infinite;
+		}
+		
+		@keyframes pulse {
+			0%, 100% {
+				transform: scale(1);
+				box-shadow: 0 10px 30px rgba(255, 69, 0, 0.3);
+			}
+			50% {
+				transform: scale(1.05);
+				box-shadow: 0 15px 40px rgba(255, 69, 0, 0.4);
+			}
+		}
+		
+		.logo-icon {
+			font-size: 36px;
+			filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+		}
+		
+		.login-card h1 {
+			color: var(--primary-blue);
+			font-size: 28px;
+			font-weight: 700;
+			margin: 0;
+			letter-spacing: -0.5px;
+		}
+		
+		.login-card h2 {
+			color: var(--primary-orange);
+			font-size: 22px;
+			font-weight: 600;
+			margin: 5px 0 8px;
+			letter-spacing: -0.3px;
+		}
+		
+		.subtitle {
+			color: #666;
+			font-size: 14px;
+			font-weight: 500;
+			margin: 0;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+		}
+		
+		.login-form {
+			text-align: left;
+			margin-bottom: 25px;
+		}
+		
+		.form-group {
+			margin-bottom: 20px;
+		}
+		
+		.form-group label {
+			color: var(--text-dark);
+			font-weight: 600;
+			margin-bottom: 8px;
+			display: block;
+			font-size: 14px;
+		}
+		
+		.form-control {
+			width: 100%;
+			padding: 15px 18px;
+			border: 2px solid #E8E8E8;
+			border-radius: 12px;
+			font-size: 15px;
+			transition: all 0.3s ease;
+			background: rgba(255, 255, 255, 0.9);
+		}
+		
+		.form-control:focus {
+			outline: none;
+			border-color: var(--primary-blue);
+			box-shadow: 0 0 0 3px rgba(30, 77, 139, 0.1);
+			background: white;
+		}
+		
+		.form-control::placeholder {
+			color: #999;
+			font-size: 14px;
+		}
+		
+		.btn-login {
+			width: 100%;
+			background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+			color: white;
+			padding: 16px 24px;
+			border: none;
+			border-radius: 12px;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			position: relative;
+			overflow: hidden;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+		
+		.btn-login:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 10px 30px rgba(30, 77, 139, 0.4);
+		}
+		
+		.btn-login:active {
+			transform: translateY(0);
+		}
+		
+		.btn-login::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: -100%;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+			transition: left 0.5s;
+		}
+		
+		.btn-login:hover::before {
+			left: 100%;
+		}
+		
+		.btn-loading {
+			display: none;
+		}
+		
+		.login-form.loading .btn-text {
+			display: none;
+		}
+		
+		.login-form.loading .btn-loading {
+			display: inline;
+		}
+		
+		.login-form.loading .btn-login {
+			opacity: 0.8;
+			cursor: not-allowed;
+		}
+		
+		.alert {
+			border-radius: 8px;
+			margin-top: 15px;
+			padding: 12px 16px;
+			font-size: 14px;
+		}
+		
+		.login-footer {
+			margin-top: 30px;
+			padding-top: 25px;
+			border-top: 1px solid #E8E8E8;
+			text-align: center;
+		}
+		
+		.login-footer p {
+			color: #666;
+			font-size: 14px;
+			margin: 0 0 8px;
+			font-weight: 500;
+		}
+		
+		.login-footer small {
+			color: #999;
+			font-size: 12px;
+			display: block;
+			margin-bottom: 5px;
+		}
+		
+		@media (max-width: 480px) {
+			.login-card {
+				padding: 30px 25px;
+				margin: 15px;
+			}
+			
+			.login-card h1 {
+				font-size: 24px;
+			}
+			
+			.login-card h2 {
+				font-size: 18px;
+			}
+			
+			.logo-circle {
+				width: 70px;
+				height: 70px;
+			}
+			
+			.logo-icon {
+				font-size: 30px;
+			}
+			
+			.form-control {
+				padding: 12px 16px;
+			}
+			
+			.btn-login {
+				padding: 14px 20px;
+				font-size: 15px;
+			}
+		}
+	</style>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const loginForm = document.getElementById('loginForm');
+			const errorMessage = document.getElementById('errorMessage');
+			
+			// Verificar si ya hay una sesión activa
+			const token = localStorage.getItem('token');
+			const user = localStorage.getItem('user');
+			
+			if (token && user) {
+				// Verificar que el token sea válido
+				fetch('http://localhost:3001/api/auth/verify', {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				})
+				.then(response => response.json())
+				.then(data => {
+					if (data.success) {
+						redirectToDashboard(JSON.parse(user));
+					} else {
+						// Token inválido, limpiar storage
+						localStorage.removeItem('token');
+						localStorage.removeItem('user');
+					}
+				})
+				.catch(error => {
+					console.error('Error verificando token:', error);
+					localStorage.removeItem('token');
+					localStorage.removeItem('user');
+				});
+			}
+			
+			loginForm.addEventListener('submit', async function(e) {
+				e.preventDefault();
+				
+				const formData = new FormData(loginForm);
+				const loginData = {
+					usuario: formData.get('usuario'),
+					clave: formData.get('clave')
+				};
+				
+				try {
+					loginForm.classList.add('loading');
+					errorMessage.style.display = 'none';
+					
+					const response = await fetch('http://localhost:3001/api/auth/login', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(loginData)
+					});
+					
+					const result = await response.json();
+					
+					if (result.success) {
+						// Guardar token y datos del usuario
+						localStorage.setItem('token', result.token);
+						localStorage.setItem('user', JSON.stringify(result.user));
+						
+						// Redirigir según el rol
+						redirectToDashboard(result.user);
+					} else {
+						showError(result.message || 'Error en el login');
+					}
+				} catch (error) {
+					console.error('Error en login:', error);
+					showError('Error de conexión con el servidor');
+				} finally {
+					loginForm.classList.remove('loading');
+				}
+			});
+			
+			function showError(message) {
+				errorMessage.textContent = message;
+				errorMessage.style.display = 'block';
+			}
+			
+			function redirectToDashboard(user) {
+				if (user.rol === 'admin') {
+					window.location.href = '/admin/dashboard';
+				} else if (user.rol === 'tecnico') {
+					window.location.href = '/tecnico/dashboard';
+				}
+			}
+		});
+	</script>
+</Layout>

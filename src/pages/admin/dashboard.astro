@@ -1,0 +1,552 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Panel Administrativo - TecniCentro Ibarra Express">
+	<div class="navbar">
+		<div class="container">
+			<div class="logo">
+				<span class="logo-icon">🔧</span>
+				TecniCentro Ibarra Express
+			</div>
+			<div class="user-info">
+				<span id="userWelcome">Cargando...</span>
+				<button class="btn btn-orange" onclick="logout()">Cerrar Sesión</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="dashboard-header">
+			<h1>Panel de Administración</h1>
+			<p class="subtitle">Gestión integral del taller automotriz</p>
+		</div>
+
+		<!-- Tarjetas de resumen -->
+		<div class="stats-grid">
+			<div class="stat-card primary">
+				<div class="stat-icon">👥</div>
+				<div class="stat-content">
+					<h3 id="totalClientes">0</h3>
+					<p>Clientes Registrados</p>
+				</div>
+			</div>
+			<div class="stat-card success">
+				<div class="stat-icon">🚗</div>
+				<div class="stat-content">
+					<h3 id="totalVehiculos">0</h3>
+					<p>Vehículos en Sistema</p>
+				</div>
+			</div>
+			<div class="stat-card warning">
+				<div class="stat-icon">⚙️</div>
+				<div class="stat-content">
+					<h3 id="ordenesActivas">0</h3>
+					<p>Órdenes Activas</p>
+				</div>
+			</div>
+			<div class="stat-card orange">
+				<div class="stat-icon">💰</div>
+				<div class="stat-content">
+					<h3 id="facturasHoy">$0</h3>
+					<p>Facturación Hoy</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Navegación principal -->
+		<div class="main-nav">
+			<h2>Módulos del Sistema</h2>
+			<div class="nav-grid">
+				<a href="/admin/clientes" class="nav-card primary">
+					<div class="nav-icon">👥</div>
+					<h3>Gestión de Clientes</h3>
+					<p>Administrar información de clientes y contactos</p>
+				</a>
+				
+				<a href="/admin/vehiculos" class="nav-card success">
+					<div class="nav-icon">🚗</div>
+					<h3>Gestión de Vehículos</h3>
+					<p>Registro y seguimiento de vehículos</p>
+				</a>
+				
+				<a href="/admin/servicios" class="nav-card orange">
+					<div class="nav-icon">🔧</div>
+					<h3>Servicios del Taller</h3>
+					<p>Catálogo de servicios y tarifas</p>
+				</a>
+				
+				<a href="/admin/ordenes" class="nav-card warning">
+					<div class="nav-icon">📋</div>
+					<h3>Órdenes de Trabajo</h3>
+					<p>Gestión de órdenes y asignaciones</p>
+				</a>
+				
+				<a href="/admin/facturas" class="nav-card info">
+					<div class="nav-icon">🧾</div>
+					<h3>Facturación</h3>
+					<p>Emisión y control de facturas</p>
+				</a>
+				
+				<a href="/admin/reportes" class="nav-card secondary">
+					<div class="nav-icon">📊</div>
+					<h3>Reportes y Análisis</h3>
+					<p>Estadísticas y reportes del negocio</p>
+				</a>
+			</div>
+		</div>
+
+		<!-- Actividad reciente -->
+		<div class="recent-activity">
+			<h2>Actividad Reciente</h2>
+			<div class="activity-container">
+				<div id="recentOrders" class="activity-section">
+					<h3>Últimas Órdenes</h3>
+					<div class="loading-placeholder">Cargando órdenes...</div>
+				</div>
+				<div id="recentFacturas" class="activity-section">
+					<h3>Últimas Facturas</h3>
+					<div class="loading-placeholder">Cargando facturas...</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<style>
+		.dashboard-header {
+			text-align: center;
+			margin-bottom: 40px;
+			padding: 30px 0;
+		}
+		
+		.dashboard-header h1 {
+			color: var(--primary-blue);
+			font-size: 36px;
+			font-weight: 700;
+			margin: 0 0 10px;
+			text-shadow: 0 2px 4px rgba(30, 77, 139, 0.1);
+		}
+		
+		.dashboard-header .subtitle {
+			color: #666;
+			font-size: 18px;
+			margin: 0;
+			font-weight: 400;
+		}
+		
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 24px;
+			margin-bottom: 50px;
+		}
+		
+		.stat-card {
+			background: white;
+			border-radius: 16px;
+			padding: 30px 25px;
+			box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+			border-left: 5px solid;
+			transition: all 0.3s ease;
+			position: relative;
+			overflow: hidden;
+		}
+		
+		.stat-card::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 100px;
+			height: 100px;
+			background: rgba(255, 255, 255, 0.1);
+			border-radius: 50%;
+			transform: translate(30px, -30px);
+		}
+		
+		.stat-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+		}
+		
+		.stat-card.primary {
+			border-left-color: var(--primary-blue);
+		}
+		
+		.stat-card.success {
+			border-left-color: var(--success-green);
+		}
+		
+		.stat-card.warning {
+			border-left-color: var(--warning-yellow);
+		}
+		
+		.stat-card.orange {
+			border-left-color: var(--primary-orange);
+		}
+		
+		.stat-card {
+			display: flex;
+			align-items: center;
+			gap: 20px;
+		}
+		
+		.stat-icon {
+			font-size: 48px;
+			opacity: 0.8;
+		}
+		
+		.stat-content h3 {
+			font-size: 32px;
+			font-weight: 700;
+			margin: 0 0 5px;
+			color: var(--text-dark);
+		}
+		
+		.stat-content p {
+			font-size: 14px;
+			color: #666;
+			margin: 0;
+			font-weight: 500;
+		}
+		
+		.main-nav {
+			margin-bottom: 50px;
+		}
+		
+		.main-nav h2 {
+			color: var(--primary-blue);
+			font-size: 28px;
+			font-weight: 600;
+			margin-bottom: 30px;
+			text-align: center;
+		}
+		
+		.nav-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 25px;
+		}
+		
+		.nav-card {
+			background: white;
+			border-radius: 16px;
+			padding: 30px 25px;
+			text-decoration: none;
+			color: var(--text-dark);
+			box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+			transition: all 0.3s ease;
+			border-top: 4px solid;
+			position: relative;
+			overflow: hidden;
+		}
+		
+		.nav-card::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+		
+		.nav-card:hover::before {
+			opacity: 1;
+		}
+		
+		.nav-card:hover {
+			transform: translateY(-8px);
+			box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+		}
+		
+		.nav-card.primary {
+			border-top-color: var(--primary-blue);
+		}
+		
+		.nav-card.success {
+			border-top-color: var(--success-green);
+		}
+		
+		.nav-card.orange {
+			border-top-color: var(--primary-orange);
+		}
+		
+		.nav-card.warning {
+			border-top-color: var(--warning-yellow);
+		}
+		
+		.nav-card.info {
+			border-top-color: #17A2B8;
+		}
+		
+		.nav-card.secondary {
+			border-top-color: #6C757D;
+		}
+		
+		.nav-icon {
+			font-size: 48px;
+			margin-bottom: 15px;
+			opacity: 0.8;
+		}
+		
+		.nav-card h3 {
+			font-size: 20px;
+			font-weight: 600;
+			margin: 0 0 10px;
+			color: var(--text-dark);
+		}
+		
+		.nav-card p {
+			font-size: 14px;
+			color: #666;
+			margin: 0;
+			line-height: 1.5;
+		}
+		
+		.recent-activity {
+			margin-bottom: 40px;
+		}
+		
+		.recent-activity h2 {
+			color: var(--primary-blue);
+			font-size: 28px;
+			font-weight: 600;
+			margin-bottom: 30px;
+			text-align: center;
+		}
+		
+		.activity-container {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 30px;
+		}
+		
+		.activity-section {
+			background: white;
+			border-radius: 16px;
+			padding: 25px;
+			box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+		}
+		
+		.activity-section h3 {
+			color: var(--primary-blue);
+			font-size: 18px;
+			font-weight: 600;
+			margin: 0 0 20px;
+			padding-bottom: 10px;
+			border-bottom: 2px solid var(--light-blue);
+		}
+		
+		.loading-placeholder {
+			text-align: center;
+			color: #666;
+			font-style: italic;
+			padding: 20px;
+		}
+		
+		.logo-icon {
+			color: var(--primary-orange);
+			margin-right: 8px;
+			filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.2));
+		}
+		
+		@media (max-width: 768px) {
+			.stats-grid {
+				grid-template-columns: 1fr;
+			}
+			
+			.nav-grid {
+				grid-template-columns: 1fr;
+			}
+			
+			.activity-container {
+				grid-template-columns: 1fr;
+			}
+			
+			.dashboard-header h1 {
+				font-size: 28px;
+			}
+			
+			.dashboard-header .subtitle {
+				font-size: 16px;
+			}
+			
+			.stat-card {
+				padding: 20px;
+			}
+			
+			.stat-icon {
+				font-size: 36px;
+			}
+			
+			.stat-content h3 {
+				font-size: 24px;
+			}
+			
+			.nav-card {
+				padding: 20px;
+			}
+			
+			.nav-icon {
+				font-size: 36px;
+			}
+		}
+	</style>
+
+	<script>
+		// Verificar autenticación
+		const token = localStorage.getItem('token');
+		const user = localStorage.getItem('user');
+		
+		if (!token || !user) {
+			window.location.href = '/';
+		} else {
+			const userData = JSON.parse(user);
+			if (userData.rol !== 'admin') {
+				window.location.href = '/';
+			} else {
+				document.getElementById('userWelcome').textContent = `Bienvenido, ${userData.nombre}`;
+				loadDashboardData();
+			}
+		}
+		
+		function logout() {
+			localStorage.removeItem('token');
+			localStorage.removeItem('user');
+			window.location.href = '/';
+		}
+		
+		async function loadDashboardData() {
+			try {
+				const token = localStorage.getItem('token');
+				
+				// Cargar estadísticas
+				const statsResponse = await fetch('http://localhost:3001/api/admin/stats', {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				});
+				
+				if (statsResponse.ok) {
+					const stats = await statsResponse.json();
+					document.getElementById('totalClientes').textContent = stats.clientes || 0;
+					document.getElementById('totalVehiculos').textContent = stats.vehiculos || 0;
+					document.getElementById('ordenesActivas').textContent = stats.ordenesActivas || 0;
+					document.getElementById('facturasHoy').textContent = `$${stats.facturacionHoy || 0}`;
+				}
+				
+				// Cargar actividad reciente
+				await loadRecentActivity();
+				
+			} catch (error) {
+				console.error('Error cargando datos del dashboard:', error);
+			}
+		}
+		
+		async function loadRecentActivity() {
+			const token = localStorage.getItem('token');
+			
+			try {
+				// Cargar últimas órdenes
+				const ordenesResponse = await fetch('http://localhost:3001/api/ordenes?limit=5', {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				});
+				
+				if (ordenesResponse.ok) {
+					const ordenes = await ordenesResponse.json();
+					const ordenesContainer = document.getElementById('recentOrders');
+					
+					if (ordenes.length > 0) {
+						ordenesContainer.innerHTML = `
+							<h3>Últimas Órdenes</h3>
+							<div class="table">
+								<table>
+									<thead>
+										<tr>
+											<th>ID</th>
+											<th>Cliente</th>
+											<th>Estado</th>
+											<th>Fecha</th>
+										</tr>
+									</thead>
+									<tbody>
+										${ordenes.map(orden => `
+											<tr>
+												<td>#${orden.id}</td>
+												<td>${orden.cliente_nombre || 'N/A'}</td>
+												<td><span class="badge badge-${getBadgeColor(orden.estado)}">${orden.estado}</span></td>
+												<td>${new Date(orden.fecha_ingreso).toLocaleDateString()}</td>
+											</tr>
+										`).join('')}
+									</tbody>
+								</table>
+							</div>
+						`;
+					} else {
+						ordenesContainer.innerHTML = '<h3>Últimas Órdenes</h3><p>No hay órdenes registradas</p>';
+					}
+				}
+				
+				// Cargar últimas facturas
+				const facturasResponse = await fetch('http://localhost:3001/api/facturas?limit=5', {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				});
+				
+				if (facturasResponse.ok) {
+					const facturas = await facturasResponse.json();
+					const facturasContainer = document.getElementById('recentFacturas');
+					
+					if (facturas.length > 0) {
+						facturasContainer.innerHTML = `
+							<h3>Últimas Facturas</h3>
+							<div class="table">
+								<table>
+									<thead>
+										<tr>
+											<th>Número</th>
+											<th>Cliente</th>
+											<th>Total</th>
+											<th>Fecha</th>
+										</tr>
+									</thead>
+									<tbody>
+										${facturas.map(factura => `
+											<tr>
+												<td>#${factura.numero}</td>
+												<td>${factura.cliente_nombre || 'N/A'}</td>
+												<td>$${factura.total}</td>
+												<td>${new Date(factura.fecha).toLocaleDateString()}</td>
+											</tr>
+										`).join('')}
+									</tbody>
+								</table>
+							</div>
+						`;
+					} else {
+						facturasContainer.innerHTML = '<h3>Últimas Facturas</h3><p>No hay facturas registradas</p>';
+					}
+				}
+				
+			} catch (error) {
+				console.error('Error cargando actividad reciente:', error);
+			}
+		}
+		
+		function getBadgeColor(estado) {
+			switch (estado?.toLowerCase()) {
+				case 'pendiente': return 'warning';
+				case 'en proceso': return 'primary';
+				case 'completado': return 'success';
+				case 'entregado': return 'success';
+				default: return 'primary';
+			}
+		}
+	</script>
+</Layout>
