@@ -1,61 +1,61 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 
-import authRoutes from './routes/auth.js';
-import clientesRoutes from './routes/clientes.js';
-import vehiculosRoutes from './routes/vehiculos.js';
-import serviciosRoutes from './routes/servicios.js';
-import ordenesRoutes from './routes/ordenes.js';
-import facturasRoutes from './routes/facturas.js';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-dotenv.config();
+// Cargar .env desde la RAÍZ
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+
+import authRoutes from './routes/auth.js';
+// (si tienes más rutas, impórtalas aquí)
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = Number(process.env.PORT || 3001);
 
-// Middleware
-app.use(cors({
-  origin: ['http://localhost:4321', 'http://localhost:4322', 'http://localhost:4323'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Middlewares
+app.use(cookieParser());
 app.use(express.json());
+app.use(cors({
+  origin: ['http://localhost:4321','http://localhost:4322','http://localhost:4323'],
+  credentials: true,
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization']
+}));
 
-// Routes
+// Log de depuración para /api/auth
+app.use((req, _res, next) => {
+  if (req.path.startsWith('/api/auth')) {
+    console.log(`[${req.method}] ${req.path}`, { body: req.body });
+  }
+  next();
+});
+
+// Rutas
 app.use('/api/auth', authRoutes);
-app.use('/api/clientes', clientesRoutes);
-app.use('/api/vehiculos', vehiculosRoutes);
-app.use('/api/servicios', serviciosRoutes);
-app.use('/api/ordenes', ordenesRoutes);
-app.use('/api/facturas', facturasRoutes);
 
-// Health check
-app.get('/api/health', (req, res) => {
+// Health
+app.get('/api/health', (_req, res) => {
   res.json({ status: 'OK', message: 'Servidor del taller funcionando correctamente' });
 });
 
-// Database connection test
-app.get('/api/test-db', async (req, res) => {
+// DB test
+app.get('/api/test-db', async (_req, res) => {
   try {
-    const db = await import('./config/database.js');
-    const [rows] = await db.default.execute('SELECT 1 as test');
-    res.json({ 
-      status: 'OK', 
-      message: 'Conexión a base de datos exitosa',
-      test: rows[0]
-    });
+    const db = (await import('./config/database.js')).default;
+    const [rows] = await db.execute('SELECT 1 AS test');
+    res.json({ status: 'OK', test: rows[0] });
   } catch (error) {
-    console.error('Error conectando a la base de datos:', error);
-    res.status(500).json({ 
-      status: 'ERROR', 
-      message: 'Error conectando a la base de datos',
-      error: error.message
-    });
+    console.error('Error conectando a la BD:', error);
+    res.status(500).json({ status: 'ERROR', message: error.message });
   }
 });
 
 app.listen(PORT, () => {
+  console.log('JWT_SECRET presente:', Boolean(process.env.JWT_SECRET));
   console.log(`Servidor corriendo en puerto ${PORT}`);
 });
