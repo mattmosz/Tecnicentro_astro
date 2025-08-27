@@ -3,532 +3,689 @@ import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout title="Panel Técnico - TecniCentro Ibarra Express">
-	<div class="navbar">
-		<div class="container">
-			<div class="logo">
-				<span class="logo-icon">🔧</span>
-				TecniCentro Ibarra Express
-			</div>
-			<div class="user-info">
-				<span id="userName">Técnico</span>
-				<button id="logoutBtn" class="btn btn-orange">Cerrar Sesión</button>
-			</div>
-		</div>
-	</div>
+  <!-- NAVBAR -->
+  <header class="navbar" role="banner">
+    <div class="container">
+      <a href="/tecnico/dashboard" class="brand">
+        <span class="logo-circle">🔧</span>
+        <span class="brand-text">TecniCentro Ibarra Express</span>
+      </a>
 
-	<div class="container">
-		<div class="grid grid-2">
-			<div class="card">
-				<h2>Nueva Orden de Trabajo</h2>
-				<p>Crear una nueva orden de servicio para un vehículo</p>
-				<button id="nuevaOrdenBtn" class="btn btn-success">Crear Nueva Orden</button>
-			</div>
-			
-			<div class="card">
-				<h2>Mis Órdenes</h2>
-				<p>Ver y gestionar las órdenes que he creado</p>
-				<button id="misOrdenesBtn" class="btn">Ver Mis Órdenes</button>
-			</div>
-		</div>
+      <div class="user-menu">
+        <span id="userName" class="user-chip">Técnico</span>
+        <button type="button" class="btn btn-orange" id="logoutBtn" onclick="window.logout?.()">Cerrar Sesión</button>
+      </div>
+    </div>
+  </header>
 
-		<!-- Modal Nueva Orden -->
-		<div id="nuevaOrdenModal" class="modal" style="display: none;">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h3>Nueva Orden de Trabajo</h3>
-					<button class="modal-close">&times;</button>
-				</div>
-				<div class="modal-body">
-					<form id="nuevaOrdenForm">
-						<div class="form-group">
-							<label for="placaVehiculo">Placa del Vehículo:</label>
-							<div style="display: flex; gap: 10px;">
-								<input type="text" id="placaVehiculo" class="form-control" required>
-								<button type="button" id="buscarVehiculoBtn" class="btn">Buscar</button>
-							</div>
-						</div>
-						
-						<div id="vehiculoInfo" style="display: none;" class="card">
-							<h4>Información del Vehículo</h4>
-							<div id="vehiculoDetalles"></div>
-						</div>
-						
-						<div class="form-group">
-							<label for="observaciones">Observaciones:</label>
-							<textarea id="observaciones" class="form-control" rows="3"></textarea>
-						</div>
-						
-						<h4>Servicios y Repuestos</h4>
-						<div class="form-group">
-							<label for="tipoServicio">Tipo:</label>
-							<select id="tipoServicio" class="form-control">
-								<option value="">Seleccionar tipo</option>
-								<option value="servicio">Mano de Obra</option>
-								<option value="repuesto">Repuestos</option>
-								<option value="lubricante">Lubricantes</option>
-							</select>
-						</div>
-						
-						<div class="form-group">
-							<label for="buscarServicio">Buscar Servicio/Repuesto:</label>
-							<input type="text" id="buscarServicio" class="form-control" placeholder="Buscar por código o descripción">
-							<div id="serviciosEncontrados" class="servicios-list"></div>
-						</div>
-						
-						<h5>Servicios Agregados:</h5>
-						<table class="table" id="serviciosAgregados">
-							<thead>
-								<tr>
-									<th>Código</th>
-									<th>Descripción</th>
-									<th>Cantidad</th>
-									<th>Precio Unit.</th>
-									<th>Subtotal</th>
-									<th>Acción</th>
-								</tr>
-							</thead>
-							<tbody></tbody>
-							<tfoot>
-								<tr>
-									<td colspan="4"><strong>Total:</strong></td>
-									<td><strong id="totalOrden">$0.00</strong></td>
-									<td></td>
-								</tr>
-							</tfoot>
-						</table>
-						
-						<div style="text-align: center; margin-top: 20px;">
-							<button type="submit" class="btn btn-success">Crear Orden</button>
-							<button type="button" class="modal-close btn">Cancelar</button>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
+  <main class="page">
+    <div class="container">
+      <!-- KPIs -->
+      <section class="section">
+        <div class="kpi-grid">
+          <article class="kpi-card kpi-blue">
+            <div class="kpi-icon">🧰</div>
+            <div>
+              <h3 id="kpiAsignadas" class="kpi-value">0</h3>
+              <p class="kpi-label">Asignadas hoy</p>
+            </div>
+          </article>
+          <article class="kpi-card kpi-amber">
+            <div class="kpi-icon">⚙️</div>
+            <div>
+              <h3 id="kpiProceso" class="kpi-value">0</h3>
+              <p class="kpi-label">En proceso</p>
+            </div>
+          </article>
+          <article class="kpi-card kpi-green">
+            <div class="kpi-icon">✅</div>
+            <div>
+              <h3 id="kpiCompletadas" class="kpi-value">0</h3>
+              <p class="kpi-label">Completadas</p>
+            </div>
+          </article>
+        </div>
+      </section>
 
-		<!-- Lista de órdenes -->
-		<div id="ordenesContainer" style="display: none;">
-			<div class="card">
-				<h3>Mis Órdenes de Trabajo</h3>
-				<table class="table" id="tablaOrdenes">
-					<thead>
-						<tr>
-							<th>Número</th>
-							<th>Fecha</th>
-							<th>Vehículo</th>
-							<th>Cliente</th>
-							<th>Estado</th>
-							<th>Acciones</th>
-						</tr>
-					</thead>
-					<tbody></tbody>
-				</table>
-			</div>
-		</div>
-	</div>
+      <!-- Acciones rápidas -->
+      <section class="section">
+        <div class="quick">
+          <div class="quick-left">
+            <button id="nuevaOrdenBtn" class="btn btn-success">
+              <span class="btn-ico">➕</span> Nueva Orden
+            </button>
+            <div class="plate-search">
+              <input id="placaQuick" type="text" placeholder="Buscar por placa…" />
+              <button id="buscarQuickBtn" class="btn btn-outline">Buscar</button>
+            </div>
+          </div>
+          <div class="quick-right">
+            <div class="filters" role="tablist" aria-label="Estados">
+              <button class="pill active" data-estado="todas">Todas</button>
+              <button class="pill" data-estado="pendiente">Pendiente</button>
+              <button class="pill" data-estado="en proceso">En proceso</button>
+              <button class="pill" data-estado="completado">Completada</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mis órdenes -->
+      <section class="section">
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title">Mis Órdenes</h2>
+            <div class="card-tools">
+              <input id="buscarOrdenInput" class="input" placeholder="Buscar (placa / cliente / #orden)" />
+            </div>
+          </div>
+
+          <div id="ordenesContainer" class="card-body">
+            <div class="table-wrap">
+              <table class="table" id="tablaOrdenes" aria-describedby="tabla de órdenes">
+                <thead>
+                  <tr>
+                    <th>N°</th>
+                    <th>Fecha</th>
+                    <th>Vehículo</th>
+                    <th>Cliente</th>
+                    <th>Estado</th>
+                    <th style="width:120px">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody><!-- se llena por JS --></tbody>
+              </table>
+            </div>
+            <div id="emptyOrders" class="empty" style="display:none;">
+              <div class="empty-ico">📭</div>
+              <p>Sin órdenes para mostrar.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- MODAL Nueva Orden -->
+  <div id="nuevaOrdenModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Crear nueva orden</h3>
+        <button class="modal-close" aria-label="Cerrar">×</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="nuevaOrdenForm">
+          <!-- Buscar vehículo -->
+          <div class="form-row">
+            <div class="form-group grow">
+              <label for="placaVehiculo">Placa del vehículo</label>
+              <div class="input-wrap">
+                <span class="input-ico">🚘</span>
+                <input id="placaVehiculo" class="form-control" placeholder="ABC-1234" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <button type="button" id="buscarVehiculoBtn" class="btn btn-outline">Buscar</button>
+            </div>
+          </div>
+
+          <div id="vehiculoInfo" class="veh-card" style="display:none;">
+            <div class="veh-left">
+              <div class="veh-line"><strong>Marca:</strong> <span id="vehMarca"></span></div>
+              <div class="veh-line"><strong>Modelo:</strong> <span id="vehModelo"></span></div>
+              <div class="veh-line"><strong>Placa:</strong> <span id="vehPlaca"></span></div>
+            </div>
+            <div class="veh-right">
+              <div class="veh-line"><strong>Cliente:</strong> <span id="vehCliente"></span></div>
+              <div class="veh-line"><strong>Teléfono:</strong> <span id="vehTelefono"></span></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="observaciones">Observaciones</label>
+            <textarea id="observaciones" rows="3" class="form-control" placeholder="Notas iniciales, síntomas, etc."></textarea>
+          </div>
+
+          <!-- Servicios -->
+          <h4 class="subtle-title">Servicios y repuestos</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tipoServicio">Tipo</label>
+              <select id="tipoServicio" class="form-control">
+                <option value="">Todos</option>
+                <option value="servicio">Mano de obra</option>
+                <option value="repuesto">Repuestos</option>
+                <option value="lubricante">Lubricantes</option>
+              </select>
+            </div>
+            <div class="form-group grow">
+              <label for="buscarServicio">Buscar</label>
+              <div class="input-wrap">
+                <span class="input-ico">🔎</span>
+                <input id="buscarServicio" class="form-control" placeholder="Código o descripción" />
+              </div>
+              <div id="serviciosEncontrados" class="results" style="display:none;"></div>
+            </div>
+          </div>
+
+          <div class="table-wrap soft">
+            <table class="table" id="serviciosAgregados">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Descripción</th>
+                  <th style="width:110px">Cantidad</th>
+                  <th>Precio</th>
+                  <th>Subtotal</th>
+                  <th style="width:64px">—</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="4" class="t-right"><strong>Total</strong></td>
+                  <td><strong id="totalOrden">$0.00</strong></td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="modal-actions">
+            <button type="submit" class="btn btn-success"><span class="btn-ico">💾</span> Crear Orden</button>
+            <button type="button" class="btn modal-close">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    :root{
+      /* caen a tu paleta global si ya existen */
+      --text:#0f172a;
+      --muted:#64748b;
+      --ring: 0 1px 2px rgba(0,0,0,.04), 0 10px 20px rgba(2,6,23,.08);
+      --radius:16px;
+      --container:1200px;
+    }
+
+    /* -------- layout -------- */
+    .container{max-width:var(--container); margin-inline:auto; padding:0 20px}
+    .page{ padding:20px 0 48px; background:#f7f9fc }
+
+    /* navbar */
+    .navbar{position:sticky; top:0; z-index:20; background:rgba(255,255,255,.92); border-bottom:1px solid #eef2f7; backdrop-filter:saturate(180%) blur(10px)}
+    .navbar .container{display:flex; align-items:center; justify-content:space-between; height:64px}
+    .brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text); font-weight:800}
+    .logo-circle{display:grid; place-items:center; width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--primary-orange), #ffb07a); box-shadow:var(--ring)}
+    .brand-text{letter-spacing:.2px}
+    .user-menu{display:flex; align-items:center; gap:12px}
+    .user-chip{font-weight:700}
+
+    /* buttons / inputs */
+    .btn{border:0; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer; background:#fff}
+    .btn-outline{border:1px solid #e5e7eb}
+    .btn-outline:hover{box-shadow:var(--ring)}
+    .btn-orange{background:linear-gradient(135deg,var(--primary-orange), #ff974d); color:#fff}
+    .btn-success{background:linear-gradient(135deg,#16a34a, #22c55e); color:#fff}
+    .btn .btn-ico{margin-right:6px}
+    .input{border:1px solid #e5e7eb; border-radius:10px; padding:10px 12px; outline:none}
+    .input:focus{border-color:var(--primary-blue); box-shadow:0 0 0 4px rgba(30,77,139,.12)}
+    .input-wrap{display:flex; align-items:center; border:1.5px solid #e7eaf0; border-radius:12px; background:#fff}
+    .input-wrap:focus-within{border-color:var(--primary-blue); box-shadow:0 0 0 4px rgba(30,77,139,.12)}
+    .input-ico{padding:0 10px; font-size:16px; opacity:.85}
+    .form-control{width:100%; padding:12px 14px; border:0; outline:none; background:transparent; border-radius:12px}
+    .form-group{display:flex; flex-direction:column; gap:6px}
+    .form-row{display:flex; gap:14px; align-items:flex-end}
+    .form-row .grow{flex:1}
+
+    /* cards */
+    .card{background:#fff; border-radius:var(--radius); box-shadow:var(--ring); overflow:hidden}
+    .card-head{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid #eef2f7}
+    .card-title{margin:0; font-size:18px}
+    .card-tools{display:flex; gap:10px}
+    .card-body{padding:14px 16px}
+
+    /* KPIs */
+    .kpi-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px}
+    .kpi-card{display:flex; align-items:center; gap:14px; background:#fff; border-radius:16px; padding:18px; box-shadow:var(--ring); position:relative}
+    .kpi-card::after{content:""; position:absolute; inset:auto 0 0 0; height:4px}
+    .kpi-blue::after{background:linear-gradient(90deg,var(--primary-blue), #3b82f6)}
+    .kpi-amber::after{background:linear-gradient(90deg,#d97706, #f59e0b)}
+    .kpi-green::after{background:linear-gradient(90deg,#16a34a, #22c55e)}
+    .kpi-icon{font-size:26px}
+    .kpi-value{margin:0; font-size:26px}
+    .kpi-label{margin:2px 0 0; color:var(--muted); font-size:13px}
+
+    /* quick actions */
+    .quick{display:flex; align-items:center; justify-content:space-between; gap:18px}
+    .quick-left{display:flex; gap:12px; align-items:center}
+    .plate-search{display:flex; gap:8px; align-items:center}
+    .plate-search input{height:40px; border-radius:10px; border:1px solid #e5e7eb; padding:0 12px}
+
+    .filters{display:flex; gap:8px; flex-wrap:wrap}
+    .pill{border:1px solid #e5e7eb; background:#fff; color:#334155; padding:8px 12px; border-radius:999px; cursor:pointer; font-weight:700}
+    .pill.active{background:linear-gradient(135deg,var(--primary-blue), #567bd6); color:#fff; border-color:transparent}
+
+    /* table */
+    .table-wrap{overflow:auto}
+    .table{width:100%; border-collapse:separate; border-spacing:0}
+    thead th{font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); text-align:left; padding:10px; background:#fbfcfe; position:sticky; top:0}
+    tbody td{padding:12px 10px; border-top:1px solid #eef2f7}
+    tr:hover td{background:#fafafa}
+    .t-right{text-align:right}
+
+    .badge{display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:800}
+    .badge-warning{background:#fff7ed; color:#c2410c}
+    .badge-primary{background:#eff6ff; color:#1e40af}
+    .badge-success{background:#ecfdf5; color:#065f46}
+
+    .empty{display:grid; place-items:center; padding:30px; color:#94a3b8}
+    .empty-ico{font-size:28px; margin-bottom:6px}
+
+    /* modal */
+    .modal{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(15,23,42,.45); z-index:50}
+    .modal-content{background:#fff; width:min(900px, 95vw); max-height:92vh; overflow:auto; border-radius:16px; box-shadow:0 24px 60px rgba(2,6,23,.24)}
+    .modal-header{display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid #eef2f7}
+    .modal-close{border:0; background:#fff; width:34px; height:34px; border-radius:10px; font-size:20px; cursor:pointer}
+    .modal-close:hover{box-shadow:var(--ring)}
+    .modal-body{padding:16px 18px}
+    .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:12px}
+
+    .subtle-title{margin:10px 0 8px; color:#0f172a}
+
+    .veh-card{display:flex; justify-content:space-between; gap:12px; background:#fbfcfe; border:1px solid #eef2f7; border-radius:12px; padding:12px 14px; margin-bottom:8px}
+    .veh-line{color:#0f172a}
+
+    .results{border:1px solid #e7eaf0; border-radius:12px; margin-top:6px; overflow:hidden; max-height:240px; overflow-y:auto; box-shadow:0 8px 20px rgba(2,6,23,.06)}
+    .result-item{display:flex; justify-content:space-between; gap:8px; padding:10px 12px; background:#fff; cursor:pointer}
+    .result-item:hover{background:#f7f9fc}
+    .result-meta{color:#64748b; font-size:12px}
+
+    .qty-wrap{display:inline-flex; align-items:center; gap:6px}
+    .qty-btn{width:26px; height:26px; border-radius:8px; border:1px solid #e5e7eb; background:#fff; cursor:pointer}
+    .qty{min-width:26px; text-align:center}
+
+    /* toast */
+    .toast{position:fixed; left:20px; right:20px; bottom:24px; background:#fff; border:1px solid #ffd3cf; border-left:4px solid #ef4444; color:#b42318; padding:12px 14px; border-radius:12px; box-shadow:0 12px 26px rgba(0,0,0,.08); display:none; font-weight:700}
+    .toast.show{display:block; animation:fadeIn .18s ease}
+    @keyframes fadeIn{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+
+    @media (max-width: 1024px){
+      .kpi-grid{grid-template-columns:1fr 1fr}
+      .quick{flex-direction:column; align-items:stretch}
+      .quick-left{justify-content:space-between}
+    }
+    @media (max-width: 640px){
+      .kpi-grid{grid-template-columns:1fr}
+      .brand-text{display:none}
+      .form-row{flex-direction:column}
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ---------- AUTH ----------
+      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
+      if (!token || !userStr) return hardLogout();
+
+      const user = JSON.parse(userStr);
+      if (user.rol !== 'tecnico') return hardLogout();
+      document.getElementById('userName').textContent = `${user.nombre} ${user.apellido ?? ''}`.trim();
+
+      // logout robusto
+      function hardLogout(){
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        location.replace('/');
+      }
+      window.logout = hardLogout;
+      document.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('#logoutBtn');
+        if (!btn) return;
+        ev.preventDefault();
+        hardLogout();
+      });
+
+      // ---------- UI refs ----------
+      const toast = document.getElementById('toast');
+
+      const nuevaOrdenBtn = document.getElementById('nuevaOrdenBtn');
+      const nuevaOrdenModal = document.getElementById('nuevaOrdenModal');
+      const modalCloseBtns = nuevaOrdenModal.querySelectorAll('.modal-close');
+
+      const placaQuick = document.getElementById('placaQuick');
+      const buscarQuickBtn = document.getElementById('buscarQuickBtn');
+
+      const buscarOrdenInput = document.getElementById('buscarOrdenInput');
+      const ordenesTbody = document.querySelector('#tablaOrdenes tbody');
+      const emptyOrders = document.getElementById('emptyOrders');
+
+      // modal refs
+      const placaVehiculo = document.getElementById('placaVehiculo');
+      const buscarVehiculoBtn = document.getElementById('buscarVehiculoBtn');
+      const vehBox = document.getElementById('vehiculoInfo');
+      const vehMarca = document.getElementById('vehMarca');
+      const vehModelo = document.getElementById('vehModelo');
+      const vehPlaca = document.getElementById('vehPlaca');
+      const vehCliente = document.getElementById('vehCliente');
+      const vehTelefono = document.getElementById('vehTelefono');
+
+      const tipoServicio = document.getElementById('tipoServicio');
+      const buscarServicio = document.getElementById('buscarServicio');
+      const serviciosEncontrados = document.getElementById('serviciosEncontrados');
+      const serviciosTbody = document.querySelector('#serviciosAgregados tbody');
+      const totalOrdenEl = document.getElementById('totalOrden');
+
+      // ---------- state ----------
+      let vehiculoSeleccionado = null;
+      let serviciosSeleccionados = [];
+      let todasLasOrdenes = [];
+      let filtroEstado = 'todas';
+
+      // ---------- helpers ----------
+      const money = new Intl.NumberFormat('es-EC',{ style:'currency', currency:'USD' });
+      const fmt = new Intl.NumberFormat('es-EC');
+
+      const showToast = (msg) => {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+      };
+
+      const badge = (estado='') => {
+        switch(estado.toLowerCase()){
+          case 'pendiente': return 'badge badge-warning';
+          case 'en proceso': return 'badge badge-primary';
+          case 'completado':
+          case 'entregado': return 'badge badge-success';
+          default: return 'badge badge-primary';
+        }
+      };
+
+      // ---------- nueva orden (modal) ----------
+      nuevaOrdenBtn.addEventListener('click', () => {
+        nuevaOrdenModal.style.display = 'flex';
+        placaVehiculo.focus();
+      });
+      modalCloseBtns.forEach(b => b.addEventListener('click', () => {
+        nuevaOrdenModal.style.display = 'none';
+      }));
+
+      document.getElementById('nuevaOrdenForm').addEventListener('submit', crearOrden);
+
+      buscarVehiculoBtn.addEventListener('click', buscarVehiculo);
+      buscarServicio.addEventListener('input', debounce(buscarServicios, 280));
+      tipoServicio.addEventListener('change', buscarServicios);
+
+      // botones filtros
+      document.querySelectorAll('.pill').forEach(p => {
+        p.addEventListener('click', () => {
+          document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
+          p.classList.add('active');
+          filtroEstado = p.dataset.estado;
+          pintarOrdenes();
+        });
+      });
+
+      // búsqueda rápida por placa arriba
+      buscarQuickBtn.addEventListener('click', async () => {
+        const placa = (placaQuick.value || '').trim();
+        if(!placa) return;
+        await buscarVehiculo(placa, true); // muestra en modal
+        nuevaOrdenModal.style.display = 'flex';
+      });
+
+      // búsqueda en tabla
+      buscarOrdenInput.addEventListener('input', pintarOrdenes);
+
+      // ---------- carga inicial ----------
+      cargarMisOrdenes();
+
+      // ---------- funciones de datos ----------
+      async function cargarMisOrdenes(){
+        try{
+          const r = await fetch('http://localhost:3001/api/ordenes/mis-ordenes', {
+            headers:{ 'Authorization': `Bearer ${token}` }
+          });
+          const data = await r.json();
+          if(!data?.success) return;
+          todasLasOrdenes = data.data || [];
+          kpis(todasLasOrdenes);
+          pintarOrdenes();
+        }catch(e){
+          console.error(e);
+          showToast('No se pudieron cargar tus órdenes');
+        }
+      }
+
+      function kpis(list){
+        const hoy = new Date().toDateString();
+        const asignadasHoy = list.filter(o => new Date(o.fecha_ingreso).toDateString() === hoy).length;
+        const enProc = list.filter(o => (o.estado || '').toLowerCase() === 'en proceso').length;
+        const comp = list.filter(o => ['completado','entregado'].includes((o.estado||'').toLowerCase())).length;
+
+        document.getElementById('kpiAsignadas').textContent = fmt.format(asignadasHoy);
+        document.getElementById('kpiProceso').textContent   = fmt.format(enProc);
+        document.getElementById('kpiCompletadas').textContent = fmt.format(comp);
+      }
+
+      function pintarOrdenes(){
+        const q = (buscarOrdenInput.value || '').toLowerCase().trim();
+        let list = [...todasLasOrdenes];
+
+        if (filtroEstado !== 'todas'){
+          list = list.filter(o => (o.estado||'').toLowerCase() === filtroEstado);
+        }
+        if (q){
+          list = list.filter(o =>
+            String(o.numero_orden).toLowerCase().includes(q) ||
+            (o.placa||'').toLowerCase().includes(q) ||
+            (o.cliente_nombre||'').toLowerCase().includes(q)
+          );
+        }
+
+        ordenesTbody.innerHTML = list.map(o => `
+          <tr>
+            <td>${o.numero_orden}</td>
+            <td>${new Date(o.fecha_ingreso).toLocaleString()}</td>
+            <td>${o.marca} ${o.modelo} (${o.placa})</td>
+            <td>${o.cliente_nombre}</td>
+            <td><span class="${badge(o.estado)}">${o.estado}</span></td>
+            <td>
+              <button class="btn btn-outline btn-sm" onclick="verDetalleOrden(${o.id})">Ver</button>
+            </td>
+          </tr>
+        `).join('');
+
+        emptyOrders.style.display = list.length ? 'none' : 'grid';
+      }
+
+      // ---------- buscar vehículo ----------
+      async function buscarVehiculo(forcedPlaca=null, desdeQuick=false){
+        const placa = (forcedPlaca ?? placaVehiculo.value).trim();
+        if(!placa) return;
+
+        try{
+          const r = await fetch(`http://localhost:3001/api/vehiculos/buscar/${encodeURIComponent(placa)}`, {
+            headers:{ 'Authorization': `Bearer ${token}` }
+          });
+          const data = await r.json();
+          if(data?.success && (data.data?.length || 0) > 0){
+            vehiculoSeleccionado = data.data[0];
+            vehMarca.textContent   = vehiculoSeleccionado.marca;
+            vehModelo.textContent  = vehiculoSeleccionado.modelo;
+            vehPlaca.textContent   = vehiculoSeleccionado.placa;
+            vehCliente.textContent = vehiculoSeleccionado.cliente_nombre;
+            vehTelefono.textContent= vehiculoSeleccionado.telefono || 'N/D';
+            vehBox.style.display = 'flex';
+            if(desdeQuick){ placaVehiculo.value = placa; }
+          }else{
+            vehBox.style.display = 'none';
+            vehiculoSeleccionado = null;
+            showToast('Vehículo no encontrado');
+          }
+        }catch(e){
+          console.error(e);
+          showToast('Error al buscar vehículo');
+        }
+      }
+
+      // ---------- buscar servicios ----------
+      async function buscarServicios(){
+        const termino = (buscarServicio.value || '').trim();
+        const tipo = (tipoServicio.value || '').trim();
+
+        let url = 'http://localhost:3001/api/servicios';
+        if (tipo && termino) url = `http://localhost:3001/api/servicios/buscar/${encodeURIComponent(termino)}`;
+        else if (tipo)      url = `http://localhost:3001/api/servicios/tipo/${encodeURIComponent(tipo)}`;
+        else if (termino)   url = `http://localhost:3001/api/servicios/buscar/${encodeURIComponent(termino)}`;
+
+        try{
+          const r = await fetch(url, { headers:{ 'Authorization': `Bearer ${token}` }});
+          const data = await r.json();
+          if(!data?.success) return (serviciosEncontrados.style.display='none');
+
+          const arr = data.data || [];
+          if(!arr.length){ serviciosEncontrados.style.display='none'; return; }
+
+          serviciosEncontrados.innerHTML = arr.map(s => `
+            <div class="result-item" onclick='agregarServicio(${JSON.stringify(s).replace(/"/g,"&quot;")})'>
+              <div>
+                <strong>${s.codigo}</strong> - ${s.descripcion}
+                <div class="result-meta">Tipo: ${s.tipo}</div>
+              </div>
+              <div>${money.format(s.precio_unitario||0)}</div>
+            </div>
+          `).join('');
+          serviciosEncontrados.style.display = 'block';
+        }catch(e){
+          console.error(e);
+        }
+      }
+
+      // expuesto para inline
+      window.agregarServicio = function(s){
+        if (serviciosSeleccionados.find(x => x.id === s.id)) { showToast('Ya está agregado'); return; }
+        const item = { ...s, cantidad: 1, subtotal: (s.precio_unitario||0) };
+        serviciosSeleccionados.push(item);
+        serviciosEncontrados.style.display = 'none';
+        buscarServicio.value = '';
+        pintarServicios();
+      };
+
+      window.removerServicio = function(i){
+        serviciosSeleccionados.splice(i,1);
+        pintarServicios();
+      };
+
+      window.incQty = function(i){
+        serviciosSeleccionados[i].cantidad += 1;
+        serviciosSeleccionados[i].subtotal = (serviciosSeleccionados[i].precio_unitario||0) * serviciosSeleccionados[i].cantidad;
+        pintarServicios();
+      };
+
+      window.decQty = function(i){
+        if (serviciosSeleccionados[i].cantidad <= 1) return;
+        serviciosSeleccionados[i].cantidad -= 1;
+        serviciosSeleccionados[i].subtotal = (serviciosSeleccionados[i].precio_unitario||0) * serviciosSeleccionados[i].cantidad;
+        pintarServicios();
+      };
+
+      function pintarServicios(){
+        serviciosTbody.innerHTML = serviciosSeleccionados.map((s,i) => `
+          <tr>
+            <td>${s.codigo}</td>
+            <td>${s.descripcion}</td>
+            <td>
+              <div class="qty-wrap">
+                <button class="qty-btn" onclick="decQty(${i})">−</button>
+                <span class="qty">${s.cantidad}</span>
+                <button class="qty-btn" onclick="incQty(${i})">+</button>
+              </div>
+            </td>
+            <td>${money.format(s.precio_unitario||0)}</td>
+            <td>${money.format(s.subtotal||0)}</td>
+            <td><button class="btn btn-outline" onclick="removerServicio(${i})">✕</button></td>
+          </tr>
+        `).join('');
+
+        const total = serviciosSeleccionados.reduce((a,b) => a + (b.subtotal||0), 0);
+        totalOrdenEl.textContent = money.format(total);
+      }
+
+      // ---------- crear orden ----------
+      async function crearOrden(ev){
+        ev.preventDefault();
+        if(!vehiculoSeleccionado) return showToast('Busca y selecciona un vehículo');
+        if(!serviciosSeleccionados.length) return showToast('Agrega al menos un servicio');
+
+        const ordenData = {
+          id_vehiculo: vehiculoSeleccionado.id,
+          observaciones: (document.getElementById('observaciones').value || '').trim(),
+          servicios: serviciosSeleccionados.map(s => ({
+            id_servicio: s.id,
+            cantidad: s.cantidad,
+            precio_unitario: s.precio_unitario
+          }))
+        };
+
+        try{
+          const r = await fetch('http://localhost:3001/api/ordenes', {
+            method:'POST',
+            headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(ordenData)
+          });
+          const data = await r.json();
+          if(!data?.success){ showToast(data?.message || 'No se pudo crear la orden'); return; }
+
+          nuevaOrdenModal.style.display = 'none';
+          // reset UI
+          document.getElementById('nuevaOrdenForm').reset();
+          vehiculoSeleccionado = null;
+          serviciosSeleccionados = [];
+          vehBox.style.display = 'none';
+          pintarServicios();
+          showToast(`Orden #${data.numero_orden} creada correctamente`);
+          cargarMisOrdenes();
+        }catch(e){
+          console.error(e);
+          showToast('Error al crear la orden');
+        }
+      }
+
+      // ---------- ver detalle ----------
+      window.verDetalleOrden = async function(ordenId){
+        try{
+          const r = await fetch(`http://localhost:3001/api/ordenes/${ordenId}/detalle`, {
+            headers:{ 'Authorization': `Bearer ${token}` }
+          });
+          const data = await r.json();
+          if(!data?.success) return;
+
+          const detalle = (data.data || []).map(d => (
+            `${d.codigo} - ${d.descripcion} (x${d.cantidad})  ${money.format(d.precio_unitario)}  →  ${money.format(d.subtotal)}`
+          )).join('\n');
+
+          // toast largo: usa alert estilizada simple
+          showToast('Detalle obtenido. Revisa la consola.');
+          console.log('Detalle de orden #'+ordenId+'\n\n'+detalle);
+        }catch(e){
+          console.error(e);
+        }
+      };
+
+      // ---------- utils ----------
+      function debounce(fn, t=300){
+        let id; return (...args) => { clearTimeout(id); id = setTimeout(() => fn(...args), t); };
+      }
+    });
+  </script>
 </Layout>
-
-<style>
-	.modal {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: rgba(0,0,0,0.5);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		z-index: 1000;
-	}
-	
-	.modal-content {
-		background: white;
-		border-radius: 8px;
-		max-width: 800px;
-		width: 90%;
-		max-height: 90vh;
-		overflow-y: auto;
-	}
-	
-	.modal-header {
-		padding: 20px;
-		border-bottom: 1px solid #eee;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-	
-	.modal-close {
-		background: none;
-		border: none;
-		font-size: 24px;
-		cursor: pointer;
-		padding: 0;
-		width: 30px;
-		height: 30px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	
-	.modal-body {
-		padding: 20px;
-	}
-	
-	.servicios-list {
-		border: 1px solid #ddd;
-		border-radius: 4px;
-		max-height: 200px;
-		overflow-y: auto;
-		margin-top: 5px;
-		display: none;
-	}
-	
-	.servicio-item {
-		padding: 10px;
-		border-bottom: 1px solid #eee;
-		cursor: pointer;
-	}
-	
-	.servicio-item:hover {
-		background: #f5f5f5;
-	}
-	
-	.servicio-item:last-child {
-		border-bottom: none;
-	}
-	
-	.badge {
-		display: inline-block;
-		padding: 4px 8px;
-		border-radius: 4px;
-		font-size: 12px;
-		font-weight: bold;
-	}
-	
-	.badge-success {
-		background: #28a745;
-		color: white;
-	}
-	
-	.badge-warning {
-		background: #ffc107;
-		color: #212529;
-	}
-</style>
-
-<script>
-	document.addEventListener('DOMContentLoaded', function() {
-		// Verificar autenticación
-		const token = localStorage.getItem('token');
-		const user = localStorage.getItem('user');
-		
-		if (!token || !user) {
-			window.location.href = '/';
-			return;
-		}
-		
-		const userData = JSON.parse(user);
-		if (userData.rol !== 'tecnico') {
-			window.location.href = '/';
-			return;
-		}
-		
-		// Mostrar nombre del usuario
-		document.getElementById('userName').textContent = `${userData.nombre} ${userData.apellido}`;
-		
-		// Event listeners
-		document.getElementById('logoutBtn').addEventListener('click', logout);
-		document.getElementById('nuevaOrdenBtn').addEventListener('click', () => {
-			document.getElementById('nuevaOrdenModal').style.display = 'flex';
-		});
-		document.getElementById('misOrdenesBtn').addEventListener('click', cargarMisOrdenes);
-		
-		// Modal close buttons
-		document.querySelectorAll('.modal-close').forEach(btn => {
-			btn.addEventListener('click', () => {
-				document.getElementById('nuevaOrdenModal').style.display = 'none';
-			});
-		});
-		
-		// Buscar vehículo
-		document.getElementById('buscarVehiculoBtn').addEventListener('click', buscarVehiculo);
-		
-		// Buscar servicios
-		let searchTimeout;
-		document.getElementById('buscarServicio').addEventListener('input', function() {
-			clearTimeout(searchTimeout);
-			searchTimeout = setTimeout(buscarServicios, 300);
-		});
-		
-		// Filtro por tipo de servicio
-		document.getElementById('tipoServicio').addEventListener('change', buscarServicios);
-		
-		// Form submit
-		document.getElementById('nuevaOrdenForm').addEventListener('submit', crearOrden);
-		
-		let vehiculoSeleccionado = null;
-		let serviciosSeleccionados = [];
-		
-		function logout() {
-			localStorage.removeItem('token');
-			localStorage.removeItem('user');
-			window.location.href = '/';
-		}
-		
-		async function buscarVehiculo() {
-			const placa = document.getElementById('placaVehiculo').value.trim();
-			if (!placa) return;
-			
-			try {
-				const response = await fetch(`http://localhost:3001/api/vehiculos/buscar/${placa}`, {
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				});
-				
-				const result = await response.json();
-				
-				if (result.success && result.data.length > 0) {
-					vehiculoSeleccionado = result.data[0];
-					mostrarVehiculo(vehiculoSeleccionado);
-				} else {
-					alert('Vehículo no encontrado');
-					document.getElementById('vehiculoInfo').style.display = 'none';
-				}
-			} catch (error) {
-				console.error('Error buscando vehículo:', error);
-				alert('Error al buscar vehículo');
-			}
-		}
-		
-		function mostrarVehiculo(vehiculo) {
-			const detalles = `
-				<p><strong>Marca:</strong> ${vehiculo.marca}</p>
-				<p><strong>Modelo:</strong> ${vehiculo.modelo}</p>
-				<p><strong>Placa:</strong> ${vehiculo.placa}</p>
-				<p><strong>Cliente:</strong> ${vehiculo.cliente_nombre}</p>
-				<p><strong>Teléfono:</strong> ${vehiculo.telefono || 'N/A'}</p>
-			`;
-			document.getElementById('vehiculoDetalles').innerHTML = detalles;
-			document.getElementById('vehiculoInfo').style.display = 'block';
-		}
-		
-		async function buscarServicios() {
-			const termino = document.getElementById('buscarServicio').value.trim();
-			const tipo = document.getElementById('tipoServicio').value;
-			
-			if (!termino && !tipo) {
-				document.getElementById('serviciosEncontrados').style.display = 'none';
-				return;
-			}
-			
-			try {
-				let url = 'http://localhost:3001/api/servicios';
-				if (tipo && termino) {
-					url = `http://localhost:3001/api/servicios/buscar/${termino}`;
-				} else if (tipo) {
-					url = `http://localhost:3001/api/servicios/tipo/${tipo}`;
-				} else if (termino) {
-					url = `http://localhost:3001/api/servicios/buscar/${termino}`;
-				}
-				
-				const response = await fetch(url, {
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				});
-				
-				const result = await response.json();
-				
-				if (result.success) {
-					mostrarServicios(result.data);
-				}
-			} catch (error) {
-				console.error('Error buscando servicios:', error);
-			}
-		}
-		
-		function mostrarServicios(servicios) {
-			const container = document.getElementById('serviciosEncontrados');
-			
-			if (servicios.length === 0) {
-				container.style.display = 'none';
-				return;
-			}
-			
-			container.innerHTML = servicios.map(servicio => `
-				<div class="servicio-item" onclick="agregarServicio(${JSON.stringify(servicio).replace(/"/g, '&quot;')})">
-					<strong>${servicio.codigo}</strong> - ${servicio.descripcion}<br>
-					<small>Precio: $${servicio.precio_unitario} | Tipo: ${servicio.tipo}</small>
-				</div>
-			`).join('');
-			
-			container.style.display = 'block';
-		}
-		
-		window.agregarServicio = function(servicio) {
-			// Verificar si ya está agregado
-			if (serviciosSeleccionados.find(s => s.id === servicio.id)) {
-				alert('Este servicio ya está agregado');
-				return;
-			}
-			
-			const cantidad = prompt('Cantidad:', '1');
-			if (!cantidad || isNaN(cantidad) || cantidad <= 0) return;
-			
-			serviciosSeleccionados.push({
-				...servicio,
-				cantidad: parseInt(cantidad),
-				subtotal: servicio.precio_unitario * parseInt(cantidad)
-			});
-			
-			actualizarTablaServicios();
-			document.getElementById('serviciosEncontrados').style.display = 'none';
-			document.getElementById('buscarServicio').value = '';
-		};
-		
-		function actualizarTablaServicios() {
-			const tbody = document.querySelector('#serviciosAgregados tbody');
-			
-			tbody.innerHTML = serviciosSeleccionados.map((servicio, index) => `
-				<tr>
-					<td>${servicio.codigo}</td>
-					<td>${servicio.descripcion}</td>
-					<td>${servicio.cantidad}</td>
-					<td>$${servicio.precio_unitario}</td>
-					<td>$${servicio.subtotal.toFixed(2)}</td>
-					<td>
-						<button type="button" class="btn btn-danger" onclick="removerServicio(${index})">×</button>
-					</td>
-				</tr>
-			`).join('');
-			
-			const total = serviciosSeleccionados.reduce((sum, s) => sum + s.subtotal, 0);
-			document.getElementById('totalOrden').textContent = `$${total.toFixed(2)}`;
-		}
-		
-		window.removerServicio = function(index) {
-			serviciosSeleccionados.splice(index, 1);
-			actualizarTablaServicios();
-		};
-		
-		async function crearOrden(e) {
-			e.preventDefault();
-			
-			if (!vehiculoSeleccionado) {
-				alert('Debe buscar y seleccionar un vehículo');
-				return;
-			}
-			
-			if (serviciosSeleccionados.length === 0) {
-				alert('Debe agregar al menos un servicio');
-				return;
-			}
-			
-			try {
-				const ordenData = {
-					id_vehiculo: vehiculoSeleccionado.id,
-					observaciones: document.getElementById('observaciones').value,
-					servicios: serviciosSeleccionados.map(s => ({
-						id_servicio: s.id,
-						cantidad: s.cantidad,
-						precio_unitario: s.precio_unitario
-					}))
-				};
-				
-				const response = await fetch('http://localhost:3001/api/ordenes', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${token}`
-					},
-					body: JSON.stringify(ordenData)
-				});
-				
-				const result = await response.json();
-				
-				if (result.success) {
-					alert(`Orden creada exitosamente: ${result.numero_orden}`);
-					document.getElementById('nuevaOrdenModal').style.display = 'none';
-					
-					// Limpiar formulario
-					document.getElementById('nuevaOrdenForm').reset();
-					vehiculoSeleccionado = null;
-					serviciosSeleccionados = [];
-					document.getElementById('vehiculoInfo').style.display = 'none';
-					actualizarTablaServicios();
-				} else {
-					alert('Error al crear orden: ' + result.message);
-				}
-			} catch (error) {
-				console.error('Error creando orden:', error);
-				alert('Error al crear orden');
-			}
-		}
-		
-		async function cargarMisOrdenes() {
-			try {
-				const response = await fetch('http://localhost:3001/api/ordenes/mis-ordenes', {
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				});
-				
-				const result = await response.json();
-				
-				if (result.success) {
-					mostrarOrdenes(result.data);
-					document.getElementById('ordenesContainer').style.display = 'block';
-				}
-			} catch (error) {
-				console.error('Error cargando órdenes:', error);
-			}
-		}
-		
-		function mostrarOrdenes(ordenes) {
-			const tbody = document.querySelector('#tablaOrdenes tbody');
-			
-			tbody.innerHTML = ordenes.map(orden => `
-				<tr>
-					<td>${orden.numero_orden}</td>
-					<td>${new Date(orden.fecha_ingreso).toLocaleString()}</td>
-					<td>${orden.marca} ${orden.modelo} (${orden.placa})</td>
-					<td>${orden.cliente_nombre}</td>
-					<td>
-						<span class="badge ${orden.estado === 'pendiente' ? 'badge-warning' : 'badge-success'}">
-							${orden.estado}
-						</span>
-					</td>
-					<td>
-						<button class="btn" onclick="verDetalleOrden(${orden.id})">Ver Detalle</button>
-					</td>
-				</tr>
-			`).join('');
-		}
-		
-		window.verDetalleOrden = async function(ordenId) {
-			try {
-				const response = await fetch(`http://localhost:3001/api/ordenes/${ordenId}/detalle`, {
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				});
-				
-				const result = await response.json();
-				
-				if (result.success) {
-					const detalle = result.data.map(item => `
-						${item.codigo} - ${item.descripcion}
-						Cantidad: ${item.cantidad} | Precio: $${item.precio_unitario} | Subtotal: $${item.subtotal}
-					`).join('\n');
-					
-					alert('Detalle de la orden:\n\n' + detalle);
-				}
-			} catch (error) {
-				console.error('Error cargando detalle:', error);
-			}
-		};
-	});
-</script>
