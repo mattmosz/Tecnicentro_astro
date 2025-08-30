@@ -6,16 +6,14 @@ import db from '../config/database.js';
 
 const router = express.Router();
 
-// Secreto JWT (usa el de .env; en dev hay fallback para no romper)
+
 const SECRET = process.env.JWT_SECRET || 'DEV_SECRET_CAMBIA_ESTO';
 
-// Helper de error uniforme
+
 const fail = (res, http, code, message, extra = {}) =>
   res.status(http).json({ success: false, code, message, ...extra });
 
-/* =========================
- *  POST /api/auth/login
- * ========================= */
+
 router.post('/login', async (req, res) => {
   try {
     const { usuario, clave } = req.body || {};
@@ -27,7 +25,7 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Tu tabla tiene: id, nombre, apellido, usuario, clave, rol, estado
+    
     const [users] = await db.execute(
       'SELECT id, usuario, nombre, apellido, rol, estado, clave FROM usuarios WHERE usuario = ? AND estado = "activo" LIMIT 1',
       [usuario]
@@ -39,10 +37,10 @@ router.post('/login', async (req, res) => {
 
     const user = users[0];
 
-    // Hash guardado en la BD (en tu caso $2y$...)
+    
     let stored = String(user.clave || '');
 
-    // 🔧 FIX crítico: bcryptjs no acepta $2y$. Normalizamos a $2a$.
+    
     if (stored.startsWith('$2y$')) {
       stored = stored.replace(/^\$2y\$/i, '$2a$');
     }
@@ -55,7 +53,7 @@ router.post('/login', async (req, res) => {
       return res.status(500).json({
         success: false,
         message: 'Error interno del servidor',
-        error: e.message, // ← así verás "Invalid salt version" si no se normalizó
+        error: e.message, 
       });
     }
 
@@ -63,7 +61,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
     }
 
-    // Generar token
+   
     let token;
     try {
       token = jwt.sign(
@@ -99,14 +97,12 @@ router.post('/login', async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Error interno del servidor',
-      error: error.message, // ← deja esto visible mientras depuras
+      error: error.message, 
     });
   }
 });
 
-/* =========================
- *  Middleware: Bearer token
- * ========================= */
+
 const verifyToken = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return fail(res, 401, '#T1', 'Token no proporcionado');
@@ -120,16 +116,12 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-/* =========================
- *  GET /api/auth/verify
- * ========================= */
+
 router.get('/verify', verifyToken, (req, res) => {
   res.json({ success: true, user: req.user });
 });
 
-/* =========================
- *  (Opcional) Diagnóstico
- * ========================= */
+
 router.get('/_diag', async (req, res) => {
   try {
     const [ping] = await db.execute('SELECT 1 AS ok');
