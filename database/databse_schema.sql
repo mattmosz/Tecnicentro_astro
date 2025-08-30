@@ -1,0 +1,1273 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.0
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: localhost:3306
+-- Tiempo de generación: 30-08-2025 a las 17:03:46
+-- Versión del servidor: 10.4.27-MariaDB
+-- Versión de PHP: 8.2.0
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `taller`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `clientes`
+--
+
+CREATE TABLE `clientes` (
+  `id` int(11) NOT NULL,
+  `tipo` enum('particular','institucion') NOT NULL,
+  `identificacion` varchar(20) NOT NULL,
+  `nombres` varchar(100) DEFAULT NULL,
+  `apellidos` varchar(100) DEFAULT NULL,
+  `razon_social` varchar(150) DEFAULT NULL,
+  `telefono` varchar(20) DEFAULT NULL,
+  `correo` varchar(100) DEFAULT NULL,
+  `direccion` varchar(200) DEFAULT NULL,
+  `estado` enum('activo','inactivo') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `clientes`
+--
+
+INSERT INTO `clientes` (`id`, `tipo`, `identificacion`, `nombres`, `apellidos`, `razon_social`, `telefono`, `correo`, `direccion`, `estado`) VALUES
+(1, 'particular', '1003540174', 'Matías Marcelo', 'Mosquera Báez', NULL, '0958849189', 'matias.mosquera619@gmail.com', 'Av. Atahualpa 20-41 y Carlos Proaño', 'activo');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `detalle_facturas`
+--
+
+CREATE TABLE `detalle_facturas` (
+  `id` int(11) NOT NULL,
+  `id_factura` int(11) NOT NULL,
+  `descripcion` varchar(255) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 1,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  `subtotal` decimal(10,2) GENERATED ALWAYS AS (`cantidad` * `precio_unitario`) STORED
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `detalle_ordenes`
+--
+
+CREATE TABLE `detalle_ordenes` (
+  `id` int(11) NOT NULL,
+  `id_orden` int(11) NOT NULL,
+  `id_servicio` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 1,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  `subtotal` decimal(10,2) GENERATED ALWAYS AS (`cantidad` * `precio_unitario`) STORED
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `facturas`
+--
+
+CREATE TABLE `facturas` (
+  `id` int(11) NOT NULL,
+  `numero_factura` varchar(25) NOT NULL,
+  `id_orden` int(11) NOT NULL,
+  `tipo_cliente` enum('particular','institucion') NOT NULL,
+  `tipo_factura` enum('general','mano_obra','repuestos','lubricantes') DEFAULT 'general',
+  `fecha_emision` datetime DEFAULT current_timestamp(),
+  `subtotal` decimal(10,2) NOT NULL,
+  `iva` decimal(10,2) NOT NULL,
+  `total` decimal(10,2) NOT NULL,
+  `archivo_xml` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `modelos_vehiculo`
+--
+
+CREATE TABLE `modelos_vehiculo` (
+  `id` int(11) NOT NULL,
+  `nombre_modelo` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `modelos_vehiculo`
+--
+
+INSERT INTO `modelos_vehiculo` (`id`, `nombre_modelo`) VALUES
+(1, 'LUV D-MAX DIESEL 4X4 3.0');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `ordenes_servicio`
+--
+
+CREATE TABLE `ordenes_servicio` (
+  `id` int(11) NOT NULL,
+  `numero_orden` varchar(20) NOT NULL,
+  `id_vehiculo` int(11) NOT NULL,
+  `id_tecnico` int(11) DEFAULT NULL,
+  `fecha_ingreso` datetime DEFAULT current_timestamp(),
+  `observaciones` text DEFAULT NULL,
+  `estado` enum('pendiente','facturada') DEFAULT 'pendiente'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `precios_modelo_vehiculo`
+--
+
+CREATE TABLE `precios_modelo_vehiculo` (
+  `id` int(11) NOT NULL,
+  `id_modelo` int(11) NOT NULL,
+  `id_servicio` int(11) NOT NULL,
+  `tipo_cliente` enum('particular','institucion') DEFAULT 'particular',
+  `precio_especial` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `precios_modelo_vehiculo`
+--
+
+INSERT INTO `precios_modelo_vehiculo` (`id`, `id_modelo`, `id_servicio`, `tipo_cliente`, `precio_especial`) VALUES
+(5, 1, 6, 'particular', '2.17'),
+(6, 1, 7, 'particular', '2.17'),
+(7, 1, 8, 'particular', '2.17'),
+(8, 1, 9, 'particular', '2.79'),
+(9, 1, 10, 'particular', '2.79'),
+(10, 1, 11, 'particular', '2.79'),
+(11, 1, 12, 'particular', '2.79'),
+(12, 1, 13, 'particular', '3.41'),
+(13, 1, 14, 'particular', '3.41'),
+(14, 1, 15, 'particular', '3.41'),
+(15, 1, 16, 'particular', '83.59'),
+(16, 1, 17, 'particular', '6.19'),
+(17, 1, 18, 'particular', '61.92'),
+(18, 1, 19, 'particular', '184.52'),
+(19, 1, 20, 'particular', '30.96'),
+(20, 1, 21, 'particular', '30.96'),
+(21, 1, 22, 'particular', '1.24'),
+(22, 1, 23, 'particular', '3.10'),
+(23, 1, 24, 'particular', '3.10'),
+(24, 1, 25, 'particular', '3.10'),
+(25, 1, 26, 'particular', '3.10'),
+(26, 1, 27, 'particular', '61.92'),
+(27, 1, 28, 'particular', '182.67'),
+(28, 1, 29, 'particular', '15.48'),
+(29, 1, 30, 'particular', '11.15'),
+(30, 1, 31, 'particular', '13.62'),
+(31, 1, 32, 'particular', '182.67'),
+(32, 1, 33, 'particular', '48.30'),
+(33, 1, 34, 'particular', '46.44'),
+(34, 1, 35, 'particular', '12.38'),
+(35, 1, 36, 'particular', '12.38'),
+(36, 1, 37, 'particular', '27.86'),
+(37, 1, 38, 'particular', '21.67'),
+(38, 1, 39, 'particular', '21.67'),
+(39, 1, 40, 'particular', '15.48'),
+(40, 1, 41, 'particular', '89.79'),
+(41, 1, 42, 'particular', '18.58'),
+(42, 1, 43, 'particular', '18.58'),
+(43, 1, 44, 'particular', '18.58'),
+(44, 1, 45, 'particular', '18.58'),
+(45, 1, 46, 'particular', '18.58'),
+(46, 1, 47, 'particular', '9.29'),
+(47, 1, 48, 'particular', '24.77'),
+(48, 1, 49, 'particular', '117.65'),
+(49, 1, 50, 'particular', '49.54'),
+(50, 1, 51, 'particular', '681.13'),
+(51, 1, 52, 'particular', '154.80'),
+(52, 1, 53, 'particular', '4.33'),
+(53, 1, 54, 'particular', '4.95'),
+(54, 1, 55, 'particular', '3.10'),
+(55, 1, 56, 'particular', '3.10'),
+(56, 1, 57, 'particular', '18.58'),
+(57, 1, 58, 'particular', '74.31'),
+(58, 1, 59, 'particular', '6.19'),
+(59, 1, 60, 'particular', '6.81'),
+(60, 1, 61, 'particular', '7.43'),
+(61, 1, 62, 'particular', '8.05'),
+(62, 1, 63, 'particular', '6.19'),
+(63, 1, 64, 'particular', '43.34'),
+(64, 1, 65, 'particular', '49.54'),
+(65, 1, 66, 'particular', '61.92'),
+(66, 1, 67, 'particular', '247.68'),
+(67, 1, 68, 'particular', '6.19'),
+(68, 1, 69, 'particular', '6.19'),
+(69, 1, 70, 'particular', '18.58'),
+(70, 1, 71, 'particular', '24.77'),
+(71, 1, 72, 'particular', '12.38'),
+(72, 1, 73, 'particular', '30.96'),
+(73, 1, 74, 'particular', '12.38'),
+(74, 1, 75, 'particular', '185.76'),
+(75, 1, 76, 'particular', '309.61'),
+(76, 1, 77, 'particular', '74.31'),
+(77, 1, 78, 'particular', '6.19'),
+(78, 1, 79, 'particular', '6.19'),
+(79, 1, 80, 'particular', '12.38'),
+(80, 1, 81, 'particular', '12.38'),
+(81, 1, 82, 'particular', '49.54'),
+(82, 1, 83, 'particular', '61.92'),
+(83, 1, 84, 'particular', '15.48'),
+(84, 1, 85, 'particular', '61.92'),
+(85, 1, 86, 'particular', '74.31'),
+(86, 1, 87, 'particular', '30.96'),
+(87, 1, 88, 'particular', '1.86'),
+(88, 1, 89, 'particular', '12.38'),
+(89, 1, 90, 'particular', '6.19'),
+(90, 1, 91, 'particular', '49.54'),
+(91, 1, 92, 'particular', '619.21'),
+(92, 1, 93, 'particular', '6.19'),
+(93, 1, 94, 'particular', '18.58'),
+(94, 1, 95, 'particular', '18.58'),
+(95, 1, 96, 'particular', '0.62'),
+(96, 1, 97, 'particular', '12.38'),
+(97, 1, 98, 'particular', '12.38'),
+(98, 1, 99, 'particular', '12.38'),
+(99, 1, 100, 'particular', '30.96'),
+(100, 1, 101, 'particular', '309.61'),
+(101, 1, 102, 'particular', '309.61'),
+(102, 1, 103, 'particular', '3.10'),
+(103, 1, 104, 'particular', '12.38'),
+(104, 1, 105, 'particular', '12.38'),
+(105, 1, 106, 'particular', '27.86'),
+(106, 1, 107, 'particular', '136.23'),
+(107, 1, 108, 'particular', '24.77'),
+(108, 1, 109, 'particular', '61.92'),
+(109, 1, 110, 'particular', '3.10'),
+(110, 1, 111, 'particular', '34.06'),
+(111, 1, 112, 'particular', '12.38'),
+(112, 1, 113, 'particular', '12.38'),
+(113, 1, 114, 'particular', '15.48'),
+(114, 1, 115, 'particular', '6.19'),
+(115, 1, 116, 'particular', '11.15'),
+(116, 1, 117, 'particular', '11.15'),
+(117, 1, 118, 'particular', '6.19'),
+(118, 1, 119, 'particular', '6.19'),
+(119, 1, 120, 'particular', '92.88'),
+(120, 1, 121, 'particular', '12.38'),
+(121, 1, 122, 'particular', '18.58'),
+(122, 1, 123, 'particular', '6.19'),
+(123, 1, 124, 'particular', '37.15'),
+(124, 1, 125, 'particular', '37.15'),
+(125, 1, 126, 'particular', '3.10'),
+(126, 1, 127, 'particular', '68.11'),
+(127, 1, 128, 'particular', '40.25'),
+(128, 1, 129, 'particular', '5.26'),
+(129, 1, 130, 'particular', '7.74'),
+(130, 1, 131, 'particular', '4.95'),
+(131, 1, 132, 'particular', '7.43'),
+(132, 1, 133, 'particular', '7.43'),
+(133, 1, 134, 'particular', '30.96'),
+(134, 1, 135, 'particular', '6.19'),
+(135, 1, 136, 'particular', '6.19'),
+(136, 1, 137, 'particular', '5.26'),
+(137, 1, 138, 'particular', '4.95'),
+(138, 1, 139, 'particular', '4.95'),
+(139, 1, 140, 'particular', '9.29'),
+(140, 1, 141, 'particular', '278.64'),
+(141, 1, 142, 'particular', '12.38'),
+(142, 1, 143, 'particular', '1.55'),
+(143, 1, 144, 'particular', '1.55'),
+(144, 1, 145, 'particular', '2.79'),
+(145, 1, 146, 'particular', '2.79'),
+(146, 1, 147, 'particular', '2.79'),
+(147, 1, 148, 'particular', '30.96'),
+(148, 1, 149, 'particular', '9.29'),
+(149, 1, 150, 'particular', '9.29'),
+(150, 1, 151, 'particular', '173.38'),
+(151, 1, 152, 'particular', '15.48'),
+(152, 1, 153, 'particular', '15.48'),
+(153, 1, 154, 'particular', '15.48'),
+(154, 1, 155, 'particular', '24.77'),
+(155, 1, 156, 'particular', '30.96'),
+(156, 1, 157, 'particular', '30.96'),
+(157, 1, 158, 'particular', '30.96'),
+(158, 1, 159, 'particular', '30.96'),
+(159, 1, 160, 'particular', '30.96'),
+(160, 1, 161, 'particular', '24.77'),
+(161, 1, 162, 'particular', '24.77'),
+(162, 1, 163, 'particular', '24.77'),
+(163, 1, 164, 'particular', '24.77'),
+(164, 1, 165, 'particular', '24.77'),
+(165, 1, 166, 'particular', '24.77'),
+(166, 1, 167, 'particular', '160.99'),
+(167, 1, 168, 'particular', '74.31'),
+(168, 1, 169, 'particular', '185.76'),
+(169, 1, 170, 'particular', '3.10'),
+(170, 1, 171, 'particular', '3.10'),
+(171, 1, 172, 'particular', '6.19'),
+(172, 1, 173, 'particular', '123.84'),
+(173, 1, 174, 'particular', '18.58'),
+(174, 1, 175, 'particular', '12.38'),
+(175, 1, 176, 'particular', '3.10'),
+(176, 1, 177, 'particular', '9.29'),
+(177, 1, 178, 'particular', '27.86'),
+(178, 1, 179, 'particular', '29.72'),
+(179, 1, 180, 'particular', '37.15'),
+(180, 1, 181, 'particular', '74.31'),
+(181, 1, 182, 'particular', '55.73'),
+(182, 1, 183, 'particular', '55.73'),
+(183, 1, 184, 'particular', '32.20'),
+(184, 1, 185, 'particular', '433.45'),
+(185, 1, 186, 'particular', '160.99'),
+(186, 1, 187, 'particular', '49.54'),
+(187, 1, 188, 'particular', '49.54'),
+(188, 1, 189, 'particular', '27.86'),
+(189, 1, 190, 'particular', '24.77'),
+(190, 1, 191, 'particular', '2167.24'),
+(191, 1, 192, 'particular', '29.72'),
+(192, 1, 193, 'particular', '0.62'),
+(193, 1, 194, 'particular', '92.88'),
+(194, 1, 195, 'particular', '92.88'),
+(195, 1, 196, 'particular', '92.88'),
+(196, 1, 197, 'particular', '92.88'),
+(197, 1, 198, 'particular', '9.29'),
+(198, 1, 199, 'particular', '9.29'),
+(199, 1, 200, 'particular', '9.29'),
+(200, 1, 201, 'particular', '6.19'),
+(201, 1, 202, 'particular', '5.88'),
+(202, 1, 203, 'particular', '5.88'),
+(203, 1, 204, 'particular', '5.88'),
+(204, 1, 205, 'particular', '2.48'),
+(205, 1, 206, 'particular', '5.88'),
+(206, 1, 207, 'particular', '40.25'),
+(207, 1, 208, 'particular', '40.25'),
+(208, 1, 209, 'particular', '40.25'),
+(209, 1, 210, 'particular', '37.15'),
+(210, 1, 211, 'particular', '12.38'),
+(211, 1, 212, 'particular', '30.96'),
+(212, 1, 213, 'particular', '30.96'),
+(213, 1, 214, 'particular', '15.48'),
+(214, 1, 215, 'particular', '92.88'),
+(215, 1, 216, 'particular', '92.88'),
+(216, 1, 217, 'particular', '15.48'),
+(217, 1, 218, 'particular', '154.80'),
+(218, 1, 219, 'particular', '15.48'),
+(219, 1, 220, 'particular', '92.88'),
+(220, 1, 221, 'particular', '30.96'),
+(221, 1, 222, 'particular', '30.96'),
+(222, 1, 223, 'particular', '30.96'),
+(223, 1, 224, 'particular', '30.96'),
+(224, 1, 225, 'particular', '17.34'),
+(225, 1, 226, 'particular', '17.34'),
+(226, 1, 227, 'particular', '17.34'),
+(227, 1, 228, 'particular', '17.34'),
+(228, 1, 229, 'particular', '18.58'),
+(229, 1, 230, 'particular', '18.58'),
+(230, 1, 231, 'particular', '99.07'),
+(231, 1, 232, 'particular', '49.54'),
+(232, 1, 233, 'particular', '89.79'),
+(233, 1, 234, 'particular', '89.79'),
+(234, 1, 235, 'particular', '495.37'),
+(235, 1, 236, 'particular', '185.76'),
+(236, 1, 237, 'particular', '619.21'),
+(237, 1, 238, 'particular', '49.54'),
+(238, 1, 239, 'particular', '154.80'),
+(239, 1, 240, 'particular', '154.80'),
+(240, 1, 241, 'particular', '111.46'),
+(241, 1, 242, 'particular', '4.95'),
+(242, 1, 243, 'particular', '4.95'),
+(243, 1, 244, 'particular', '4.95'),
+(244, 1, 245, 'particular', '37.15'),
+(245, 1, 246, 'particular', '37.15'),
+(246, 1, 247, 'particular', '37.15'),
+(247, 1, 248, 'particular', '3.10'),
+(248, 1, 249, 'particular', '3.10'),
+(249, 1, 250, 'particular', '3.10'),
+(250, 1, 251, 'particular', '1.24'),
+(251, 1, 252, 'particular', '1.24'),
+(252, 1, 253, 'particular', '1.24'),
+(253, 1, 254, 'particular', '1.24'),
+(254, 1, 255, 'particular', '1.24'),
+(255, 1, 256, 'particular', '1.24'),
+(256, 1, 257, 'particular', '1.24'),
+(257, 1, 258, 'particular', '1.24'),
+(258, 1, 259, 'particular', '1.24'),
+(259, 1, 260, 'particular', '2.17'),
+(260, 1, 261, 'particular', '2.17'),
+(261, 1, 262, 'particular', '2.17'),
+(262, 1, 263, 'particular', '1.24'),
+(263, 1, 264, 'particular', '1.86'),
+(264, 1, 265, 'particular', '1.86'),
+(265, 1, 266, 'particular', '1.86'),
+(266, 1, 267, 'particular', '1.86'),
+(267, 1, 268, 'particular', '1.86'),
+(268, 1, 269, 'particular', '1.86'),
+(269, 1, 270, 'particular', '1.86'),
+(270, 1, 271, 'particular', '1.86'),
+(271, 1, 272, 'particular', '1.86'),
+(272, 1, 273, 'particular', '154.80'),
+(273, 1, 274, 'particular', '154.80'),
+(274, 1, 275, 'particular', '154.80'),
+(275, 1, 276, 'particular', '154.80'),
+(276, 1, 277, 'particular', '154.80'),
+(277, 1, 278, 'particular', '154.80'),
+(278, 1, 279, 'particular', '92.88'),
+(279, 1, 280, 'particular', '49.54'),
+(280, 1, 281, 'particular', '92.88'),
+(281, 1, 282, 'particular', '49.54'),
+(282, 1, 283, 'particular', '18.58'),
+(283, 1, 284, 'particular', '300.32'),
+(284, 1, 285, 'particular', '74.31'),
+(285, 1, 286, 'particular', '18.58'),
+(286, 1, 287, 'particular', '30.96'),
+(287, 1, 288, 'particular', '92.88'),
+(288, 1, 289, 'particular', '52.63'),
+(289, 1, 290, 'particular', '27.86'),
+(290, 1, 291, 'particular', '27.86'),
+(291, 1, 292, 'particular', '52.63'),
+(292, 1, 293, 'particular', '24.77'),
+(293, 1, 294, 'particular', '6.19'),
+(294, 1, 295, 'particular', '77.40'),
+(295, 1, 296, 'particular', '11.15'),
+(296, 1, 297, 'particular', '46.44'),
+(297, 1, 298, 'particular', '18.58'),
+(298, 1, 299, 'particular', '15.48'),
+(299, 1, 300, 'particular', '15.48'),
+(300, 1, 301, 'particular', '15.48'),
+(301, 1, 302, 'particular', '9.29'),
+(302, 1, 303, 'particular', '9.29'),
+(303, 1, 304, 'particular', '9.29'),
+(304, 1, 305, 'particular', '9.29'),
+(305, 1, 306, 'particular', '18.58'),
+(306, 1, 307, 'particular', '9.29'),
+(307, 1, 308, 'particular', '9.29'),
+(308, 1, 309, 'particular', '9.29'),
+(309, 1, 310, 'particular', '9.29'),
+(310, 1, 311, 'particular', '6.19'),
+(311, 1, 312, 'particular', '3.10'),
+(312, 1, 313, 'particular', '6.19'),
+(313, 1, 314, 'particular', '6.19'),
+(314, 1, 315, 'particular', '6.19'),
+(315, 1, 316, 'particular', '6.19'),
+(316, 1, 317, 'particular', '9.29'),
+(317, 1, 318, 'particular', '15.48'),
+(318, 1, 319, 'particular', '3.10'),
+(319, 1, 320, 'particular', '27.86'),
+(320, 1, 321, 'particular', '6.19'),
+(321, 1, 322, 'particular', '6.19'),
+(322, 1, 323, 'particular', '9.29'),
+(323, 1, 324, 'particular', '9.29'),
+(324, 1, 325, 'particular', '9.29'),
+(325, 1, 326, 'particular', '6.19'),
+(326, 1, 327, 'particular', '18.58'),
+(327, 1, 328, 'particular', '18.58'),
+(328, 1, 329, 'particular', '9.29'),
+(329, 1, 330, 'particular', '37.15'),
+(330, 1, 331, 'particular', '74.31'),
+(331, 1, 332, 'particular', '37.15'),
+(332, 1, 333, 'particular', '24.77'),
+(333, 1, 334, 'particular', '15.48'),
+(334, 1, 335, 'particular', '15.48'),
+(335, 1, 336, 'particular', '15.48'),
+(336, 1, 337, 'particular', '29.72'),
+(337, 1, 338, 'particular', '29.72'),
+(338, 1, 339, 'particular', '55.73'),
+(339, 1, 340, 'particular', '6.19'),
+(340, 1, 341, 'particular', '6.19'),
+(341, 1, 342, 'particular', '6.19'),
+(342, 1, 343, 'particular', '17.34'),
+(343, 1, 344, 'particular', '17.34'),
+(344, 1, 345, 'particular', '55.73'),
+(345, 1, 346, 'particular', '6.19'),
+(346, 1, 347, 'particular', '6.19'),
+(347, 1, 348, 'particular', '1.86'),
+(348, 1, 349, 'particular', '114.55'),
+(349, 1, 350, 'particular', '99.07'),
+(350, 1, 351, 'particular', '99.07'),
+(351, 1, 352, 'particular', '114.55'),
+(352, 1, 353, 'particular', '52.63'),
+(353, 1, 354, 'particular', '148.61'),
+(354, 1, 355, 'particular', '77.40'),
+(355, 1, 356, 'particular', '173.38'),
+(356, 1, 357, 'particular', '148.61'),
+(357, 1, 358, 'particular', '92.88'),
+(358, 1, 359, 'particular', '43.34'),
+(359, 1, 360, 'particular', '154.80'),
+(360, 1, 361, 'particular', '6.19'),
+(361, 1, 362, 'particular', '6.19'),
+(362, 1, 363, 'particular', '92.88'),
+(363, 1, 364, 'particular', '111.46'),
+(364, 1, 365, 'particular', '167.19'),
+(365, 1, 366, 'particular', '4.95'),
+(366, 1, 367, 'particular', '4.95'),
+(367, 1, 368, 'particular', '4.95'),
+(368, 1, 369, 'particular', '4.95'),
+(369, 1, 370, 'particular', '5.57'),
+(370, 1, 371, 'particular', '5.57'),
+(371, 1, 372, 'particular', '27.86'),
+(372, 1, 373, 'particular', '18.58'),
+(373, 1, 374, 'particular', '18.58'),
+(374, 1, 375, 'particular', '18.58'),
+(375, 1, 376, 'particular', '6.19'),
+(376, 1, 377, 'particular', '6.19'),
+(377, 1, 378, 'particular', '6.19'),
+(378, 1, 379, 'particular', '6.19'),
+(379, 1, 380, 'particular', '6.19'),
+(380, 1, 381, 'particular', '6.19'),
+(381, 1, 382, 'particular', '6.19'),
+(382, 1, 383, 'particular', '9.29'),
+(383, 1, 384, 'particular', '43.34'),
+(384, 1, 385, 'particular', '37.15'),
+(385, 1, 386, 'particular', '12.38'),
+(386, 1, 387, 'particular', '13.62'),
+(387, 1, 388, 'particular', '3.10'),
+(388, 1, 389, 'particular', '173.38'),
+(389, 1, 390, 'particular', '1.86'),
+(390, 1, 391, 'particular', '43.34'),
+(391, 1, 392, 'particular', '6.19'),
+(392, 1, 393, 'particular', '6.19'),
+(393, 1, 394, 'particular', '15.48'),
+(394, 1, 395, 'particular', '15.48'),
+(395, 1, 396, 'particular', '9.29'),
+(396, 1, 397, 'particular', '9.29'),
+(397, 1, 398, 'particular', '26.01'),
+(398, 1, 399, 'particular', '6.19'),
+(399, 1, 400, 'particular', '6.19'),
+(400, 1, 401, 'particular', '1.86'),
+(401, 1, 402, 'particular', '1.86'),
+(402, 1, 403, 'particular', '30.96'),
+(403, 1, 404, 'particular', '30.96'),
+(404, 1, 405, 'particular', '30.96'),
+(405, 1, 406, 'particular', '30.96'),
+(406, 1, 407, 'particular', '24.77'),
+(407, 1, 408, 'particular', '18.58'),
+(408, 1, 409, 'particular', '18.58'),
+(409, 1, 410, 'particular', '18.58'),
+(410, 1, 411, 'particular', '18.58'),
+(411, 1, 412, 'particular', '6.19'),
+(412, 1, 413, 'particular', '0.62'),
+(413, 1, 414, 'particular', '0.62'),
+(414, 1, 415, 'particular', '0.62'),
+(415, 1, 416, 'particular', '0.62'),
+(416, 1, 417, 'particular', '588.25'),
+(417, 1, 418, 'particular', '6.19'),
+(418, 1, 419, 'particular', '74.31'),
+(419, 1, 420, 'particular', '74.31'),
+(420, 1, 421, 'particular', '74.31'),
+(421, 1, 422, 'particular', '86.69'),
+(422, 1, 423, 'particular', '68.11'),
+(423, 1, 424, 'particular', '61.92'),
+(424, 1, 425, 'particular', '61.92'),
+(425, 1, 426, 'particular', '30.96'),
+(426, 1, 427, 'particular', '30.96'),
+(427, 1, 428, 'particular', '9.29'),
+(428, 1, 429, 'particular', '9.29'),
+(429, 1, 430, 'particular', '30.96'),
+(430, 1, 431, 'particular', '30.96'),
+(431, 1, 432, 'particular', '6.19'),
+(432, 1, 433, 'particular', '3.10'),
+(433, 1, 434, 'particular', '6.19'),
+(434, 1, 435, 'particular', '6.19');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `servicios`
+--
+
+CREATE TABLE `servicios` (
+  `id` int(11) NOT NULL,
+  `codigo` varchar(20) NOT NULL,
+  `descripcion` varchar(255) NOT NULL,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  `tipo` enum('servicio','repuesto','lubricante') DEFAULT 'servicio'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `servicios`
+--
+
+INSERT INTO `servicios` (`id`, `codigo`, `descripcion`, `precio_unitario`, `tipo`) VALUES
+(6, 'REP0001', 'ABRAZADERA 10X16.5/8', '2.17', 'repuesto'),
+(7, 'REP0002', 'ABRAZADERA 12X20.3/4', '2.17', 'repuesto'),
+(8, 'REP0003', 'ABRAZADERA 20X32, 1P', '2.17', 'repuesto'),
+(9, 'REP0004', 'ABRAZADERA 30X45 1 3./4', '2.79', 'repuesto'),
+(10, 'REP0005', 'ABRAZADERA 38X50', '2.79', 'repuesto'),
+(11, 'REP0006', 'ABRAZADERA 40X60 ', '2.79', 'repuesto'),
+(12, 'REP0007', 'ABRAZADERA 50X70', '2.79', 'repuesto'),
+(13, 'REP0008', 'ABRAZADERA 60X80', '3.41', 'repuesto'),
+(14, 'REP0009', 'ABRAZADERA DE MANGUERA', '3.41', 'repuesto'),
+(15, 'REP0010', 'ABRAZADERA PAQUETE RES/DIM', '3.41', 'repuesto'),
+(16, 'REP0011', 'ACOPLE INFERIOR', '83.59', 'repuesto'),
+(17, 'REP0012', 'ACUMULADOR', '6.19', 'repuesto'),
+(18, 'REP0013', 'ALARMA CHEVROLET', '61.92', 'repuesto'),
+(19, 'REP0014', 'ALTERNADOR', '184.52', 'repuesto'),
+(20, 'REP0015', 'AMORTIGUADOR DELANTERO', '30.96', 'repuesto'),
+(21, 'REP0016', 'AMORTIGUADOR POSTERIOR', '30.96', 'repuesto'),
+(22, 'REP0017', 'ANILLO DE COBRE INYECTOR', '1.24', 'repuesto'),
+(23, 'REP0018', 'ANILLO INYECTOR DOBLE', '3.10', 'repuesto'),
+(24, 'REP0019', 'ANILLO PL 6.4', '3.10', 'repuesto'),
+(25, 'REP0020', 'ANILLO TAPON', '3.10', 'repuesto'),
+(26, 'REP0021', 'ARANDELA EJE CONO', '3.10', 'repuesto'),
+(27, 'REP0022', 'ARAÑA DE EJE DELANTERO', '61.92', 'repuesto'),
+(28, 'REP0023', 'ARO DE LEVAS', '182.67', 'repuesto'),
+(29, 'REP0024', 'ARTICULACION DE DIRECCION', '15.48', 'repuesto'),
+(30, 'REP0025', 'BANDA DE ACCESORIOS (BOMBA HIDARULICA Y A/C)', '11.15', 'repuesto'),
+(31, 'REP0026', 'BANDA DE ALTERNADOR ', '13.62', 'repuesto'),
+(32, 'REP0027', 'BARRA DE LEVAS', '182.67', 'repuesto'),
+(33, 'REP0028', 'BASE C/CARDAN 3.0', '48.30', 'repuesto'),
+(34, 'REP0029', 'BASE CARDAN DIM (CORTA)', '46.44', 'repuesto'),
+(35, 'REP0030', 'BASE COMPRESOR', '12.38', 'repuesto'),
+(36, 'REP0031', 'BASE DE FILTRO COMBUSTIBLE', '12.38', 'repuesto'),
+(37, 'REP0032', 'BASE DE CAJA DE CAMBIO', '27.86', 'repuesto'),
+(38, 'REP0033', 'BASE DEL MOTOR LH', '21.67', 'repuesto'),
+(39, 'REP0034', 'BASE DEL MOTOR RH', '21.67', 'repuesto'),
+(40, 'REP0035', 'BASE SOPORTE DE HORQUILLA', '15.48', 'repuesto'),
+(41, 'REP0036', 'BATERÍA 12V S4 FULL EQUIPO 80 AMP', '89.79', 'repuesto'),
+(42, 'REP0037', 'BOCIN B/ESTABILIZADOR DIM 4X4', '18.58', 'repuesto'),
+(43, 'REP0038', 'BOCIN DE MESA INFERIOR ANTERIOR', '18.58', 'repuesto'),
+(44, 'REP0039', 'BOCIN DE MESA SUPERIOR ANTERIOR', '18.58', 'repuesto'),
+(45, 'REP0040', 'BOCIN DEL PAQUETE POSTERIOR', '18.58', 'repuesto'),
+(46, 'REP0041', 'BOCINA O PITO', '18.58', 'repuesto'),
+(47, 'REP0042', 'BOCINES DE  BARRA DE LEVAS', '9.29', 'repuesto'),
+(48, 'REP0043', 'BOMBA AUXILIAR DE COMBUSTIBLE', '24.77', 'repuesto'),
+(49, 'REP0044', 'BOMBA DE ACEITE', '117.65', 'repuesto'),
+(50, 'REP0045', 'BOMBA DE AGUA', '49.54', 'repuesto'),
+(51, 'REP0046', 'BOMBA DE INYECCION', '681.13', 'repuesto'),
+(52, 'REP0047', 'BOMBA HIDRAULICA DEL  DIRECCION', '154.80', 'repuesto'),
+(53, 'REP0048', 'BOMBILLO H4/12V/60/55/P', '4.33', 'repuesto'),
+(54, 'REP0049', 'BOMBILLO H7/12V/55W/PX2', '4.95', 'repuesto'),
+(55, 'REP0050', 'BOTON A/C .ST/ 95-', '3.10', 'repuesto'),
+(56, 'REP0051', 'BLOWER', '3.10', 'repuesto'),
+(57, 'REP0052', 'BRAZO DE TORSION', '18.58', 'repuesto'),
+(58, 'REP0053', 'BUJIA DE PRECALENTAMIENTO', '74.31', 'repuesto'),
+(59, 'REP0054', 'CABLE # 10', '6.19', 'repuesto'),
+(60, 'REP0055', 'CABLE # 14', '6.81', 'repuesto'),
+(61, 'REP0056', 'CABLE # 16', '7.43', 'repuesto'),
+(62, 'REP0057', 'CABLE # 18', '8.05', 'repuesto'),
+(63, 'REP0058', 'CABLE CAPOT', '6.19', 'repuesto'),
+(64, 'REP0059', 'CABLE DE FRENO DE MANO ', '43.34', 'repuesto'),
+(65, 'REP0060', 'CADENA DEL  DISTRIBUCION', '49.54', 'repuesto'),
+(66, 'REP0061', 'CAJA DE DIRECCION', '61.92', 'repuesto'),
+(67, 'REP0062', 'CAMISA DE PISTON', '247.68', 'repuesto'),
+(68, 'REP0063', 'CANAL PUERTA DELANTERA LH/DIM', '6.19', 'repuesto'),
+(69, 'REP0064', 'CANAL PUERTA DELANTERA RH/DIM', '6.19', 'repuesto'),
+(70, 'REP0065', 'CANASTILLA CC', '18.58', 'repuesto'),
+(71, 'REP0066', 'CANASTILLA EJE', '24.77', 'repuesto'),
+(72, 'REP0067', 'CANASTILLA PALANCA DE CAMBIOS', '12.38', 'repuesto'),
+(73, 'REP0068', 'CAPACITADORES DE BALIZAS', '30.96', 'repuesto'),
+(74, 'REP0069', 'CARBONES DE ALTERNADOR', '12.38', 'repuesto'),
+(75, 'REP0070', 'CARDAN PROPULSOR', '185.76', 'repuesto'),
+(76, 'REP0071', 'CARDAN TRANSF.DIM/4X4', '309.61', 'repuesto'),
+(77, 'REP0072', 'CATALIZADOR DE ESCAPE', '74.31', 'repuesto'),
+(78, 'REP0073', 'CAUCHO DEL  BARRA ESTABILIZADORA', '6.19', 'repuesto'),
+(79, 'REP0074', 'CAUCHO DEL PAQUETE POSTERIOR', '6.19', 'repuesto'),
+(80, 'REP0075', 'CAUCHO INFERIOR CABINA FRONTAL/DIM', '12.38', 'repuesto'),
+(81, 'REP0076', 'CAUCHO SUPERIOR CABINA FRONTAL/DIM', '12.38', 'repuesto'),
+(82, 'REP0077', 'CILINDRO AUXILIAR DE EMBRAGUE', '49.54', 'repuesto'),
+(83, 'REP0078', 'CILINDRO DE AVANCE', '61.92', 'repuesto'),
+(84, 'REP0079', 'CILINDRO DE RUEDA POSTERIOR DE FRENO', '15.48', 'repuesto'),
+(85, 'REP0080', 'CILINDRO PRINCIPAL DE EMBRAGUE', '61.92', 'repuesto'),
+(86, 'REP0081', 'CILINDRO PRINCIPAL DE FRENO', '74.31', 'repuesto'),
+(87, 'REP0082', 'CILINDRO PTA. DEL. RH/DIM', '30.96', 'repuesto'),
+(88, 'REP0083', 'CINTA AISLANTE', '1.86', 'repuesto'),
+(89, 'REP0084', 'COLECTOR DE ALTERNADOR', '12.38', 'repuesto'),
+(90, 'REP0085', 'CONECTOR A/C ', '6.19', 'repuesto'),
+(91, 'REP0086', 'CONJUNTO P/FR/MANO/DIM', '49.54', 'repuesto'),
+(92, 'REP0087', 'CONO/CORONA D-MAX', '619.21', 'repuesto'),
+(93, 'REP0088', 'CONTROL A/C DIM 09', '6.19', 'repuesto'),
+(94, 'REP0089', 'CONTROL ALARMA CHEVY', '18.58', 'repuesto'),
+(95, 'REP0090', 'CORONILLA DE ALTERNADOR', '18.58', 'repuesto'),
+(96, 'REP0091', 'CORREA DE AMARRE', '0.62', 'repuesto'),
+(97, 'REP0092', 'CRUCETA DEL CARDAN', '12.38', 'repuesto'),
+(98, 'REP0093', 'DEFLECTOR INFERIOR RADIADOR', '12.38', 'repuesto'),
+(99, 'REP0094', 'DEFLECTOR SUPERIOR RADIADOR', '12.38', 'repuesto'),
+(100, 'REP0095', 'DESLIZADOR TRANSFER D-MAX', '30.96', 'repuesto'),
+(101, 'REP0096', 'DIFERENCIAL POSTERIOR', '309.61', 'repuesto'),
+(102, 'REP0097', 'DIFRENCIAL ANTERIOR', '309.61', 'repuesto'),
+(103, 'REP0098', 'DIODO DE PANEL DE INSTRUMENTO', '3.10', 'repuesto'),
+(104, 'REP0099', 'DIRECCIONAL GURADFANGO', '12.38', 'repuesto'),
+(105, 'REP0100', 'DISCO CLOSH COMPRESOR', '12.38', 'repuesto'),
+(106, 'REP0101', 'DISCO DE FRENO ', '27.86', 'repuesto'),
+(107, 'REP0102', 'EJE POSTERIOR DIM 4X4', '136.23', 'repuesto'),
+(108, 'REP0103', 'ELECTROVALVULA', '24.77', 'repuesto'),
+(109, 'REP0104', 'EMBRAGUE DEL VENTILADOR', '61.92', 'repuesto'),
+(110, 'REP0105', 'EMPAQUE BASE FILTR/DIM', '3.10', 'repuesto'),
+(111, 'REP0106', 'EMPAQUE DE CABEZOTE', '34.06', 'repuesto'),
+(112, 'REP0107', 'EMPAQUE DE CARTER INFERIOR', '12.38', 'repuesto'),
+(113, 'REP0108', 'EMPAQUE DE CARTER SUPERIOR', '12.38', 'repuesto'),
+(114, 'REP0109', 'EMPAQUE DE TAPA VALVULA', '15.48', 'repuesto'),
+(115, 'REP0110', 'EMPAQUE ENFRIADOR DE AC', '6.19', 'repuesto'),
+(116, 'REP0111', 'EMPAQUE MULTIPLE DE ADMISION', '11.15', 'repuesto'),
+(117, 'REP0112', 'EMPAQUE MULTIPLE DE ESCAPE', '11.15', 'repuesto'),
+(118, 'REP0113', 'EMPAQUE TAPA DISTRIBUCION', '6.19', 'repuesto'),
+(119, 'REP0114', 'EMPAQUE TERMOSTATO', '6.19', 'repuesto'),
+(120, 'REP0115', 'EMPAQUETADURA DEL MOTOR', '92.88', 'repuesto'),
+(121, 'REP0116', 'ENFRIADOR DE ACEITE', '12.38', 'repuesto'),
+(122, 'REP0117', 'ESPACIADOR DE CONO', '18.58', 'repuesto'),
+(123, 'REP0118', 'ESPARRAGO DE RUEDA', '6.19', 'repuesto'),
+(124, 'REP0119', 'ESPONJA ASIENTO DEL LH', '37.15', 'repuesto'),
+(125, 'REP0120', 'ESPONJA ASIENTO DEL RH', '37.15', 'repuesto'),
+(126, 'REP0121', 'EVAPORADOR DIM', '3.10', 'repuesto'),
+(127, 'REP0122', 'FARO DELANTERO', '68.11', 'repuesto'),
+(128, 'REP0123', 'FARO POSTERIOR', '40.25', 'repuesto'),
+(129, 'REP0124', 'FILTRO DE ACEITE DE MOTOR', '5.26', 'repuesto'),
+(130, 'REP0125', 'FILTRO DE AIRE', '7.74', 'repuesto'),
+(131, 'REP0126', 'FILTRO DE BOMBA DE INYECCION (TABACO)', '4.95', 'repuesto'),
+(132, 'REP0127', 'FILTRO DE COMBUSTIBLE PRIMARIO', '7.43', 'repuesto'),
+(133, 'REP0128', 'FILTRO TRAMPA DE AGUA ', '7.43', 'repuesto'),
+(134, 'REP0129', 'FLOTADOR TANQUE DE COMBUSTIBLE', '30.96', 'repuesto'),
+(135, 'REP0130', 'FOCO 9001', '6.19', 'repuesto'),
+(136, 'REP0131', 'FOCO 9006', '6.19', 'repuesto'),
+(137, 'REP0132', 'FOCO DE DOS PUNTOS', '5.26', 'repuesto'),
+(138, 'REP0133', 'FOCO DE UN PUNTO', '4.95', 'repuesto'),
+(139, 'REP0134', 'FOCO DE UÑA', '4.95', 'repuesto'),
+(140, 'REP0135', 'FORRO PALANCA DE CAMBIO', '9.29', 'repuesto'),
+(141, 'REP0136', 'FORROS DE ASIENTO', '278.64', 'repuesto'),
+(142, 'REP0137', 'FUSIBLE 100A', '12.38', 'repuesto'),
+(143, 'REP0138', 'FUSIBLE 10A/ROJO', '1.55', 'repuesto'),
+(144, 'REP0139', 'FUSIBLE 15A/AZUL', '1.55', 'repuesto'),
+(145, 'REP0140', 'FUSIBLE 20A/AMAR', '2.79', 'repuesto'),
+(146, 'REP0141', 'FUSIBLE 25A/CLAR', '2.79', 'repuesto'),
+(147, 'REP0142', 'FUSIBLE 30A/AV3', '2.79', 'repuesto'),
+(148, 'REP0143', 'GAS + ACEITE A/C', '30.96', 'repuesto'),
+(149, 'REP0144', 'GRASA RODAMIENTOS', '9.29', 'repuesto'),
+(150, 'REP0145', 'GUARDAP.HORQ.EMBRAGUE', '9.29', 'repuesto'),
+(151, 'REP0146', 'GUARDAPOLVO DE GUARDAFANGO', '173.38', 'repuesto'),
+(152, 'REP0147', 'GUARDAPOLVO DEL EJE EXTERIOR DELANTERO', '15.48', 'repuesto'),
+(153, 'REP0148', 'GUARDAPOLVO DEL EJE INTERIOR DELANTERO', '15.48', 'repuesto'),
+(154, 'REP0149', 'GUIA LATERAL TF/DIM', '15.48', 'repuesto'),
+(155, 'REP0150', 'HALOGENO DE BALIZA', '24.77', 'repuesto'),
+(156, 'REP0151', 'HOJA RESORTE # 1', '30.96', 'repuesto'),
+(157, 'REP0152', 'HOJA RESORTE # 2', '30.96', 'repuesto'),
+(158, 'REP0153', 'HOJA RESORTE # 3', '30.96', 'repuesto'),
+(159, 'REP0154', 'HOJA RESORTE # 4', '30.96', 'repuesto'),
+(160, 'REP0155', 'HOJA RESORTE # 5', '30.96', 'repuesto'),
+(161, 'REP0156', 'HORQUILLA CAJA DE TRANSFERENCIA', '24.77', 'repuesto'),
+(162, 'REP0157', 'HORQUILLA DE CAJA DE PRIMERA', '24.77', 'repuesto'),
+(163, 'REP0158', 'HORQUILLA DE CAJA DE SEGUNDA', '24.77', 'repuesto'),
+(164, 'REP0159', 'HORQUILLA DE CAJA DE TERCERA', '24.77', 'repuesto'),
+(165, 'REP0160', 'HORQUILLA EMBR.TF/UC', '24.77', 'repuesto'),
+(166, 'REP0161', 'INDUCIDO DE BLOWER', '24.77', 'repuesto'),
+(167, 'REP0162', 'INTEGRADO DE AUDIO SIRENA', '160.99', 'repuesto'),
+(168, 'REP0163', 'INTEGRADO DE BALIZA', '74.31', 'repuesto'),
+(169, 'REP0164', 'INTERCOOLER ', '185.76', 'repuesto'),
+(170, 'REP0165', 'INTERRUPTOR V/PTA.LH/DIM/08-', '3.10', 'repuesto'),
+(171, 'REP0166', 'INTERRUPTOR V/PTA DEL RH/DIM', '3.10', 'repuesto'),
+(172, 'REP0167', 'INTERRUPTOR DE PARQUEO', '6.19', 'repuesto'),
+(173, 'REP0168', 'INYECTOR DE COMBUSTIBLE', '123.84', 'repuesto'),
+(174, 'REP0169', 'JUEGO CARBON DE BLOWER', '18.58', 'repuesto'),
+(175, 'REP0170', 'JUEGO DE CARCAZA DE ALTERNADOR', '12.38', 'repuesto'),
+(176, 'REP0171', 'JUEGO SEGUROS DE BATERIA', '3.10', 'repuesto'),
+(177, 'REP0172', 'JUEGO SELLOS Y ORINES', '9.29', 'repuesto'),
+(178, 'REP0173', 'JUEGO COJINETES DE BANCADA', '27.86', 'repuesto'),
+(179, 'REP0174', 'JUEGO COJINETES DE BIELA', '29.72', 'repuesto'),
+(180, 'REP0175', 'JUEGO DE ELEVADORES HIDRAULICOS', '37.15', 'repuesto'),
+(181, 'REP0176', 'JUEGO DE MOQUETAS', '74.31', 'repuesto'),
+(182, 'REP0177', 'JUEGO DE VALVULAS DE ADMISION', '55.73', 'repuesto'),
+(183, 'REP0178', 'JUEGO DE VALVULAS DE ESCAPE', '55.73', 'repuesto'),
+(184, 'REP0179', 'JUEGO PASTILLAS DE FRENO ', '32.20', 'repuesto'),
+(185, 'REP0180', 'KIT AIRE ACONDICIONADO DIM /3.0', '433.45', 'repuesto'),
+(186, 'REP0181', 'KIT DE EMBRAGUE', '160.99', 'repuesto'),
+(187, 'REP0182', 'KIT GRILLETE PAQUETES', '49.54', 'repuesto'),
+(188, 'REP0183', 'KIT GUARDAPOLVO EXTERIOR EJE', '49.54', 'repuesto'),
+(189, 'REP0184', 'KIT LIMPIEZA INY DIESEL', '27.86', 'repuesto'),
+(190, 'REP0185', 'KIT REPAR.MORDAZA CORTA DIM', '24.77', 'repuesto'),
+(191, 'REP0186', 'KIT REPARACION MOTOR (CAMISAS, RINES, PISTON\r\nBOMBA DE AGUA, BOMBA DE ACEITE, TERMOSTATO, V. ADMISION VALVULA DE ESCAPE, JUEGO EMPAQUES, CASQUETES BIELA Y BANCADA, GUIAS DE VALVULA, BOCINES ARBOL)', '2167.24', 'repuesto'),
+(192, 'REP0187', 'ZAPATAS DE FRENO POST', '29.72', 'repuesto'),
+(193, 'REP0188', 'LAINA DE EJE', '0.62', 'repuesto'),
+(194, 'REP0189', 'ELEVAVIDRIOS DELANTERO LH ', '92.88', 'repuesto'),
+(195, 'REP0190', 'ELEVAVIDRIOS POSTERIOR LH', '92.88', 'repuesto'),
+(196, 'REP0191', 'ELEVAVIDRIOS DELANTERO RH', '92.88', 'repuesto'),
+(197, 'REP0192', 'ELEVAVIDRIOS POSTEIOR RH ', '92.88', 'repuesto'),
+(198, 'REP0193', 'LIMPIADOR EVAPORADOR', '9.29', 'repuesto'),
+(199, 'REP0194', 'PLUMA LIMPIAVIDRIO 20/NH/NK/SQ/S', '9.29', 'repuesto'),
+(200, 'REP0195', 'PLUMA LIMPIAVIDRIO 18`/UC/SQ/ST', '9.29', 'repuesto'),
+(201, 'REP0196', 'LIQUIDO FRENO DOT 4', '6.19', 'repuesto'),
+(202, 'REP0197', 'LT ACEITE 80W90 ', '5.88', 'repuesto'),
+(203, 'REP0198', 'LT ACEITE C.C 75W90 ', '5.88', 'repuesto'),
+(204, 'REP0199', 'LT ACEITE C.C ATF', '5.88', 'repuesto'),
+(205, 'REP0200', 'LT. ACEITE 2 TIEMPOS', '2.48', 'repuesto'),
+(206, 'REP0201', 'LT. ACEITE MOTOR 15W40', '5.88', 'repuesto'),
+(207, 'REP0202', 'MANGUERA DE AGUA TERMOSTATO', '40.25', 'repuesto'),
+(208, 'REP0203', 'MANGUERA A/C', '40.25', 'repuesto'),
+(209, 'REP0204', 'MANGUERA AGUA', '40.25', 'repuesto'),
+(210, 'REP0205', 'MANGUERA AIRE 3/8', '37.15', 'repuesto'),
+(211, 'REP0206', 'MANGUERA ANTERIOR DE FRENO', '12.38', 'repuesto'),
+(212, 'REP0207', 'MANGUERA COMBUSTIBLE', '30.96', 'repuesto'),
+(213, 'REP0208', 'MANGUERA DE ALTERNADOR', '30.96', 'repuesto'),
+(214, 'REP0209', 'MANGUERA DE CALEFACCION', '15.48', 'repuesto'),
+(215, 'REP0210', 'MANGUERA DE DIRECCION SUPERIOR', '92.88', 'repuesto'),
+(216, 'REP0211', 'MANGUERA DE PRESION DEL ACEITE HIDRAULICO', '92.88', 'repuesto'),
+(217, 'REP0212', 'MANGUERA DE TAPA VALVULA', '15.48', 'repuesto'),
+(218, 'REP0213', 'MANGUERA DEL TURBO', '154.80', 'repuesto'),
+(219, 'REP0214', 'MANGUERA DEL CILINDRO AUXILIAR DE EMBRAGUE', '15.48', 'repuesto'),
+(220, 'REP0215', 'MANGUERA DE DIRECCION HIDRAULICA', '92.88', 'repuesto'),
+(221, 'REP0216', 'MANGUERA INFERIOR DE RADIADOR', '30.96', 'repuesto'),
+(222, 'REP0217', 'MANGUERA INTERCOOLER INFERIOR', '30.96', 'repuesto'),
+(223, 'REP0218', 'MANGUERA INTERCOOLER SUPERIOR', '30.96', 'repuesto'),
+(224, 'REP0219', 'MANGUERA SUPERIOR DE RADIADOR', '30.96', 'repuesto'),
+(225, 'REP0220', 'MANIJA ASIENTO LH PEQ DIM', '17.34', 'repuesto'),
+(226, 'REP0221', 'MANIJA ASIENTO LH/DMAX', '17.34', 'repuesto'),
+(227, 'REP0222', 'MANIJA ASIENTO RH PEQ DIM', '17.34', 'repuesto'),
+(228, 'REP0223', 'MANIJA ASIENTO RH/DMAX', '17.34', 'repuesto'),
+(229, 'REP0224', 'MANIJA REGULADOR ASIENTO LH', '18.58', 'repuesto'),
+(230, 'REP0225', 'MANIJA REGULADOR ASIENTO RH', '18.58', 'repuesto'),
+(231, 'REP0226', 'MANZANA RUEDA DELANTERA DIM 4X4', '99.07', 'repuesto'),
+(232, 'REP0227', 'MASA DE ARRANQUE', '49.54', 'repuesto'),
+(233, 'REP0228', 'MESA INFERIOR DE SUSPENSION ', '89.79', 'repuesto'),
+(234, 'REP0229', 'MESA SUPERIOR DE SUSPENSION ', '89.79', 'repuesto'),
+(235, 'REP0230', 'MODULO ACTUADOR 4X4', '495.37', 'repuesto'),
+(236, 'REP0231', 'MODULO DE BALIZA', '185.76', 'repuesto'),
+(237, 'REP0232', 'MODULO MOTOR ECM', '619.21', 'repuesto'),
+(238, 'REP0233', 'MOLDURA CROMADA MASCARILLA', '49.54', 'repuesto'),
+(239, 'REP0234', 'MORDAZA DE FRENO', '154.80', 'repuesto'),
+(240, 'REP0235', 'MOTOR DE ARRANQUE', '154.80', 'repuesto'),
+(241, 'REP0236', 'MOTOR ELEVAVIDRIO', '111.46', 'repuesto'),
+(242, 'REP0237', 'ORING DE ALTERNADOR', '4.95', 'repuesto'),
+(243, 'REP0238', 'ORING DE BOMBA', '4.95', 'repuesto'),
+(244, 'REP0239', 'ORING DE ENFRIADOR DE ACEITE', '4.95', 'repuesto'),
+(245, 'REP0240', 'PALANCA DIRECCIONALES DIM/09', '37.15', 'repuesto'),
+(246, 'REP0241', 'PAQUETE DE RESORTE POSTERIOR', '37.15', 'repuesto'),
+(247, 'REP0242', 'PARLANTE DE SIRENA', '37.15', 'repuesto'),
+(248, 'REP0243', 'PASADOR 3X25/ROTULA T1', '3.10', 'repuesto'),
+(249, 'REP0244', 'PASADOR 4X40/SINFÍN/T2', '3.10', 'repuesto'),
+(250, 'REP0245', 'PEGAMENTO PEGA TODO', '3.10', 'repuesto'),
+(251, 'REP0246', 'PERNO 10X100', '1.24', 'repuesto'),
+(252, 'REP0247', 'PERNO 10X48', '1.24', 'repuesto'),
+(253, 'REP0248', 'PERNO 12X30', '1.24', 'repuesto'),
+(254, 'REP0249', 'PERNO 16X120', '1.24', 'repuesto'),
+(255, 'REP0250', 'PERNO 4X20', '1.24', 'repuesto'),
+(256, 'REP0251', 'PERNO 6X10', '1.24', 'repuesto'),
+(257, 'REP0252', 'PERNO 6X15', '1.24', 'repuesto'),
+(258, 'REP0253', 'PERNO 6X18', '1.24', 'repuesto'),
+(259, 'REP0254', 'PERNO 8X75', '1.24', 'repuesto'),
+(260, 'REP0255', 'PERNO ALEN', '2.17', 'repuesto'),
+(261, 'REP0256', 'PERNO BASE DE ALTERNADOR', '2.17', 'repuesto'),
+(262, 'REP0257', 'PERNO CABINA DELANTERO FRONTAL', '2.17', 'repuesto'),
+(263, 'REP0258', 'PERNO CABINA FRONTAL/DIM', '1.24', 'repuesto'),
+(264, 'REP0259', 'PERNO DE BOMBA AUXILIAR', '1.86', 'repuesto'),
+(265, 'REP0260', 'PERNO DEL  MORDAZA DE FRENO INFERIOR', '1.86', 'repuesto'),
+(266, 'REP0261', 'PERNO DEL  MORDAZA DE FRENO SUPERIOR', '1.86', 'repuesto'),
+(267, 'REP0262', 'PERNO ENTRADA FILTRO', '1.86', 'repuesto'),
+(268, 'REP0263', 'PERNO GUIA DE PAQUETE', '1.86', 'repuesto'),
+(269, 'REP0264', 'PERNO REG.SUSP. DIM', '1.86', 'repuesto'),
+(270, 'REP0265', 'PERNO RUEDA DEL', '1.86', 'repuesto'),
+(271, 'REP0266', 'PERNO RUEDAS POS', '1.86', 'repuesto'),
+(272, 'REP0267', 'PERNO VALVULA', '1.86', 'repuesto'),
+(273, 'REP0268', 'PIÑON CC 1ERA', '154.80', 'repuesto'),
+(274, 'REP0269', 'PIÑON CC 2DA', '154.80', 'repuesto'),
+(275, 'REP0270', 'PIÑON CC 3ERA', '154.80', 'repuesto'),
+(276, 'REP0271', 'PIÑON CC 4TA', '154.80', 'repuesto'),
+(277, 'REP0272', 'PIÑON CC 5TA', '154.80', 'repuesto'),
+(278, 'REP0273', 'PIÑON CC RETRO', '154.80', 'repuesto'),
+(279, 'REP0274', 'PIÑON DEL  BARRA DE LEVAS', '92.88', 'repuesto'),
+(280, 'REP0275', 'PIÑON DEL CIGÜEÑAL', '49.54', 'repuesto'),
+(281, 'REP0276', 'PIÑON DISTRIBUCION', '92.88', 'repuesto'),
+(282, 'REP0277', 'PIÑON EJE DE ENTRADA ', '49.54', 'repuesto'),
+(283, 'REP0278', 'PIÑON TRANS/DIM', '18.58', 'repuesto'),
+(284, 'REP0279', 'PISTON DE MOTOR STD', '300.32', 'repuesto'),
+(285, 'REP0280', 'PISTON MORDAZA DIM 4X4', '74.31', 'repuesto'),
+(286, 'REP0281', 'PLACA DE DIODO DE ALTERNADOR', '18.58', 'repuesto'),
+(287, 'REP0282', 'PLACA LED PARA BALIZAS', '30.96', 'repuesto'),
+(288, 'REP0283', 'PLANETARIO DIFERENCIAL', '92.88', 'repuesto'),
+(289, 'REP0284', 'POLEA CIGÜEÑAL', '52.63', 'repuesto'),
+(290, 'REP0285', 'POLEA DE ALTERNADOR', '27.86', 'repuesto'),
+(291, 'REP0286', 'PORTA CARBON *T*', '27.86', 'repuesto'),
+(292, 'REP0287', 'PORTA FUSIBLE ', '52.63', 'repuesto'),
+(293, 'REP0288', 'PORTALLANTA EMERG.DIM', '24.77', 'repuesto'),
+(294, 'REP0289', 'PRESILLA CABLE', '6.19', 'repuesto'),
+(295, 'REP0290', 'RADIADOR CONJUNTO', '77.40', 'repuesto'),
+(296, 'REP0291', 'REFRIGERANTE LIQUIDO', '11.15', 'repuesto'),
+(297, 'REP0292', 'REGULADOR VOLTAJE', '46.44', 'repuesto'),
+(298, 'REP0293', 'REGULADOR PRESION', '18.58', 'repuesto'),
+(299, 'REP0294', 'REJILLA CENTRAL DE VENTILACION TABLERO', '15.48', 'repuesto'),
+(300, 'REP0295', 'REJILLA DE VENTILACION LH TABLERO ', '15.48', 'repuesto'),
+(301, 'REP0296', 'REJILLA DE VENTILACION RH TABLERO', '15.48', 'repuesto'),
+(302, 'REP0297', 'RELE CAJA DE FUSIBLES', '9.29', 'repuesto'),
+(303, 'REP0298', 'RELE DE LUCES', '9.29', 'repuesto'),
+(304, 'REP0299', 'RELE ENCENDIDO', '9.29', 'repuesto'),
+(305, 'REP0300', 'RELE PITO 12V/30A/5P', '9.29', 'repuesto'),
+(306, 'REP0301', 'RESERVORIO AUX.RAD/TF/DIM', '18.58', 'repuesto'),
+(307, 'REP0302', 'RESISTENCIA A/C DIM/09-', '9.29', 'repuesto'),
+(308, 'REP0303', 'RESISTENCIA DE BALIZA', '9.29', 'repuesto'),
+(309, 'REP0304', 'RESISTENCIA DE CUADRO DE INSTRUMENTO', '9.29', 'repuesto'),
+(310, 'REP0305', 'RESISTENCIA DE SIRENA', '9.29', 'repuesto'),
+(311, 'REP0306', 'RESORTE ZAPATA', '6.19', 'repuesto'),
+(312, 'REP0307', 'RETEN ALTERNADOR ', '3.10', 'repuesto'),
+(313, 'REP0308', 'RETEN BOMBA DIRECCION', '6.19', 'repuesto'),
+(314, 'REP0309', 'RETEN BOMBA INYECC', '6.19', 'repuesto'),
+(315, 'REP0310', 'RETEN CAJA TRANSFER', '6.19', 'repuesto'),
+(316, 'REP0311', 'RETEN DE CORNETA', '6.19', 'repuesto'),
+(317, 'REP0312', 'RETEN EJE ENTRADA', '9.29', 'repuesto'),
+(318, 'REP0313', 'RETEN SUP DIRECCION', '15.48', 'repuesto'),
+(319, 'REP0314', 'RETEN TAPA CAJA CAMBIOS', '3.10', 'repuesto'),
+(320, 'REP0315', 'RETENEDOR  DELANTERO CIGÜEÑAL', '27.86', 'repuesto'),
+(321, 'REP0316', 'RETENEDOR DE ALTERNADOR', '6.19', 'repuesto'),
+(322, 'REP0317', 'RETENEDOR DEL CONO', '6.19', 'repuesto'),
+(323, 'REP0318', 'RETENEDOR DEL EJE POSTERIOR', '9.29', 'repuesto'),
+(324, 'REP0319', 'RETENEDOR INTERIOR DEL  RUEDA DELANTERA', '9.29', 'repuesto'),
+(325, 'REP0320', 'RETENEDOR INTERIOR DEL EJE POSTERIOR', '9.29', 'repuesto'),
+(326, 'REP0321', 'RETENEDOR POSTERIOR CAJA DE CAMBIOS', '6.19', 'repuesto'),
+(327, 'REP0322', 'RETENEDOR POSTERIOR DEL CIGÜEÑAL', '18.58', 'repuesto'),
+(328, 'REP0323', 'RODAM POSTERIOR CIGÜEÑAL', '18.58', 'repuesto'),
+(329, 'REP0324', 'RODAMIENTO  INTERIOR DE CONO', '9.29', 'repuesto'),
+(330, 'REP0325', 'RODAMIENTO CAJA DE CAMBIOS', '37.15', 'repuesto'),
+(331, 'REP0326', 'RODAMIENTO DE CONO Y CORONA', '74.31', 'repuesto'),
+(332, 'REP0327', 'RODAMIENTO EXTERIOR DE CONO', '37.15', 'repuesto'),
+(333, 'REP0328', 'RODAMIENTO POLEA COMPRESOR', '24.77', 'repuesto'),
+(334, 'REP0329', 'RODELA DE ARRAQNUE', '15.48', 'repuesto'),
+(335, 'REP0330', 'RODELA GUIA', '15.48', 'repuesto'),
+(336, 'REP0331', 'RODELAS BOMBA', '15.48', 'repuesto'),
+(337, 'REP0332', 'ROTULA MESA INFERIOR ', '29.72', 'repuesto'),
+(338, 'REP0333', 'ROTULA MESA SUPERIOR ', '29.72', 'repuesto'),
+(339, 'REP0334', 'RULIMAN CENTRAL DEL CARDAN', '55.73', 'repuesto'),
+(340, 'REP0335', 'RULIMAN DE ALTERNADOR DELANTERO', '6.19', 'repuesto'),
+(341, 'REP0336', 'RULIMAN DE ALTERNADOR POSTERIOR', '6.19', 'repuesto'),
+(342, 'REP0337', 'RULIMAN DEL EJE POSTERIOR', '6.19', 'repuesto'),
+(343, 'REP0338', 'RULIMAN EXTERIOR DE RUEDA DELANTERA', '17.34', 'repuesto'),
+(344, 'REP0339', 'RULIMAN INTERIOR DE RUEDA DELANTERA', '17.34', 'repuesto'),
+(345, 'REP0340', 'SATELITE DIFERENCIAL', '55.73', 'repuesto'),
+(346, 'REP0341', 'SEGURO DE EJE', '6.19', 'repuesto'),
+(347, 'REP0342', 'SELLADOR  SIKAFLEX', '6.19', 'repuesto'),
+(348, 'REP0343', 'SELLO PERNO CUB.T/V DIM', '1.86', 'repuesto'),
+(349, 'REP0344', 'SENSOR ACUMULADOR DE GASES (EGR)', '114.55', 'repuesto'),
+(350, 'REP0345', 'SENSOR TPS ACELERACION', '99.07', 'repuesto'),
+(351, 'REP0346', 'SENSOR DE ANGULO', '99.07', 'repuesto'),
+(352, 'REP0347', 'SENSOR DE OXIGENO', '114.55', 'repuesto'),
+(353, 'REP0348', 'SENSOR FILTRO SED/DIM', '52.63', 'repuesto'),
+(354, 'REP0349', 'SENSOR MAF', '148.61', 'repuesto'),
+(355, 'REP0350', 'SENSOR POSICION CIGÜEÑAL 3.0', '77.40', 'repuesto'),
+(356, 'REP0351', 'SENSOR PRESION DEL TURBO', '173.38', 'repuesto'),
+(357, 'REP0352', 'SENSOR TERMICO ', '148.61', 'repuesto'),
+(358, 'REP0353', 'SENSOR VELOCIMETRO', '92.88', 'repuesto'),
+(359, 'REP0354', 'SEÑALETICA VEHICULO POLICIAL', '43.34', 'repuesto'),
+(360, 'REP0355', 'SERVOFRENO ', '154.80', 'repuesto'),
+(361, 'REP0356', 'SHELACK', '6.19', 'repuesto'),
+(362, 'REP0357', 'SILICON GRIS', '6.19', 'repuesto'),
+(363, 'REP0358', 'SINCRONIZADO DE CAJA', '92.88', 'repuesto'),
+(364, 'REP0359', 'SINCRONIZADOR DE CAJA DE CAMBIOS', '111.46', 'repuesto'),
+(365, 'REP0360', 'SIRENA ALARMA CHEVY', '167.19', 'repuesto'),
+(366, 'REP0361', 'SOCKET 2P', '4.95', 'repuesto'),
+(367, 'REP0362', 'SOCKET B/HALOG/2P', '4.95', 'repuesto'),
+(368, 'REP0363', 'SOCKET B/HALOG/3P/J4', '4.95', 'repuesto'),
+(369, 'REP0364', 'SOCKET BOMBILLO H7 JB', '4.95', 'repuesto'),
+(370, 'REP0365', 'SOCKET BOMBILLO H7/DIM', '5.57', 'repuesto'),
+(371, 'REP0366', 'SOCKET DE FARO ', '5.57', 'repuesto'),
+(372, 'REP0367', 'SOPORTE DE AMORTIGUADOR DEL', '27.86', 'repuesto'),
+(373, 'REP0368', 'SOPORTE DE VIDRIO', '18.58', 'repuesto'),
+(374, 'REP0369', 'SOPORTE ESC/DIM', '18.58', 'repuesto'),
+(375, 'REP0370', 'SOPORTE PARA ANULAR 4X4', '18.58', 'repuesto'),
+(376, 'REP0371', 'SPRAY  LIMPIACARBURADOR', '6.19', 'repuesto'),
+(377, 'REP0372', 'SPRAY LIMPIADOR DE CONTACTOS', '6.19', 'repuesto'),
+(378, 'REP0373', 'SPRAY LIMPIADOR DE FRENOS', '6.19', 'repuesto'),
+(379, 'REP0374', 'SPRAY PENETRANTE', '6.19', 'repuesto'),
+(380, 'REP0375', 'SPRAY SILICON LUBRICANTE', '6.19', 'repuesto'),
+(381, 'REP0376', 'SWICHT DE BALIZA', '6.19', 'repuesto'),
+(382, 'REP0377', 'SWICHT DE SIRENA', '6.19', 'repuesto'),
+(383, 'REP0378', 'SWITCH VARIOS', '9.29', 'repuesto'),
+(384, 'REP0379', 'TAMBOR DE FRENO', '43.34', 'repuesto'),
+(385, 'REP0380', 'TAPA DE COMBUSTIBLE', '37.15', 'repuesto'),
+(386, 'REP0381', 'TAPA PORTACARBONES', '12.38', 'repuesto'),
+(387, 'REP0382', 'TAPA RADIADIADOR', '13.62', 'repuesto'),
+(388, 'REP0383', 'TAPON DE CARTER', '3.10', 'repuesto'),
+(389, 'REP0384', 'TARJETA DE BOMBA DE INYECCION', '173.38', 'repuesto'),
+(390, 'REP0385', 'TEFLON', '1.86', 'repuesto'),
+(391, 'REP0386', 'TEMPLADOR CADENA DEL  DISTRIBUCION', '43.34', 'repuesto'),
+(392, 'REP0387', 'TERMINAL BATERIA GRANDE', '6.19', 'repuesto'),
+(393, 'REP0388', 'TERMINAL BATERIA PEQUEÑO', '6.19', 'repuesto'),
+(394, 'REP0389', 'TERMINAL DE BARRA ESTABILIZADORA', '15.48', 'repuesto'),
+(395, 'REP0390', 'TERMINAL EXTERIOR DE DIRECCIÓN ', '15.48', 'repuesto'),
+(396, 'REP0391', 'TERMINAL OJO AMAR/M6', '9.29', 'repuesto'),
+(397, 'REP0392', 'TERMINAL OJOAZUL /M6', '9.29', 'repuesto'),
+(398, 'REP0393', 'TERMOSTATO', '26.01', 'repuesto'),
+(399, 'REP0394', 'TOPE CAPOT DIM', '6.19', 'repuesto'),
+(400, 'REP0395', 'TOPE HIDRAULICO DEL PISO', '6.19', 'repuesto'),
+(401, 'REP0396', 'TORNILLO COMPUERTA DE BALDE', '1.86', 'repuesto'),
+(402, 'REP0397', 'TORNILLO PIN MORDAZA', '1.86', 'repuesto'),
+(403, 'REP0398', 'TRANSFORMADOR DE SIRENA', '30.96', 'repuesto'),
+(404, 'REP0399', 'TRANSISTOR DE BALIZAS', '30.96', 'repuesto'),
+(405, 'REP0400', 'TRANSITOR DE MEGAFONO', '30.96', 'repuesto'),
+(406, 'REP0401', 'TRANSITORES DE SIRENA', '30.96', 'repuesto'),
+(407, 'REP0402', 'TROMPO A/C D-MAX', '24.77', 'repuesto'),
+(408, 'REP0403', 'TROMPO DE LA DOBLE TRANSMISION', '18.58', 'repuesto'),
+(409, 'REP0404', 'TROMPO NEUTRO ', '18.58', 'repuesto'),
+(410, 'REP0405', 'TROMPO PRESION AC DIM', '18.58', 'repuesto'),
+(411, 'REP0406', 'TROMPO REVERSA', '18.58', 'repuesto'),
+(412, 'REP0407', 'TUBO RETORNO ACEITE DIM', '6.19', 'repuesto'),
+(413, 'REP0408', 'TUERCA DE RUEDA', '0.62', 'repuesto'),
+(414, 'REP0409', 'TUERCA EJE CONO', '0.62', 'repuesto'),
+(415, 'REP0410', 'TUERCA M12X1.5', '0.62', 'repuesto'),
+(416, 'REP0411', 'TUERCA M6', '0.62', 'repuesto'),
+(417, 'REP0412', 'TURBO COMPRESOR', '588.25', 'repuesto'),
+(418, 'REP0413', 'U DE RADIADOR', '6.19', 'repuesto'),
+(419, 'REP0414', 'VALVULA DE AVANCE', '74.31', 'repuesto'),
+(420, 'REP0415', 'VALVULA DE RETORNO', '74.31', 'repuesto'),
+(421, 'REP0416', 'VALVULA DE VACIO', '74.31', 'repuesto'),
+(422, 'REP0417', 'VALVULA EGR', '86.69', 'repuesto'),
+(423, 'REP0418', 'VALVULA EVAPORADOR ', '68.11', 'repuesto'),
+(424, 'REP0419', 'VALVULA EXPANSION A/C', '61.92', 'repuesto'),
+(425, 'REP0420', 'VALVULA REGULADORA', '61.92', 'repuesto'),
+(426, 'REP0421', 'VALVULA TRATAMIENTO DE OLORES A/C', '30.96', 'repuesto'),
+(427, 'REP0422', 'VALVULA VENT T/V', '30.96', 'repuesto'),
+(428, 'REP0423', 'VALVULAS DE ADMISION', '9.29', 'repuesto'),
+(429, 'REP0424', 'VALVULAS DE ESCAPE', '9.29', 'repuesto'),
+(430, 'REP0425', 'VENTILADOR DE RADIADOR', '30.96', 'repuesto'),
+(431, 'REP0426', 'VENTILADOR EVAPORADOR CALEFACCION A/C', '30.96', 'repuesto'),
+(432, 'REP0427', 'VINCHA GUARDAPOLVO', '6.19', 'repuesto'),
+(433, 'REP0428', 'VINCHA MOLDURA DE ARCO RUEDA', '3.10', 'repuesto'),
+(434, 'REP0429', 'VINCHA REGULACION ZAPATA', '6.19', 'repuesto'),
+(435, 'REP0430', 'VINCHA TAPIZADO', '6.19', 'repuesto');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuarios`
+--
+
+CREATE TABLE `usuarios` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `apellido` varchar(100) NOT NULL,
+  `usuario` varchar(50) NOT NULL,
+  `clave` varchar(255) NOT NULL,
+  `rol` enum('admin','tecnico') NOT NULL,
+  `estado` enum('activo','inactivo') DEFAULT 'activo'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `usuarios`
+--
+
+INSERT INTO `usuarios` (`id`, `nombre`, `apellido`, `usuario`, `clave`, `rol`, `estado`) VALUES
+(1, 'Nadmin', 'Aadmin', 'admin', '$2y$10$BClzd9tlAFT0C1UsMon5yuaCfALZHlAdZz8KI3KkMPnlSPjbEkiNK', 'admin', 'activo'),
+(2, 'Tecnico', 'Atecnico', 'tec1', '$2y$10$P5ZbiFVzDy.khcWKmh463eaBUoKw74SaGr2KHuZAHi2DeexThspBi', 'tecnico', 'activo'),
+(3, 'Tecnico2', 'Atec2', 'tec2', '$2y$10$dlz.4k5mS16JinZZ1tUJeuoLlE4q4CJshgIuLQzGLoC9okojVIJLu', 'tecnico', 'activo');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `vehiculos`
+--
+
+CREATE TABLE `vehiculos` (
+  `id` int(11) NOT NULL,
+  `id_cliente` int(11) NOT NULL,
+  `marca` varchar(50) NOT NULL,
+  `placa` varchar(20) NOT NULL,
+  `kilometraje` varchar(20) DEFAULT '0',
+  `id_modelo` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `vehiculos`
+--
+
+INSERT INTO `vehiculos` (`id`, `id_cliente`, `marca`, `placa`, `kilometraje`, `id_modelo`) VALUES
+(1, 1, 'Chevrolet', 'PLJ-4444', '10.000', 1);
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `clientes`
+--
+ALTER TABLE `clientes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `identificacion` (`identificacion`);
+
+--
+-- Indices de la tabla `detalle_facturas`
+--
+ALTER TABLE `detalle_facturas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_factura` (`id_factura`);
+
+--
+-- Indices de la tabla `detalle_ordenes`
+--
+ALTER TABLE `detalle_ordenes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_orden` (`id_orden`),
+  ADD KEY `id_servicio` (`id_servicio`);
+
+--
+-- Indices de la tabla `facturas`
+--
+ALTER TABLE `facturas`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `numero_factura` (`numero_factura`),
+  ADD KEY `id_orden` (`id_orden`);
+
+--
+-- Indices de la tabla `modelos_vehiculo`
+--
+ALTER TABLE `modelos_vehiculo`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `nombre_modelo` (`nombre_modelo`);
+
+--
+-- Indices de la tabla `ordenes_servicio`
+--
+ALTER TABLE `ordenes_servicio`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `numero_orden` (`numero_orden`),
+  ADD KEY `id_vehiculo` (`id_vehiculo`),
+  ADD KEY `id_tecnico` (`id_tecnico`);
+
+--
+-- Indices de la tabla `precios_modelo_vehiculo`
+--
+ALTER TABLE `precios_modelo_vehiculo`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_modelo` (`id_modelo`),
+  ADD KEY `id_servicio` (`id_servicio`);
+
+--
+-- Indices de la tabla `servicios`
+--
+ALTER TABLE `servicios`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`);
+
+--
+-- Indices de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `usuario` (`usuario`);
+
+--
+-- Indices de la tabla `vehiculos`
+--
+ALTER TABLE `vehiculos`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `placa` (`placa`),
+  ADD KEY `id_cliente` (`id_cliente`),
+  ADD KEY `fk_vehiculos_modelo` (`id_modelo`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `clientes`
+--
+ALTER TABLE `clientes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `detalle_facturas`
+--
+ALTER TABLE `detalle_facturas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `detalle_ordenes`
+--
+ALTER TABLE `detalle_ordenes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `facturas`
+--
+ALTER TABLE `facturas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `modelos_vehiculo`
+--
+ALTER TABLE `modelos_vehiculo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `ordenes_servicio`
+--
+ALTER TABLE `ordenes_servicio`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `precios_modelo_vehiculo`
+--
+ALTER TABLE `precios_modelo_vehiculo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=435;
+
+--
+-- AUTO_INCREMENT de la tabla `servicios`
+--
+ALTER TABLE `servicios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=436;
+
+--
+-- AUTO_INCREMENT de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `vehiculos`
+--
+ALTER TABLE `vehiculos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `detalle_facturas`
+--
+ALTER TABLE `detalle_facturas`
+  ADD CONSTRAINT `detalle_facturas_ibfk_1` FOREIGN KEY (`id_factura`) REFERENCES `facturas` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `detalle_ordenes`
+--
+ALTER TABLE `detalle_ordenes`
+  ADD CONSTRAINT `detalle_ordenes_ibfk_1` FOREIGN KEY (`id_orden`) REFERENCES `ordenes_servicio` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `detalle_ordenes_ibfk_2` FOREIGN KEY (`id_servicio`) REFERENCES `servicios` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `facturas`
+--
+ALTER TABLE `facturas`
+  ADD CONSTRAINT `facturas_ibfk_1` FOREIGN KEY (`id_orden`) REFERENCES `ordenes_servicio` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `ordenes_servicio`
+--
+ALTER TABLE `ordenes_servicio`
+  ADD CONSTRAINT `ordenes_servicio_ibfk_1` FOREIGN KEY (`id_vehiculo`) REFERENCES `vehiculos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `ordenes_servicio_ibfk_2` FOREIGN KEY (`id_tecnico`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL;
+
+--
+-- Filtros para la tabla `precios_modelo_vehiculo`
+--
+ALTER TABLE `precios_modelo_vehiculo`
+  ADD CONSTRAINT `precios_modelo_vehiculo_ibfk_1` FOREIGN KEY (`id_modelo`) REFERENCES `modelos_vehiculo` (`id`),
+  ADD CONSTRAINT `precios_modelo_vehiculo_ibfk_2` FOREIGN KEY (`id_servicio`) REFERENCES `servicios` (`id`);
+
+--
+-- Filtros para la tabla `vehiculos`
+--
+ALTER TABLE `vehiculos`
+  ADD CONSTRAINT `fk_vehiculos_modelo` FOREIGN KEY (`id_modelo`) REFERENCES `modelos_vehiculo` (`id`),
+  ADD CONSTRAINT `vehiculos_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+

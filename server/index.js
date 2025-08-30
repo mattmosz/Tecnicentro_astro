@@ -12,6 +12,8 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 import authRoutes from './routes/auth.js';
+import clientesRoutes from './routes/clientes.js';
+import vehiculosRoutes from './routes/vehiculos.js';
 // (si tienes más rutas, impórtalas aquí)
 
 const app = express();
@@ -37,6 +39,8 @@ app.use((req, _res, next) => {
 
 // Rutas
 app.use('/api/auth', authRoutes);
+app.use('/api/clientes', clientesRoutes);
+app.use('/api/vehiculos', vehiculosRoutes);
 
 // Health
 app.get('/api/health', (_req, res) => {
