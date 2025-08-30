@@ -1,1112 +1,205 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 ---
-
-<Layout title="Gestión de Clientes">
-  <div class="container">
-    <!-- Header con botón volver y crear nuevo -->
-    <div class="page-header">
-      <div class="header-left">
-        <a href="/admin/dashboard" class="btn btn-orange">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5"></path>
-            <polyline points="12,19 5,12 12,5"></polyline>
-          </svg>
-          Volver al Dashboard
-        </a>
-        <h1>Gestión de Clientes</h1>
-      </div>
-      <button id="btnNuevoCliente" class="btn btn-primary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        Nuevo Cliente
-      </button>
-    </div>
-
-    <!-- Buscador -->
-    <div class="search-section">
-      <div class="search-box">
-        <input 
-          type="text" 
-          id="searchInput" 
-          placeholder="Buscar por nombre, apellido o cédula..." 
-          class="search-input"
-        >
-        <button id="btnBuscar" class="btn btn-secondary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="M21 21l-4.35-4.35"></path>
-          </svg>
-          Buscar
-        </button>
-        <button id="btnLimpiar" class="btn btn-light">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-          Limpiar
-        </button>
+<Layout title="Clientes - TecniCentro Ibarra Express">
+  <header class="navbar" role="banner">
+    <div class="container">
+      <a href="/admin/dashboard" class="brand"><span class="logo-circle">🔧</span><span class="brand-text">TecniCentro Ibarra Express</span></a>
+      <div class="user-menu">
+        <span id="userWelcome" class="user-chip">Cargando…</span>
+        <button type="button" id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">Cerrar Sesión</button>
       </div>
     </div>
+  </header>
 
-    <!-- Tabla de clientes -->
-    <div class="table-section">
-      <div id="loadingSpinner" class="loading hidden">Cargando clientes...</div>
-      <div id="errorMessage" class="error-message hidden"></div>
-      
-      <table id="tablaClientes" class="table">
-        <thead>
-          <tr>
-            <th>Tipo</th>
-            <th>Identificación</th>
-            <th>Nombre / Razón Social</th>
-            <th>Teléfono</th>
-            <th>Correo</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="clientesBody">
-          <!-- Los datos se cargan dinámicamente -->
-        </tbody>
-      </table>
+  <main class="page">
+    <div class="container">
+      <div class="header-row">
+        <div>
+          <h1>Gestión de Clientes</h1>
+          <p class="muted">Administra tus clientes y contactos</p>
+        </div>
+        <div class="actions">
+          <input id="q" class="input" placeholder="Buscar por CI / nombre / email" />
+          <button class="btn btn-outline" id="btnBuscar">Buscar</button>
+          <button class="btn btn-orange" id="btnNuevo">Nuevo Cliente</button>
+        </div>
+      </div>
 
-      <!-- Paginación -->
-      <div id="paginacion" class="pagination">
-        <button id="btnAnterior" class="btn btn-light">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="15,18 9,12 15,6"></polyline>
-          </svg>
-          Anterior
-        </button>
-        <span id="infoPagina">Página 1 de 1</span>
-        <button id="btnSiguiente" class="btn btn-light">
-          Siguiente
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9,18 15,12 9,6"></polyline>
-          </svg>
-        </button>
+      <div class="card">
+        <div class="card-head"><h3>Listado</h3></div>
+        <div class="card-body">
+          <div id="wrapTable" class="table-wrap"><div class="skeleton"></div></div>
+          <div class="pager">
+            <button id="prev" class="btn btn-outline" disabled>Anterior</button>
+            <span id="pageInfo" class="muted">Página 1</span>
+            <button id="next" class="btn btn-outline" disabled>Siguiente</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </main>
 
-  <!-- Modal para crear/editar cliente -->
-  <div id="modalCliente" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
+  <!-- Modal Cliente -->
+  <dialog id="modalCliente">
+    <form id="frmCliente" method="dialog" class="modal">
+      <div class="modal-head">
         <h3 id="modalTitle">Nuevo Cliente</h3>
-        <button id="btnCerrarModal" class="btn-close">×</button>
+        <button class="icon" type="button" id="closeCliente">✖</button>
       </div>
-      
-      <form id="formCliente" class="modal-body">
-        <div class="form-group">
-          <label for="tipo">Tipo de Cliente *</label>
-          <select id="tipo" name="tipo" required>
-            <option value="">Seleccionar tipo</option>
-            <option value="particular">Particular</option>
-            <option value="institucion">Institución</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="identificacion">Identificación *</label>
-          <input type="text" id="identificacion" name="identificacion" required maxlength="20">
-          <small class="help-text">Cédula (10 dígitos) o RUC (13 dígitos)</small>
-        </div>
-
-        <div id="camposParticular" class="campos-tipo">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="nombres">Nombres *</label>
-              <input type="text" id="nombres" name="nombres" maxlength="100">
-            </div>
-            <div class="form-group">
-              <label for="apellidos">Apellidos *</label>
-              <input type="text" id="apellidos" name="apellidos" maxlength="100">
-            </div>
-          </div>
-        </div>
-
-        <div id="camposInstitucion" class="campos-tipo hidden">
-          <div class="form-group">
-            <label for="razon_social">Razón Social *</label>
-            <input type="text" id="razon_social" name="razon_social" maxlength="150">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="telefono">Teléfono</label>
-          <input type="text" id="telefono" name="telefono" maxlength="20">
-        </div>
-
-        <div class="form-group">
-          <label for="correo">Correo Electrónico</label>
-          <input type="email" id="correo" name="correo" maxlength="100">
-        </div>
-
-        <div class="form-group">
-          <label for="direccion">Dirección</label>
-          <textarea id="direccion" name="direccion" rows="3" maxlength="200"></textarea>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" id="btnCancelar" class="btn btn-light">Cancelar</button>
-          <button type="submit" id="btnGuardar" class="btn btn-primary">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal de confirmación -->
-  <div id="modalConfirm" class="modal hidden">
-    <div class="modal-content small">
-      <div class="modal-header">
-        <h3>Confirmar Eliminación</h3>
-        <button id="btnCerrarConfirm" class="btn-close">×</button>
+      <div class="modal-body grid2">
+        <label>CI/RUC<input name="identificacion" required class="input" /></label>
+        <label>Nombre<input name="nombre" required class="input" /></label>
+        <label>Teléfono<input name="telefono" class="input" /></label>
+        <label>Email<input name="email" type="email" class="input" /></label>
+        <label>Dirección<input name="direccion" class="input" /></label>
       </div>
-      <div class="modal-body">
-        <p id="mensajeConfirm">¿Está seguro que desea eliminar este cliente?</p>
-        <div class="modal-footer">
-          <button id="btnCancelarElim" class="btn btn-light">Cancelar</button>
-          <button id="btnConfirmarElim" class="btn btn-danger">Eliminar</button>
-        </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" value="cancel">Cancelar</button>
+        <button class="btn btn-orange" id="btnGuardarCliente" value="default">Guardar</button>
       </div>
-    </div>
-  </div>
-
-  <!-- Toast para mensajes -->
-  <div id="toast" class="toast hidden">
-    <span id="toastMessage"></span>
-  </div>
+    </form>
+  </dialog>
 
   <style>
-    /* Variables CSS consistentes con el dashboard */
-    :root {
-      --bg: #f6f8fb;
-      --card: #fff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --blue: #1e40af;
-      --blue-500: #3b82f6;
-      --green-500: #22c55e;
-      --amber-500: #f59e0b;
-      --orange-500: #fb923c;
-      --cyan-500: #06b6d4;
-      --slate-500: #64748b;
-      --red-500: #ef4444;
-      --ring: 0 1px 2px rgba(0,0,0,.04), 0 10px 20px rgba(2,6,23,.08);
-      --ring-sm: 0 1px 2px rgba(0,0,0,.04), 0 4px 8px rgba(2,6,23,.04);
-      --radius: 16px;
-      --radius-sm: 8px;
-      --container: 1200px;
-    }
-
-    body { 
-      background: var(--bg);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      color: var(--text);
-      line-height: 1.6;
-      margin: 0;
-    }
-
-    .container { 
-      max-width: var(--container); 
-      margin: 0 auto; 
-      padding: 2rem; 
-    }
-    
-    /* Header */
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    
-    .header-left h1 {
-      margin: 0;
-      color: var(--text);
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-    }
-
-    /* Botones estilo dashboard */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
-      border-radius: var(--radius-sm);
-      border: none;
-      font-weight: 600;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      text-decoration: none;
-      box-shadow: var(--ring-sm);
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--ring);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--blue-500), var(--blue));
-      color: white;
-    }
-
-    .btn-secondary {
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid #e5e7eb;
-    }
-
-    .btn-light {
-      background: #f8fafc;
-      color: var(--muted);
-      border: 1px solid #e2e8f0;
-    }
-
-    .btn-orange {
-      background: linear-gradient(135deg, var(--orange-500), #ff7849);
-      color: white;
-    }
-
-    .btn-sm {
-      padding: 0.375rem 0.75rem;
-      font-size: 0.75rem;
-      border-radius: 6px;
-      box-shadow: none;
-      border: 1px solid transparent;
-    }
-
-    .btn-info { 
-      background: var(--cyan-500); 
-      color: white; 
-    }
-
-    .btn-warning { 
-      background: var(--amber-500); 
-      color: white; 
-    }
-
-    .btn-danger { 
-      background: var(--red-500); 
-      color: white; 
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Cards estilo dashboard */
-    .search-section, .table-section {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--ring);
-      overflow: hidden;
-      margin-bottom: 1.5rem;
-    }
-
-    .search-section {
-      padding: 1.5rem;
-    }
-
-    .search-box {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .search-input {
-      flex: 1;
-      min-width: 300px;
-      padding: 0.75rem 1rem;
-      border: 1px solid #e5e7eb;
-      border-radius: var(--radius-sm);
-      font-size: 0.875rem;
-      background: var(--card);
-      color: var(--text);
-      transition: all 0.15s ease;
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--blue-500);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    /* Tabla estilo dashboard */
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 0;
-    }
-
-    .table th {
-      background: #fafbfc;
-      padding: 1rem;
-      text-align: left;
-      font-weight: 600;
-      font-size: 0.875rem;
-      color: var(--muted);
-      border-bottom: 1px solid #eef2f7;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .table td {
-      padding: 1rem;
-      border-bottom: 1px solid #f1f5f9;
-      vertical-align: middle;
-      font-size: 0.875rem;
-    }
-
-    .table tbody tr {
-      transition: all 0.15s ease;
-    }
-
-    .table tbody tr:hover {
-      background: #fafbfc;
-    }
-
-    .btn-actions {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    /* Paginación */
-    .pagination {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      background: #fafbfc;
-      border-top: 1px solid #eef2f7;
-      font-size: 0.875rem;
-      color: var(--muted);
-    }
-
-    /* Estados */
-    .loading {
-      text-align: center;
-      padding: 3rem;
-      color: var(--muted);
-      font-style: italic;
-    }
-
-    .error-message {
-      background: #fef2f2;
-      color: #dc2626;
-      padding: 1rem 1.5rem;
-      border-radius: var(--radius-sm);
-      margin: 1rem;
-      border: 1px solid #fecaca;
-      font-size: 0.875rem;
-    }
-
-    .hidden { 
-      display: none !important; 
-    }
-
-    /* Modales estilo dashboard */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      animation: fadeIn 0.15s ease;
-    }
-
-    .modal-content {
-      background: var(--card);
-      border-radius: var(--radius);
-      max-width: 600px;
-      width: 90%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      animation: slideUp 0.15s ease;
-    }
-
-    .modal-content.small { 
-      max-width: 400px; 
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem;
-      border-bottom: 1px solid #eef2f7;
-    }
-
-    .modal-header h3 { 
-      margin: 0; 
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .btn-close {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--muted);
-      padding: 0;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      transition: all 0.15s ease;
-    }
-
-    .btn-close:hover { 
-      background: #f1f5f9;
-      color: var(--text);
-    }
-
-    .modal-body {
-      padding: 1.5rem;
-    }
-
-    .modal-footer {
-      display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
-      margin-top: 2rem;
-    }
-
-    /* Formularios estilo dashboard */
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: var(--text);
-      font-size: 0.875rem;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid #e5e7eb;
-      border-radius: var(--radius-sm);
-      font-size: 0.875rem;
-      background: var(--card);
-      color: var(--text);
-      box-sizing: border-box;
-      transition: all 0.15s ease;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--blue-500);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .help-text {
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-top: 0.25rem;
-      display: block;
-    }
-
-    .campos-tipo.hidden { 
-      display: none; 
-    }
-
-    /* Badges estilo dashboard */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.25rem 0.625rem;
-      font-size: 0.75rem;
-      font-weight: 500;
-      border-radius: 9999px;
-      text-transform: uppercase;
-      letter-spacing: 0.025em;
-    }
-
-    .badge-info { 
-      background: #ecfeff; 
-      color: #0891b2; 
-    }
-
-    .badge-warning { 
-      background: #fffbeb; 
-      color: #d97706; 
-    }
-
-    /* Toast estilo dashboard */
-    .toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: var(--green-500);
-      color: white;
-      padding: 1rem 1.5rem;
-      border-radius: var(--radius-sm);
-      box-shadow: var(--ring);
-      z-index: 2000;
-      animation: slideInRight 0.3s ease;
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-
-    .toast.error { 
-      background: var(--red-500); 
-    }
-
-    /* Animaciones */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    @keyframes slideInRight {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .container { 
-        padding: 1rem; 
-      }
-      
-      .page-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 1rem;
-      }
-      
-      .header-left {
-        justify-content: space-between;
-      }
-      
-      .header-left h1 {
-        font-size: 1.5rem;
-      }
-      
-      .search-box {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      .search-input { 
-        min-width: auto; 
-      }
-      
-      .table-section { 
-        overflow-x: auto; 
-      }
-      
-      .table { 
-        min-width: 700px; 
-      }
-      
-      .form-row { 
-        grid-template-columns: 1fr; 
-      }
-      
-      .modal-content { 
-        width: 95%; 
-        margin: 1rem; 
-      }
-
-      .btn-actions {
-        flex-direction: column;
-      }
-
-      .btn-sm {
-        justify-content: center;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .pagination {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-      }
-    }
+    :root{--bg:#f6f8fb;--card:#fff;--text:#0f172a;--muted:#64748b;--orange-500:#fb923c;--ring:0 1px 2px rgba(0,0,0,.04),0 10px 20px rgba(2,6,23,.08);--radius:16px;--container:1200px}
+    .muted{color:var(--muted)} .navbar{position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid #eef2f7;z-index:20}
+    .navbar .container{display:flex;align-items:center;justify-content:space-between;height:64px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700}
+    .logo-circle{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--orange-500),#ffb07a);box-shadow:var(--ring)}
+    .user-menu{display:flex;align-items:center;gap:12px}.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .btn-outline{background:#fff;border:1px solid #e5e7eb}.btn-orange{background:var(--orange-500);color:#fff}
+    .container{max-width:var(--container);margin-inline:auto;padding:0 20px}.page{padding:24px 0 48px}
+    .header-row{display:flex;gap:12px;align-items:end;justify-content:space-between;margin:16px 0 18px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}.input{border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;min-width:240px}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--ring);overflow:hidden}
+    .card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eef2f7}
+    .card-body{padding:12px 16px 16px}.table-wrap{overflow:auto}
+    table{width:100%;border-collapse:separate;border-spacing:0} thead th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);text-align:left;padding:10px}
+    tbody td{padding:12px 10px;border-top:1px solid #eef2f7} tr:hover td{background:#fafafa}
+    .row-actions{display:flex;gap:6px}.icon-btn{border:1px solid #e5e7eb;border-radius:8px;padding:6px 8px;background:#fff}
+    .skeleton{height:64px;border-radius:12px;background:linear-gradient(90deg,#f2f4f8 25%,#e6eaf1 37%,#f2f4f8 63%);background-size:400% 100%;animation:shimmer 1.2s infinite}
+    @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+    .pager{display:flex;align-items:center;gap:10px;justify-content:flex-end;padding:10px 0}
+    dialog::backdrop{background:rgba(0,0,0,.25)} dialog{border:0;border-radius:14px;padding:0;box-shadow:var(--ring);max-width:720px;width:100%}
+    .modal{background:#fff;border-radius:14px;overflow:hidden}.modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #eef2f7}
+    .modal-body{padding:16px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid #eef2f7}
+    @media (max-width:720px){.grid2{grid-template-columns:1fr}.input{min-width:unset;width:100%}}
   </style>
 
   <script>
-    // Estado global
-    let clientes = [];
-    let clienteEditando = null;
-    let paginaActual = 1;
-    let totalPaginas = 1;
-    let terminoBusqueda = '';
+    // -------- logout & guard ----------
+    function _hardLogout(){ try{localStorage.removeItem('token');localStorage.removeItem('user')}finally{location.replace('/')} }
+    window.logout=_hardLogout;
+    document.addEventListener('click',(e)=>{const b=e.target.closest('#btnLogout');if(!b)return;e.preventDefault();_hardLogout();});
+    (async()=>{
+      const token=localStorage.getItem('token');const uStr=localStorage.getItem('user'); if(!token||!uStr) return _hardLogout();
+      try{const r=await fetch('/api/auth/verify',{headers:{Authorization:`Bearer ${token}`}});const j=await r.json().catch(()=>({}));if(!r.ok||!j?.success)return _hardLogout();}catch{return _hardLogout();}
+      const user=JSON.parse(uStr); if(user.rol!=='admin') return _hardLogout();
+      document.getElementById('userWelcome').textContent=`Bienvenido, ${user.nombre}`;
+      loadPage();
+    })();
 
-    // Referencias DOM
-    const elements = {
-      searchInput: document.getElementById('searchInput'),
-      btnBuscar: document.getElementById('btnBuscar'),
-      btnLimpiar: document.getElementById('btnLimpiar'),
-      btnNuevoCliente: document.getElementById('btnNuevoCliente'),
-      loadingSpinner: document.getElementById('loadingSpinner'),
-      errorMessage: document.getElementById('errorMessage'),
-      clientesBody: document.getElementById('clientesBody'),
-      btnAnterior: document.getElementById('btnAnterior'),
-      btnSiguiente: document.getElementById('btnSiguiente'),
-      infoPagina: document.getElementById('infoPagina'),
-      modalCliente: document.getElementById('modalCliente'),
-      modalTitle: document.getElementById('modalTitle'),
-      formCliente: document.getElementById('formCliente'),
-      btnCerrarModal: document.getElementById('btnCerrarModal'),
-      btnCancelar: document.getElementById('btnCancelar'),
-      btnGuardar: document.getElementById('btnGuardar'),
-      modalConfirm: document.getElementById('modalConfirm'),
-      mensajeConfirm: document.getElementById('mensajeConfirm'),
-      btnCerrarConfirm: document.getElementById('btnCerrarConfirm'),
-      btnCancelarElim: document.getElementById('btnCancelarElim'),
-      btnConfirmarElim: document.getElementById('btnConfirmarElim'),
-      toast: document.getElementById('toast'),
-      toastMessage: document.getElementById('toastMessage'),
-      tipo: document.getElementById('tipo'),
-      camposParticular: document.getElementById('camposParticular'),
-      camposInstitucion: document.getElementById('camposInstitucion'),
-      nombres: document.getElementById('nombres'),
-      apellidos: document.getElementById('apellidos'),
-      razonSocial: document.getElementById('razon_social')
-    };
+    // -------- page logic ----------
+    let page=1, limit=10, total=0, q='';
+    const fmt=new Intl.NumberFormat('es-EC');
 
-    // Inicialización
-    document.addEventListener('DOMContentLoaded', () => {
-      verificarAutenticacion();
-      configurarEventListeners();
-      cargarClientes();
+    async function loadPage(){
+      const token=localStorage.getItem('token');
+      const url=new URL('/api/clientes', location.origin);
+      url.searchParams.set('page', page); url.searchParams.set('limit', limit);
+      if(q) url.searchParams.set('q', q);
+      const r=await fetch(url,{headers:{Authorization:`Bearer ${token}`}}); 
+      const data=await r.json().catch(()=>({items:[],total:0}));
+      total=data.total||0;
+      renderTable(data.items||[]);
+      updatePager();
+    }
+
+    function renderTable(items){
+      const wrap=document.getElementById('wrapTable');
+      if(!items.length){ wrap.innerHTML = '<div class="muted">Sin resultados</div>'; return; }
+      wrap.innerHTML = `
+        <table>
+          <thead><tr>
+            <th>CI/RUC</th><th>Nombre</th><th>Teléfono</th><th>Email</th><th>Dirección</th><th></th>
+          </tr></thead>
+          <tbody>
+            ${items.map(c=>`
+              <tr>
+                <td>${c.identificacion||''}</td>
+                <td>${c.nombre||''}</td>
+                <td>${c.telefono||''}</td>
+                <td>${c.email||''}</td>
+                <td>${c.direccion||''}</td>
+                <td>
+                  <div class="row-actions">
+                    <button class="icon-btn" data-edit='${JSON.stringify(c).replaceAll("'", "&apos;")}'>✎</button>
+                    <button class="icon-btn" data-del="${c.id}">🗑</button>
+                  </div>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    function updatePager(){
+      const pages=Math.max(1, Math.ceil(total/limit));
+      document.getElementById('pageInfo').textContent = `Página ${page} de ${fmt.format(pages)} (${fmt.format(total)} registros)`;
+      document.getElementById('prev').disabled = page<=1;
+      document.getElementById('next').disabled = page>=pages;
+    }
+
+    // search & pager
+    document.getElementById('btnBuscar').addEventListener('click', ()=>{ q=document.getElementById('q').value.trim(); page=1; loadPage(); });
+    document.getElementById('prev').addEventListener('click', ()=>{ if(page>1){page--;loadPage();} });
+    document.getElementById('next').addEventListener('click', ()=>{ page++;loadPage(); });
+
+    // modal create/edit
+    const modal=document.getElementById('modalCliente');
+    document.getElementById('btnNuevo').addEventListener('click', ()=>{ openModal(); });
+    document.getElementById('closeCliente').addEventListener('click', ()=> modal.close());
+
+    function openModal(data=null){
+      const frm=document.getElementById('frmCliente'); frm.reset();
+      frm.dataset.id = data?.id || '';
+      document.getElementById('modalTitle').textContent = data?'Editar Cliente':'Nuevo Cliente';
+      if(data){
+        frm.identificacion.value=data.identificacion||''; frm.nombre.value=data.nombre||'';
+        frm.telefono.value=data.telefono||''; frm.email.value=data.email||''; frm.direccion.value=data.direccion||'';
+      }
+      modal.showModal();
+    }
+
+    document.addEventListener('click',(e)=>{
+      const btnEdit=e.target.closest('button[data-edit]'); if(btnEdit){ openModal(JSON.parse(btnEdit.dataset.edit)); return; }
+      const btnDel=e.target.closest('button[data-del]'); if(btnDel){ delCliente(btnDel.dataset.del); return; }
     });
 
-    function verificarAutenticacion() {
-      const token = localStorage.getItem('token');
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      
-      if (!token || user.rol !== 'admin') {
-        window.location.href = '/';
-        return;
-      }
-    }
-
-    function configurarEventListeners() {
-      // Búsqueda
-      elements.searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          buscarClientes();
-        }
-      });
-      
-      elements.btnBuscar.addEventListener('click', buscarClientes);
-      elements.btnLimpiar.addEventListener('click', limpiarBusqueda);
-
-      // Paginación
-      elements.btnAnterior.addEventListener('click', () => cambiarPagina(paginaActual - 1));
-      elements.btnSiguiente.addEventListener('click', () => cambiarPagina(paginaActual + 1));
-
-      // Nuevo cliente
-      elements.btnNuevoCliente.addEventListener('click', () => abrirModal());
-
-      // Modal eventos
-      elements.btnCerrarModal.addEventListener('click', cerrarModal);
-      elements.btnCancelar.addEventListener('click', cerrarModal);
-      elements.modalCliente.addEventListener('click', (e) => {
-        if (e.target === elements.modalCliente) cerrarModal();
-      });
-
-      // Confirmación
-      elements.btnCerrarConfirm.addEventListener('click', cerrarModalConfirm);
-      elements.btnCancelarElim.addEventListener('click', cerrarModalConfirm);
-      elements.modalConfirm.addEventListener('click', (e) => {
-        if (e.target === elements.modalConfirm) cerrarModalConfirm();
-      });
-
-      // Form submit
-      elements.formCliente.addEventListener('submit', guardarCliente);
-
-      // Cambio de tipo de cliente
-      elements.tipo.addEventListener('change', cambiarTipoCliente);
-    }
-
-    // API Functions
-    async function apiRequest(url, options = {}) {
-      const token = localStorage.getItem('token');
-      const defaultOptions = {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      };
-
-      try {
-        console.log('Haciendo petición a:', url);
-        const response = await fetch(url, { ...defaultOptions, ...options });
-        
-        // Verificar si la respuesta es JSON
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          const textResponse = await response.text();
-          console.error('Respuesta no es JSON:', textResponse.substring(0, 200));
-          throw new Error(`El servidor devolvió ${response.status}: ${response.statusText}. Verifica que el backend esté corriendo en el puerto correcto.`);
-        }
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || `Error ${response.status}: ${response.statusText}`);
-        }
-
-        return data;
-      } catch (error) {
-        console.error('Error en API:', error);
-        throw error;
-      }
-    }
-
-    async function cargarClientes() {
-      try {
-        mostrarCargando(true);
-        ocultarError();
-
-        const params = new URLSearchParams({
-          pagina: paginaActual.toString(),
-          limite: '10'
-        });
-
-        if (terminoBusqueda) {
-          params.append('buscar', terminoBusqueda);
-        }
-
-        const response = await apiRequest(`/api/clientes?${params}`);
-        
-        clientes = response.data || [];
-        
-        if (response.pagination) {
-          totalPaginas = response.pagination.totalPaginas;
-          actualizarInfoPaginacion(response.pagination);
-        }
-
-        renderizarClientes();
-        
-      } catch (error) {
-        mostrarError('Error al cargar los clientes: ' + error.message);
-      } finally {
-        mostrarCargando(false);
-      }
-    }
-
-    function renderizarClientes() {
-      if (clientes.length === 0) {
-        elements.clientesBody.innerHTML = `
-          <tr>
-            <td colspan="6" style="text-align: center; padding: 2rem; color: #666;">
-              ${terminoBusqueda ? 'No se encontraron clientes con ese término de búsqueda' : 'No hay clientes registrados'}
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      elements.clientesBody.innerHTML = clientes.map(cliente => {
-        const nombreCompleto = cliente.tipo === 'particular' 
-          ? `${cliente.nombres || ''} ${cliente.apellidos || ''}`.trim()
-          : cliente.razon_social || '';
-
-        return `
-          <tr>
-            <td>
-              <span class="badge ${cliente.tipo === 'particular' ? 'badge-info' : 'badge-warning'}">
-                ${cliente.tipo === 'particular' ? 'Particular' : 'Institución'}
-              </span>
-            </td>
-            <td>${cliente.identificacion}</td>
-            <td>${nombreCompleto}</td>
-            <td>${cliente.telefono || '-'}</td>
-            <td>${cliente.correo || '-'}</td>
-            <td>
-              <div class="btn-actions">
-                <button onclick="verCliente(${cliente.id})" class="btn-sm btn-info" title="Ver detalles">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
-                  Ver
-                </button>
-                <button onclick="editarCliente(${cliente.id})" class="btn-sm btn-warning" title="Editar">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                  </svg>
-                  Editar
-                </button>
-                <button onclick="confirmarEliminar(${cliente.id}, '${nombreCompleto}')" class="btn-sm btn-danger" title="Eliminar">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3,6 5,6 21,6"></polyline>
-                    <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
-                  </svg>
-                  Eliminar
-                </button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function actualizarInfoPaginacion(pagination) {
-      elements.infoPagina.textContent = `Página ${pagination.pagina} de ${pagination.totalPaginas}`;
-      elements.btnAnterior.disabled = pagination.pagina <= 1;
-      elements.btnSiguiente.disabled = pagination.pagina >= pagination.totalPaginas;
-    }
-
-    function buscarClientes() {
-      terminoBusqueda = elements.searchInput.value.trim();
-      paginaActual = 1;
-      cargarClientes();
-    }
-
-    function limpiarBusqueda() {
-      elements.searchInput.value = '';
-      terminoBusqueda = '';
-      paginaActual = 1;
-      cargarClientes();
-    }
-
-    function cambiarPagina(nuevaPagina) {
-      if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
-        paginaActual = nuevaPagina;
-        cargarClientes();
-      }
-    }
-
-    // Modal Functions
-    function abrirModal(cliente = null) {
-      clienteEditando = cliente;
-      
-      if (cliente) {
-        elements.modalTitle.textContent = 'Editar Cliente';
-        elements.btnGuardar.textContent = 'Actualizar';
-        llenarFormulario(cliente);
-      } else {
-        elements.modalTitle.textContent = 'Nuevo Cliente';
-        elements.btnGuardar.textContent = 'Crear';
-        elements.formCliente.reset();
-        cambiarTipoCliente(); // Reset campos
-      }
-      
-      elements.modalCliente.classList.remove('hidden');
-    }
-
-    function cerrarModal() {
-      elements.modalCliente.classList.add('hidden');
-      elements.formCliente.reset();
-      clienteEditando = null;
-    }
-
-    function llenarFormulario(cliente) {
-      Object.keys(cliente).forEach(key => {
-        const input = document.getElementById(key);
-        if (input) {
-          input.value = cliente[key] || '';
-        }
-      });
-      
-      cambiarTipoCliente();
-    }
-
-    function cambiarTipoCliente() {
-      const tipo = elements.tipo.value;
-      
-      if (tipo === 'particular') {
-        elements.camposParticular?.classList.remove('hidden');
-        elements.camposInstitucion?.classList.add('hidden');
-        if (elements.nombres) elements.nombres.required = true;
-        if (elements.apellidos) elements.apellidos.required = true;
-        if (elements.razonSocial) elements.razonSocial.required = false;
-      } else if (tipo === 'institucion') {
-        elements.camposParticular?.classList.add('hidden');
-        elements.camposInstitucion?.classList.remove('hidden');
-        if (elements.nombres) elements.nombres.required = false;
-        if (elements.apellidos) elements.apellidos.required = false;
-        if (elements.razonSocial) elements.razonSocial.required = true;
-      } else {
-        elements.camposParticular?.classList.remove('hidden');
-        elements.camposInstitucion?.classList.add('hidden');
-        if (elements.nombres) elements.nombres.required = false;
-        if (elements.apellidos) elements.apellidos.required = false;
-        if (elements.razonSocial) elements.razonSocial.required = false;
-      }
-    }
-
-    async function guardarCliente(e) {
+    document.getElementById('frmCliente').addEventListener('submit', async (e)=>{
       e.preventDefault();
-      
-      try {
-        elements.btnGuardar.disabled = true;
-        elements.btnGuardar.textContent = 'Guardando...';
+      const frm=e.target;
+      const payload = {
+        identificacion: frm.identificacion.value.trim(),
+        nombre: frm.nombre.value.trim(),
+        telefono: frm.telefono.value.trim(),
+        email: frm.email.value.trim(),
+        direccion: frm.direccion.value.trim()
+      };
+      const id = frm.dataset.id;
+      const token=localStorage.getItem('token');
+      const r = await fetch(id? `/api/clientes/${id}` : '/api/clientes', {
+        method: id? 'PUT':'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`}, body: JSON.stringify(payload)
+      });
+      if(r.ok){ modal.close(); loadPage(); } else { alert('No se pudo guardar'); }
+    });
 
-        const formData = new FormData(elements.formCliente);
-        const clienteData = Object.fromEntries(formData.entries());
-
-        let response;
-        
-        if (clienteEditando) {
-          response = await apiRequest(`/api/clientes/${clienteEditando.id}`, {
-            method: 'PUT',
-            body: JSON.stringify(clienteData)
-          });
-          mostrarToast('Cliente actualizado exitosamente');
-        } else {
-          response = await apiRequest('/api/clientes', {
-            method: 'POST',
-            body: JSON.stringify(clienteData)
-          });
-          mostrarToast('Cliente creado exitosamente');
-        }
-
-        cerrarModal();
-        cargarClientes();
-        
-      } catch (error) {
-        mostrarToast('Error: ' + error.message, 'error');
-      } finally {
-        elements.btnGuardar.disabled = false;
-        elements.btnGuardar.textContent = clienteEditando ? 'Actualizar' : 'Crear';
-      }
+    async function delCliente(id){
+      if(!confirm('¿Eliminar cliente?')) return;
+      const token=localStorage.getItem('token');
+      const r=await fetch(`/api/clientes/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});
+      if(r.ok) loadPage(); else alert('No se pudo eliminar');
     }
-
-    // Actions
-    async function verCliente(id) {
-      try {
-        const response = await apiRequest(`/api/clientes/${id}`);
-        const cliente = response.data;
-        
-        const nombreCompleto = cliente.tipo === 'particular' 
-          ? `${cliente.nombres || ''} ${cliente.apellidos || ''}`.trim()
-          : cliente.razon_social || '';
-
-        alert(`
-INFORMACIÓN DEL CLIENTE
-
-Tipo: ${cliente.tipo === 'particular' ? 'Particular' : 'Institución'}
-Identificación: ${cliente.identificacion}
-${cliente.tipo === 'particular' ? 'Nombre' : 'Razón Social'}: ${nombreCompleto}
-Teléfono: ${cliente.telefono || 'No registrado'}
-Correo: ${cliente.correo || 'No registrado'}
-Dirección: ${cliente.direccion || 'No registrada'}
-Estado: ${cliente.estado}
-        `);
-      } catch (error) {
-        mostrarToast('Error al obtener la información del cliente: ' + error.message, 'error');
-      }
-    }
-
-    async function editarCliente(id) {
-      try {
-        const response = await apiRequest(`/api/clientes/${id}`);
-        abrirModal(response.data);
-      } catch (error) {
-        mostrarToast('Error al cargar el cliente: ' + error.message, 'error');
-      }
-    }
-
-    function confirmarEliminar(id, nombre) {
-      elements.mensajeConfirm.textContent = `¿Está seguro que desea eliminar el cliente "${nombre}"?`;
-      elements.modalConfirm.classList.remove('hidden');
-      
-      elements.btnConfirmarElim.onclick = () => eliminarCliente(id);
-    }
-
-    function cerrarModalConfirm() {
-      elements.modalConfirm.classList.add('hidden');
-      elements.btnConfirmarElim.onclick = null;
-    }
-
-    async function eliminarCliente(id) {
-      try {
-        await apiRequest(`/api/clientes/${id}`, { method: 'DELETE' });
-        mostrarToast('Cliente eliminado exitosamente');
-        cerrarModalConfirm();
-        cargarClientes();
-      } catch (error) {
-        mostrarToast('Error al eliminar el cliente: ' + error.message, 'error');
-      }
-    }
-
-    // Utility Functions
-    function mostrarCargando(mostrar) {
-      elements.loadingSpinner.classList.toggle('hidden', !mostrar);
-    }
-
-    function mostrarError(mensaje) {
-      elements.errorMessage.textContent = mensaje;
-      elements.errorMessage.classList.remove('hidden');
-    }
-
-    function ocultarError() {
-      elements.errorMessage.classList.add('hidden');
-    }
-
-    function mostrarToast(mensaje, tipo = 'success') {
-      elements.toastMessage.textContent = mensaje;
-      elements.toast.className = `toast ${tipo}`;
-      elements.toast.classList.remove('hidden');
-      
-      setTimeout(() => {
-        elements.toast.classList.add('hidden');
-      }, 3000);
-    }
-
-    // Exponer funciones globales para onclick
-    window.verCliente = verCliente;
-    window.editarCliente = editarCliente;
-    window.confirmarEliminar = confirmarEliminar;
   </script>
 </Layout>

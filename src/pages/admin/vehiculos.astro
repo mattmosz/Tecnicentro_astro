@@ -1,1038 +1,303 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 ---
+<Layout title="Vehículos - TecniCentro Ibarra Express">
+  <header class="navbar"><div class="container">
+    <a href="/admin/dashboard" class="brand"><span class="logo-circle">🔧</span><span class="brand-text">TecniCentro Ibarra Express</span></a>
+    <div class="user-menu"><span id="userWelcome" class="user-chip">Cargando…</span><button id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">Cerrar Sesión</button></div>
+  </div></header>
 
-<Layout title="Gestión de Vehículos">
-  <div class="container">
-    <!-- Header con botón volver y crear nuevo -->
-    <div class="page-header">
-      <div class="header-left">
-        <a href="/admin/dashboard" class="btn btn-orange">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5"></path>
-            <polyline points="12,19 5,12 12,5"></polyline>
-          </svg>
-          Volver al Dashboard
-        </a>
-        <h1>Gestión de Vehículos</h1>
-      </div>
-      <button id="btnNuevoVehiculo" class="btn btn-primary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        Nuevo Vehículo
-      </button>
-    </div>
-
-    <!-- Buscador -->
-    <div class="search-section">
-      <div class="search-box">
-        <input 
-          type="text" 
-          id="searchInput" 
-          placeholder="Buscar por placa, marca, cliente o modelo..." 
-          class="search-input"
-        >
-        <button id="btnBuscar" class="btn btn-secondary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="M21 21l-4.35-4.35"></path>
-          </svg>
-          Buscar
-        </button>
-        <button id="btnLimpiar" class="btn btn-light">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-          Limpiar
-        </button>
-      </div>
-    </div>
-
-    <!-- Tabla de vehículos -->
-    <div class="table-section">
-      <div id="loadingSpinner" class="loading hidden">Cargando vehículos...</div>
-      <div id="errorMessage" class="error-message hidden"></div>
-      
-      <table id="tablaVehiculos" class="table">
-        <thead>
-          <tr>
-            <th>Placa</th>
-            <th>Marca</th>
-            <th>Modelo</th>
-            <th>Cliente</th>
-            <th>Kilometraje</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="vehiculosBody">
-          <!-- Los datos se cargan dinámicamente -->
-        </tbody>
-      </table>
-
-      <!-- Paginación -->
-      <div id="paginacion" class="pagination">
-        <button id="btnAnterior" class="btn btn-light">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="15,18 9,12 15,6"></polyline>
-          </svg>
-          Anterior
-        </button>
-        <span id="infoPagina">Página 1 de 1</span>
-        <button id="btnSiguiente" class="btn btn-light">
-          Siguiente
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9,18 15,12 9,6"></polyline>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal para crear/editar vehículo -->
-  <div id="modalVehiculo" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modalTitle">Nuevo Vehículo</h3>
-        <button id="btnCerrarModal" class="btn-close">×</button>
-      </div>
-      
-      <form id="formVehiculo" class="modal-body">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="id_cliente" class="required">Cliente</label>
-            <select id="id_cliente" name="id_cliente" required>
-              <option value="">Seleccionar cliente...</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="placa" class="required">Placa</label>
-            <input type="text" id="placa" name="placa" required maxlength="10" 
-                   placeholder="Ej: ABC-123">
-          </div>
-
-          <div class="form-group">
-            <label for="marca" class="required">Marca</label>
-            <input type="text" id="marca" name="marca" required maxlength="50" 
-                   placeholder="Ej: Toyota">
-          </div>
-
-          <div class="form-group">
-            <label for="id_modelo">Modelo</label>
-            <select id="id_modelo" name="id_modelo">
-              <option value="">Seleccionar modelo...</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="kilometraje">Kilometraje</label>
-            <input type="number" id="kilometraje" name="kilometraje" min="0" 
-                   placeholder="Ej: 50000">
-          </div>
+  <main class="page">
+    <div class="container">
+      <div class="header-row">
+        <div><h1>Gestión de Vehículos</h1><p class="muted">Registro y seguimiento de unidades</p></div>
+        <div class="actions">
+          <input id="q" class="input" placeholder="Buscar por placa / marca / cliente" />
+          <select id="fMarca" class="input"><option value="">Todas las marcas</option></select>
+          <button class="btn btn-outline" id="btnBuscar">Buscar</button>
+          <button class="btn btn-orange" id="btnNuevo">Nuevo Vehículo</button>
         </div>
+      </div>
 
-        <div class="modal-footer">
-          <button type="button" id="btnCancelar" class="btn btn-light">Cancelar</button>
-          <button type="submit" id="btnGuardar" class="btn btn-primary">
-            <span class="btn-text">Guardar Vehículo</span>
-            <span class="loading-text hidden">Guardando...</span>
-          </button>
+      <div class="card">
+        <div class="card-head"><h3>Listado</h3></div>
+        <div class="card-body">
+          <div id="wrapTable" class="table-wrap"><div class="skeleton"></div></div>
         </div>
-      </form>
+      </div>
     </div>
-  </div>
+  </main>
 
-  <style>
-    /* Variables CSS consistentes con el dashboard */
-    :root {
-      --bg: #f6f8fb;
-      --card: #fff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --blue: #1e40af;
-      --blue-500: #3b82f6;
-      --green-500: #22c55e;
-      --amber-500: #f59e0b;
-      --orange-500: #fb923c;
-      --cyan-500: #06b6d4;
-      --slate-500: #64748b;
-      --red-500: #ef4444;
-      --ring: 0 1px 2px rgba(0,0,0,.04), 0 10px 20px rgba(2,6,23,.08);
-      --ring-sm: 0 1px 2px rgba(0,0,0,.04), 0 4px 8px rgba(2,6,23,.04);
-      --radius: 16px;
-      --radius-sm: 8px;
-      --container: 1200px;
-    }
+  <!-- Modal Vehículo -->
+  <dialog id="modalVehiculo">
+    <form id="frmVehiculo" method="dialog" class="modal">
+      <div class="modal-head"><h3 id="modalTitle">Nuevo Vehículo</h3><button class="icon" type="button" id="closeVehiculo">✖</button></div>
+      <div class="modal-body grid2">
+        <label>Cliente (ID)<input name="id_cliente" required class="input" /></label>
+        <label>Placa<input name="placa" required class="input" /></label>
+        <label>Marca<input name="marca" class="input" /></label>
+        <label>Modelo<input name="modelo" class="input" /></label>
+        <label>Año<input name="anio" type="number" class="input" /></label>
+        <label>Kilometraje<input name="km" type="number" class="input" /></label>
+        <label>Color<input name="color" class="input" /></label>
+        <label>VIN<input name="vin" class="input" /></label>
+      </div>
+      <div class="modal-foot"><button class="btn btn-outline" value="cancel">Cancelar</button><button class="btn btn-orange" id="btnGuardar" value="default">Guardar</button></div>
+    </form>
+  </dialog>
 
-    body { 
-      background: var(--bg);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      color: var(--text);
-      line-height: 1.6;
-      margin: 0;
-    }
+<style>
+  /* ========= Light theme tokens ========= */
+  :root{
+    --bg:#f6f8fb;           /* fondo claro */
+    --card:#ffffff;         /* tarjetas */
+    --surface:#f9fbff;      /* superficies sutiles */
+    --text:#0f172a;         /* texto principal */
+    --muted:#64748b;        /* texto secundario */
+    --line:#e6ebf2;         /* bordes suaves */
 
-    .container { 
-      max-width: var(--container); 
-      margin: 0 auto; 
-      padding: 2rem; 
-    }
-    
-    /* Header */
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    
-    .header-left h1 {
-      margin: 0;
-      color: var(--text);
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-    }
+    --brand-1:#fb923c;      /* naranja */
+    --brand-2:#f59e0b;      /* ámbar */
+    --accent:#2563eb;       /* azul acción */
 
-    /* Botones estilo dashboard */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
-      border-radius: var(--radius-sm);
-      border: none;
-      font-weight: 600;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      text-decoration: none;
-      box-shadow: var(--ring-sm);
-    }
+    --ring:0 1px 2px rgba(2,6,23,.06), 0 10px 20px rgba(2,6,23,.06);
+    --radius:16px;
+    --container:1200px;
+  }
 
-    .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--ring);
-    }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font:14px/1.45 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial;
+  }
+  .container{max-width:var(--container);margin-inline:auto;padding:0 20px}
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--blue-500), var(--blue));
-      color: white;
-    }
+  /* ========= Navbar (clara, sticky) ========= */
+  .navbar{
+    position:sticky;top:0;z-index:40;
+    background:rgba(255,255,255,.88);
+    backdrop-filter:saturate(160%) blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .navbar .container{display:flex;align-items:center;justify-content:space-between;height:70px}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);font-weight:800}
+  .logo-circle{
+    display:grid;place-items:center;width:40px;height:40px;border-radius:50%;
+    background:conic-gradient(from 160deg,var(--brand-1),var(--brand-2));
+    box-shadow:var(--ring)
+  }
+  .brand-text{letter-spacing:.2px}
+  .user-menu{display:flex;align-items:center;gap:12px}
+  .user-chip{
+    padding:8px 12px;border-radius:999px;
+    background:#f4f7fb;border:1px solid var(--line);color:#334155;font-weight:700;
+  }
 
-    .btn-secondary {
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid #e5e7eb;
-    }
+  /* ========= Page ========= */
+  .page{padding:28px 0 48px}
+  .header-row{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:12px 0 20px}
+  h1{margin:0 0 6px;font-size:28px}
+  .muted{color:var(--muted)}
+  .actions{display:flex;gap:10px;flex-wrap:wrap}
 
-    .btn-light {
-      background: #f8fafc;
-      color: var(--muted);
-      border: 1px solid #e2e8f0;
-    }
+  /* ========= Inputs & Buttons (claros) ========= */
+  .input{
+    width:auto;min-width:240px;appearance:none;outline:none;
+    padding:11px 12px;border-radius:12px;background:#fff;color:var(--text);
+    border:1px solid var(--line); box-shadow:0 1px 0 rgba(2,6,23,.02);
+    transition:border-color .12s ease, box-shadow .12s ease, transform .12s ease;
+  }
+  .input::placeholder{color:#9aa9bd}
+  .input:focus{
+    border-color:#bfdbfe; box-shadow:0 0 0 3px rgba(59,130,246,.25)
+  }
+  select.input{
+    padding-right:34px;background-image:
+      linear-gradient(45deg, transparent 50%, #64748b 50%),
+      linear-gradient(135deg, #64748b 50%, transparent 50%),
+      linear-gradient(to right, transparent, transparent);
+    background-position: calc(100% - 18px) 55%, calc(100% - 12px) 55%, 100% 0;
+    background-size:6px 6px, 6px 6px, 2.5em 2.5em; background-repeat:no-repeat;
+  }
 
-    .btn-orange {
-      background: linear-gradient(135deg, var(--orange-500), #ff7849);
-      color: white;
-    }
+  .btn{
+    appearance:none;border:1px solid var(--line);border-radius:12px;
+    padding:10px 14px;font-weight:800;cursor:pointer;background:#fff;color:#0b1324;
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:var(--ring);border-color:#d7deea}
+  .btn:active{transform:translateY(0)}
+  .btn-outline{background:#fff}
+  .btn-orange{
+    color:#fff;border:1px solid #f59e0b;background:linear-gradient(180deg,var(--brand-1),#f97316);
+    box-shadow:0 6px 18px rgba(251,146,60,.18)
+  }
+  .btn-orange:hover{box-shadow:0 8px 28px rgba(251,146,60,.28)}
 
-    .btn-sm {
-      padding: 0.375rem 0.75rem;
-      font-size: 0.75rem;
-      border-radius: 6px;
-      box-shadow: none;
-      border: 1px solid transparent;
-    }
+  /* ========= Card ========= */
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--ring);overflow:hidden;
+  }
+  .card-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#ffffff,#fcfdff)
+  }
+  .card-head h3{margin:0;font-size:16px;font-weight:800}
+  .card-body{padding:14px 16px 18px}
 
-    .btn-info { 
-      background: var(--cyan-500); 
-      color: white; 
-    }
+  /* ========= Tabla clara ========= */
+  .table-wrap{overflow:auto;scrollbar-gutter:stable both-edges}
+  table{width:100%;border-collapse:separate;border-spacing:0}
+  thead th{
+    position:sticky;top:0;z-index:1;background:#f8fafc;color:#64748b;
+    text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.05em;
+    padding:12px 10px;border-bottom:1px solid var(--line)
+  }
+  tbody td{padding:14px 10px;border-top:1px solid var(--line);color:#0f172a}
+  tr:hover td{background:#f9fbff}
+  .row-actions{display:flex;gap:8px}
+  .icon-btn{
+    background:#fff;border:1px solid var(--line);color:#0f172a;border-radius:10px;padding:6px 9px;cursor:pointer;
+  }
+  .icon-btn:hover{border-color:#cdd6e5;box-shadow:0 4px 14px rgba(2,6,23,.08)}
 
-    .btn-warning { 
-      background: var(--amber-500); 
-      color: white; 
-    }
+  /* ========= Empty / Skeleton ========= */
+  .skeleton{
+    height:64px;border-radius:12px;
+    background:linear-gradient(90deg,#f2f5fb 25%,#eaeef6 37%,#f2f5fb 63%);
+    background-size:400% 100%;animation:shimmer 1.2s infinite
+  }
+  @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+  #wrapTable>.muted{
+    padding:18px;border:1px dashed var(--line);border-radius:12px;background:#fff
+  }
 
-    .btn-danger { 
-      background: var(--red-500); 
-      color: white; 
-    }
+  /* ========= Modal claro ========= */
+  dialog::backdrop{background:rgba(15,23,42,.25)}
+  dialog{
+    border:0;padding:0;width:min(860px,92vw);border-radius:18px;overflow:hidden;
+    background:#fff;border:1px solid var(--line);box-shadow:0 40px 80px rgba(2,6,23,.18)
+  }
+  .modal{background:transparent}
+  .modal-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px;border-bottom:1px solid var(--line);background:#f9fbff
+  }
+  .modal-head h3{margin:0}
+  .modal-body{padding:16px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 16px;border-top:1px solid var(--line)}
+  .modal label{display:flex;flex-direction:column;gap:8px;font-weight:700;color:#0b1324}
+  .icon{
+    appearance:none;background:#fff;border:1px solid var(--line);color:#0f172a;border-radius:10px;padding:6px 10px;cursor:pointer;
+  }
+  .icon:hover{border-color:#cdd6e5}
 
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
+  /* ========= Badges (por si luego usas) ========= */
+  .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:800}
+  .badge-warning{background:#fff7ed;color:#c2410c;border:1px solid #fde7c6}
+  .badge-primary{background:#eff6ff;color:#1e40af;border:1px solid #dbeafe}
+  .badge-success{background:#ecfdf5;color:#065f46;border:1px solid #d1fae5}
 
-    /* Cards estilo dashboard */
-    .search-section, .table-section {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--ring);
-      overflow: hidden;
-      margin-bottom: 1.5rem;
-    }
+  /* ========= Responsive ========= */
+  @media (max-width:1024px){
+    .header-row{align-items:stretch;flex-direction:column}
+    .actions{justify-content:flex-start}
+  }
+  @media (max-width:640px){
+    .brand-text{display:none}
+    .input{min-width:unset;width:100%}
+    .grid2{grid-template-columns:1fr}
+    .actions{flex-direction:column}
+  }
+</style>
 
-    .search-section {
-      padding: 1.5rem;
-    }
-
-    .search-box {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .search-input {
-      flex: 1;
-      min-width: 300px;
-      padding: 0.75rem 1rem;
-      border: 1px solid #e5e7eb;
-      border-radius: var(--radius-sm);
-      font-size: 0.875rem;
-      background: var(--card);
-      color: var(--text);
-      transition: all 0.15s ease;
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--blue-500);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    /* Tabla estilo dashboard */
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 0;
-    }
-
-    .table th {
-      background: #fafbfc;
-      padding: 1rem;
-      text-align: left;
-      font-weight: 600;
-      font-size: 0.875rem;
-      color: var(--muted);
-      border-bottom: 1px solid #eef2f7;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .table td {
-      padding: 1rem;
-      border-bottom: 1px solid #f1f5f9;
-      vertical-align: middle;
-      font-size: 0.875rem;
-    }
-
-    .table tbody tr {
-      transition: all 0.15s ease;
-    }
-
-    .table tbody tr:hover {
-      background: #fafbfc;
-    }
-
-    .btn-actions {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    /* Paginación */
-    .pagination {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      background: #fafbfc;
-      border-top: 1px solid #eef2f7;
-      font-size: 0.875rem;
-      color: var(--muted);
-    }
-
-    /* Estados */
-    .loading {
-      text-align: center;
-      padding: 3rem;
-      color: var(--muted);
-      font-style: italic;
-    }
-
-    .error-message {
-      background: #fef2f2;
-      color: #dc2626;
-      padding: 1rem 1.5rem;
-      border-radius: var(--radius-sm);
-      margin: 1rem;
-      border: 1px solid #fecaca;
-      font-size: 0.875rem;
-    }
-
-    .hidden { 
-      display: none !important; 
-    }
-
-    /* Modales estilo dashboard */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      animation: fadeIn 0.15s ease;
-    }
-
-    .modal-content {
-      background: var(--card);
-      border-radius: var(--radius);
-      max-width: 600px;
-      width: 90%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      animation: slideUp 0.15s ease;
-    }
-
-    .modal-content.small { 
-      max-width: 400px; 
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem;
-      border-bottom: 1px solid #eef2f7;
-    }
-
-    .modal-header h3 { 
-      margin: 0; 
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .btn-close {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--muted);
-      padding: 0;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      transition: all 0.15s ease;
-    }
-
-    .btn-close:hover { 
-      background: #f1f5f9;
-      color: var(--text);
-    }
-
-    .modal-body {
-      padding: 1.5rem;
-    }
-
-    .modal-footer {
-      display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
-      margin-top: 2rem;
-    }
-
-    /* Formularios estilo dashboard */
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: var(--text);
-      font-size: 0.875rem;
-    }
-
-    .form-group label.required::after {
-      content: " *";
-      color: var(--red-500);
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid #e5e7eb;
-      border-radius: var(--radius-sm);
-      font-size: 0.875rem;
-      background: var(--card);
-      color: var(--text);
-      box-sizing: border-box;
-      transition: all 0.15s ease;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--blue-500);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    /* Animaciones */
-    @keyframes fadeIn { 
-      from { opacity: 0; } 
-      to { opacity: 1; } 
-    }
-
-    @keyframes slideUp { 
-      from { 
-        opacity: 0; 
-        transform: translateY(20px); 
-      } 
-      to { 
-        opacity: 1; 
-        transform: translateY(0); 
-      } 
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .container { 
-        padding: 1rem; 
-      }
-
-      .page-header {
-        flex-direction: column;
-        align-items: stretch;
-        text-align: center;
-      }
-
-      .header-left {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .search-box {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .search-input {
-        min-width: auto;
-      }
-
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .modal-content {
-        width: 95%;
-        margin: 1rem;
-      }
-
-      .btn-actions {
-        flex-direction: column;
-      }
-
-      .pagination {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-      }
-    }
-  </style>
 
   <script>
-    // Variables globales
-    let currentPage = 1;
-    let totalPages = 1;
-    let isLoading = false;
-    let editingId = null;
-    let clientes = [];
-    let modelos = [];
+    // Guard
+    function _hardLogout(){ try{localStorage.removeItem('token');localStorage.removeItem('user')}finally{location.replace('/')} }
+    window.logout=_hardLogout;
+    document.addEventListener('click',(e)=>{const b=e.target.closest('#btnLogout');if(!b)return;e.preventDefault();_hardLogout();});
+    (async()=>{
+      const t=localStorage.getItem('token');const u=localStorage.getItem('user'); if(!t||!u) return _hardLogout();
+      try{const r=await fetch('/api/auth/verify',{headers:{Authorization:`Bearer ${t}`}});const j=await r.json().catch(()=>({}));if(!r.ok||!j?.success)return _hardLogout();}catch{return _hardLogout();}
+      const user=JSON.parse(u); if(user.rol!=='admin') return _hardLogout();
+      document.getElementById('userWelcome').textContent=`Bienvenido, ${user.nombre}`;
+      await loadFiltros(); loadPage();
+    })();
 
-    // Elementos del DOM
-    const elements = {
-      // Búsqueda
-      searchInput: null,
-      btnBuscar: null,
-      btnLimpiar: null,
-      
-      // Tabla
-      vehiculosBody: null,
-      loadingSpinner: null,
-      errorMessage: null,
-      
-      // Paginación
-      btnAnterior: null,
-      btnSiguiente: null,
-      infoPagina: null,
-      
-      // Modal
-      modalVehiculo: null,
-      modalTitle: null,
-      formVehiculo: null,
-      btnCerrarModal: null,
-      btnCancelar: null,
-      btnGuardar: null,
-      btnNuevoVehiculo: null
-    };
-
-    // API con autenticación
-    async function apiRequest(url, options = {}) {
-      const token = localStorage.getItem('token');
-      const defaultOptions = {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      };
-
-      try {
-        const response = await fetch(url, { ...defaultOptions, ...options });
-        
-        // Verificar si la respuesta es JSON
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          const textResponse = await response.text();
-          console.error('Respuesta no es JSON:', textResponse.substring(0, 200));
-          throw new Error(`El servidor devolvió ${response.status}: ${response.statusText}. Verifica que el backend esté corriendo en el puerto correcto.`);
-        }
-
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.message || `Error ${response.status}: ${response.statusText}`);
-        }
-
-        return data;
-      } catch (error) {
-        console.error('Error en petición API:', error);
-        throw error;
-      }
+    let q='', marca='', list=[];
+    async function loadFiltros(){
+      const t=localStorage.getItem('token');
+      const r=await fetch('/api/vehiculos/marcas',{headers:{Authorization:`Bearer ${t}`}});
+      const marcas= await r.json().catch(()=>[]);
+      const sel=document.getElementById('fMarca');
+      sel.innerHTML = '<option value="">Todas las marcas</option>' + marcas.map(m=>`<option>${m}</option>`).join('');
     }
 
-    // Inicialización
-    document.addEventListener('DOMContentLoaded', async function() {
-      initializeElements();
-      bindEvents();
-      await loadInitialData();
+    async function loadPage(){
+      const t=localStorage.getItem('token');
+      const url=new URL('/api/vehiculos', location.origin);
+      if(q) url.searchParams.set('q', q); if(marca) url.searchParams.set('marca', marca);
+      const r=await fetch(url,{headers:{Authorization:`Bearer ${t}`}});
+      list=await r.json().catch(()=>[]);
+      renderTable(list);
+    }
+
+    function renderTable(items){
+      const wrap=document.getElementById('wrapTable');
+      if(!items.length){ wrap.innerHTML = '<div class="muted">Sin resultados</div>'; return; }
+      wrap.innerHTML = `
+        <table>
+          <thead><tr><th>Placa</th><th>Marca/Modelo</th><th>Año</th><th>Cliente</th><th>KM</th><th></th></tr></thead>
+          <tbody>
+            ${items.map(v=>`
+              <tr>
+                <td>${v.placa||''}</td>
+                <td>${(v.marca||'')+' '+(v.modelo||'')}</td>
+                <td>${v.anio||''}</td>
+                <td>${v.cliente_nombre||''}</td>
+                <td>${v.km??''}</td>
+                <td>
+                  <div class="row-actions">
+                    <button class="icon-btn" data-edit='${JSON.stringify(v).replaceAll("'", "&apos;")}'>✎</button>
+                    <button class="icon-btn" data-del="${v.id}">🗑</button>
+                  </div>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    document.getElementById('btnBuscar').addEventListener('click',()=>{ q=document.getElementById('q').value.trim(); marca=document.getElementById('fMarca').value; loadPage(); });
+
+    // modal
+    const modal=document.getElementById('modalVehiculo');
+    document.getElementById('btnNuevo').addEventListener('click',()=>openModal());
+    document.getElementById('closeVehiculo').addEventListener('click',()=>modal.close());
+    function openModal(data=null){
+      const f=document.getElementById('frmVehiculo'); f.reset(); f.dataset.id=data?.id||'';
+      document.getElementById('modalTitle').textContent=data?'Editar Vehículo':'Nuevo Vehículo';
+      if(data){ for(const k of ['id_cliente','placa','marca','modelo','anio','km','color','vin']) f[k].value = data[k]??''; }
+      modal.showModal();
+    }
+    document.addEventListener('click',(e)=>{
+      const be=e.target.closest('button[data-edit]'); if(be){ openModal(JSON.parse(be.dataset.edit)); return; }
+      const bd=e.target.closest('button[data-del]'); if(bd){ delVehiculo(bd.dataset.del); return; }
     });
-
-    function initializeElements() {
-      elements.searchInput = document.getElementById('searchInput');
-      elements.btnBuscar = document.getElementById('btnBuscar');
-      elements.btnLimpiar = document.getElementById('btnLimpiar');
-      elements.vehiculosBody = document.getElementById('vehiculosBody');
-      elements.loadingSpinner = document.getElementById('loadingSpinner');
-      elements.errorMessage = document.getElementById('errorMessage');
-      elements.btnAnterior = document.getElementById('btnAnterior');
-      elements.btnSiguiente = document.getElementById('btnSiguiente');
-      elements.infoPagina = document.getElementById('infoPagina');
-      elements.modalVehiculo = document.getElementById('modalVehiculo');
-      elements.modalTitle = document.getElementById('modalTitle');
-      elements.formVehiculo = document.getElementById('formVehiculo');
-      elements.btnCerrarModal = document.getElementById('btnCerrarModal');
-      elements.btnCancelar = document.getElementById('btnCancelar');
-      elements.btnGuardar = document.getElementById('btnGuardar');
-      elements.btnNuevoVehiculo = document.getElementById('btnNuevoVehiculo');
-    }
-
-    function bindEvents() {
-      // Búsqueda
-      elements.searchInput.addEventListener('input', debounce(buscarVehiculos, 300));
-      elements.btnBuscar.addEventListener('click', buscarVehiculos);
-      elements.btnLimpiar.addEventListener('click', limpiarBusqueda);
-      
-      // Modal
-      elements.btnNuevoVehiculo.addEventListener('click', () => abrirModal());
-      elements.btnCerrarModal.addEventListener('click', cerrarModal);
-      elements.btnCancelar.addEventListener('click', cerrarModal);
-      elements.modalVehiculo.addEventListener('click', (e) => {
-        if (e.target === elements.modalVehiculo) cerrarModal();
-      });
-      
-      // Formulario
-      elements.formVehiculo.addEventListener('submit', guardarVehiculo);
-      
-      // Paginación
-      elements.btnAnterior.addEventListener('click', paginaAnterior);
-      elements.btnSiguiente.addEventListener('click', paginaSiguiente);
-      
-      // Escape para cerrar modal
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !elements.modalVehiculo.classList.contains('hidden')) {
-          cerrarModal();
-        }
-      });
-    }
-
-    async function loadInitialData() {
-      try {
-        showLoading(true);
-        
-        // Cargar clientes y modelos en paralelo
-        const [clientesRes, modelosRes] = await Promise.all([
-          apiRequest('/api/vehiculos/data/clientes'),
-          apiRequest('/api/vehiculos/data/modelos')
-        ]);
-
-        if (clientesRes.success) {
-          clientes = clientesRes.data || [];
-          populateClientesSelect();
-        }
-
-        if (modelosRes.success) {
-          modelos = modelosRes.data || [];
-          populateModelosSelect();
-        }
-
-        // Cargar vehículos
-        await cargarVehiculos();
-      } catch (error) {
-        console.error('Error cargando datos iniciales:', error);
-        showError('Error al cargar los datos iniciales: ' + error.message);
-      } finally {
-        showLoading(false);
-      }
-    }
-
-    function populateClientesSelect() {
-      const select = document.getElementById('id_cliente');
-      select.innerHTML = '<option value="">Seleccionar cliente...</option>';
-      
-      clientes.forEach(cliente => {
-        const option = document.createElement('option');
-        option.value = cliente.id;
-        
-        if (cliente.tipo === 'particular') {
-          option.textContent = `${cliente.nombres} ${cliente.apellidos}`;
-        } else {
-          option.textContent = cliente.razon_social;
-        }
-        
-        select.appendChild(option);
-      });
-    }
-
-    function populateModelosSelect() {
-      const select = document.getElementById('id_modelo');
-      select.innerHTML = '<option value="">Seleccionar modelo...</option>';
-      
-      modelos.forEach(modelo => {
-        const option = document.createElement('option');
-        option.value = modelo.id;
-        option.textContent = modelo.nombre_modelo;
-        select.appendChild(option);
-      });
-    }
-
-    async function cargarVehiculos() {
-      try {
-        showLoading(true);
-        hideError();
-        
-        const searchTerm = elements.searchInput.value.trim();
-        const params = new URLSearchParams({
-          pagina: currentPage,
-          limite: 10,
-          buscar: searchTerm
-        });
-
-        const data = await apiRequest(`/api/vehiculos?${params}`);
-
-        if (data.success) {
-          renderVehiculos(data.data);
-          updatePagination(data.pagination);
-        } else {
-          throw new Error(data.message);
-        }
-      } catch (error) {
-        console.error('Error cargando vehículos:', error);
-        showError('Error al cargar los vehículos: ' + error.message);
-      } finally {
-        showLoading(false);
-      }
-    }
-
-    function renderVehiculos(vehiculos) {
-      if (vehiculos.length === 0) {
-        elements.vehiculosBody.innerHTML = `
-          <tr>
-            <td colspan="6" class="loading">
-              ${elements.searchInput.value ? 'No se encontraron vehículos' : 'No hay vehículos registrados'}
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      elements.vehiculosBody.innerHTML = vehiculos.map(vehiculo => `
-        <tr>
-          <td><strong>${vehiculo.placa}</strong></td>
-          <td>${vehiculo.marca}</td>
-          <td>${vehiculo.nombre_modelo || 'N/A'}</td>
-          <td>
-            ${vehiculo.cliente_tipo === 'particular' 
-              ? `${vehiculo.nombres} ${vehiculo.apellidos}`
-              : vehiculo.razon_social
-            }
-          </td>
-          <td>${Number(vehiculo.kilometraje).toLocaleString()} km</td>
-          <td>
-            <div class="btn-actions">
-              <button class="btn btn-info btn-sm" onclick="editarVehiculo(${vehiculo.id})">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-                Editar
-              </button>
-              <button class="btn btn-danger btn-sm" onclick="eliminarVehiculo(${vehiculo.id}, '${vehiculo.placa}')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="3,6 5,6 21,6"/>
-                  <path d="M19,6v14a2,2,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
-                </svg>
-                Eliminar
-              </button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function updatePagination(pagination) {
-      totalPages = pagination.totalPaginas;
-      elements.infoPagina.textContent = `Página ${pagination.pagina} de ${totalPages}`;
-      
-      elements.btnAnterior.disabled = pagination.pagina <= 1;
-      elements.btnSiguiente.disabled = pagination.pagina >= totalPages;
-    }
-
-    function buscarVehiculos() {
-      currentPage = 1;
-      cargarVehiculos();
-    }
-
-    function limpiarBusqueda() {
-      elements.searchInput.value = '';
-      currentPage = 1;
-      cargarVehiculos();
-    }
-
-    function paginaAnterior() {
-      if (currentPage > 1) {
-        currentPage--;
-        cargarVehiculos();
-      }
-    }
-
-    function paginaSiguiente() {
-      if (currentPage < totalPages) {
-        currentPage++;
-        cargarVehiculos();
-      }
-    }
-
-    function abrirModal(vehiculo = null) {
-      editingId = vehiculo?.id || null;
-      
-      elements.modalTitle.textContent = vehiculo ? 'Editar Vehículo' : 'Nuevo Vehículo';
-      elements.btnGuardar.querySelector('.btn-text').textContent = vehiculo ? 'Actualizar' : 'Guardar Vehículo';
-      
-      if (vehiculo) {
-        document.getElementById('id_cliente').value = vehiculo.id_cliente || '';
-        document.getElementById('placa').value = vehiculo.placa || '';
-        document.getElementById('marca').value = vehiculo.marca || '';
-        document.getElementById('id_modelo').value = vehiculo.id_modelo || '';
-        document.getElementById('kilometraje').value = vehiculo.kilometraje || '';
-      } else {
-        elements.formVehiculo.reset();
-      }
-      
-      elements.modalVehiculo.classList.remove('hidden');
-      
-      // Focus en el primer campo
-      setTimeout(() => {
-        document.getElementById('id_cliente').focus();
-      }, 100);
-    }
-
-    function cerrarModal() {
-      elements.modalVehiculo.classList.add('hidden');
-      elements.formVehiculo.reset();
-      editingId = null;
-    }
-
-    async function guardarVehiculo(e) {
-      e.preventDefault();
-      
-      if (isLoading) return;
-      
-      const formData = new FormData(elements.formVehiculo);
-      const vehiculoData = Object.fromEntries(formData.entries());
-      
-      // Validación básica
-      if (!vehiculoData.id_cliente || !vehiculoData.marca || !vehiculoData.placa) {
-        showError('Por favor completa todos los campos requeridos');
-        return;
-      }
-
-      setLoadingButton(true);
-
-      try {
-        const url = editingId ? `/api/vehiculos/${editingId}` : '/api/vehiculos';
-        const method = editingId ? 'PUT' : 'POST';
-        
-        const result = await apiRequest(url, {
-          method,
-          body: JSON.stringify(vehiculoData)
-        });
-
-        if (result.success) {
-          showSuccess(result.message);
-          cerrarModal();
-          cargarVehiculos();
-        } else {
-          throw new Error(result.message);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        showError(error.message || 'Error al guardar el vehículo');
-      } finally {
-        setLoadingButton(false);
-      }
-    }
-
-    // Funciones globales para onclick
-    window.editarVehiculo = async function(id) {
-      try {
-        const data = await apiRequest(`/api/vehiculos/${id}`);
-        
-        if (data.success) {
-          abrirModal(data.data);
-        } else {
-          throw new Error(data.message);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        showError('Error al cargar los datos del vehículo');
-      }
-    };
-
-    window.eliminarVehiculo = async function(id, placa) {
-      if (!confirm(`¿Estás seguro de que deseas eliminar el vehículo con placa "${placa}"?`)) {
-        return;
-      }
-
-      try {
-        const result = await apiRequest(`/api/vehiculos/${id}`, {
-          method: 'DELETE'
-        });
-
-        if (result.success) {
-          showSuccess(result.message);
-          cargarVehiculos();
-        } else {
-          throw new Error(result.message);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        showError(error.message || 'Error al eliminar el vehículo');
-      }
-    };
-
-    // Utilidades
-    function showLoading(show) {
-      isLoading = show;
-      if (show) {
-        elements.loadingSpinner.classList.remove('hidden');
-        elements.vehiculosBody.innerHTML = '';
-      } else {
-        elements.loadingSpinner.classList.add('hidden');
-      }
-    }
-
-    function setLoadingButton(loading) {
-      elements.btnGuardar.disabled = loading;
-      const btnText = elements.btnGuardar.querySelector('.btn-text');
-      const loadingText = elements.btnGuardar.querySelector('.loading-text');
-      
-      if (loading) {
-        btnText.classList.add('hidden');
-        loadingText.classList.remove('hidden');
-      } else {
-        btnText.classList.remove('hidden');
-        loadingText.classList.add('hidden');
-      }
-    }
-
-    function showError(message) {
-      elements.errorMessage.textContent = message;
-      elements.errorMessage.classList.remove('hidden');
-      
-      // Auto ocultar después de 5 segundos
-      setTimeout(() => {
-        hideError();
-      }, 5000);
-    }
-
-    function hideError() {
-      elements.errorMessage.classList.add('hidden');
-    }
-
-    function showSuccess(message) {
-      // Implementar toast o notificación de éxito
-      alert(message); // Temporal - puedes reemplazar con una librería de toast
-    }
-
-    function debounce(func, wait) {
-      let timeout;
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-      };
+    document.getElementById('frmVehiculo').addEventListener('submit', async (e)=>{
+      e.preventDefault(); const f=e.target; const id=f.dataset.id; const t=localStorage.getItem('token');
+      const payload=Object.fromEntries(new FormData(f).entries());
+      const r=await fetch(id? `/api/vehiculos/${id}`:'/api/vehiculos',{method:id?'PUT':'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${t}`},body:JSON.stringify(payload)});
+      if(r.ok){ modal.close(); loadPage(); } else alert('No se pudo guardar');
+    });
+    async function delVehiculo(id){
+      if(!confirm('¿Eliminar vehículo?')) return;
+      const t=localStorage.getItem('token');
+      const r=await fetch(`/api/vehiculos/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${t}`}});
+      if(r.ok) loadPage(); else alert('No se pudo eliminar');
     }
   </script>
 </Layout>
