@@ -1,0 +1,127 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Reportes y Análisis - TecniCentro Ibarra Express">
+  <header class="navbar"><div class="container">
+    <a href="/admin/dashboard" class="brand"><span class="logo-circle">🔧</span><span class="brand-text">TecniCentro Ibarra Express</span></a>
+    <div class="user-menu"><span id="userWelcome" class="user-chip">Cargando…</span><button id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">Cerrar Sesión</button></div>
+  </div></header>
+
+  <main class="page">
+    <div class="container">
+      <div class="header-row">
+        <div><h1>Reportes y Análisis</h1><p class="muted">Estadísticas operativas y de ventas</p></div>
+        <div class="actions">
+          <input id="fDesde" type="date" class="input"/>
+          <input id="fHasta" type="date" class="input"/>
+          <button class="btn btn-outline" id="btnAplicar">Aplicar</button>
+          <button class="btn btn-orange" id="btnExport">Exportar CSV</button>
+        </div>
+      </div>
+
+      <!-- Tarjetas Resumen -->
+      <div class="stats-grid">
+        <article class="kpi-card kpi-orange"><div class="kpi-icon">💰</div><div><h3 id="kTotal" class="kpi-value">$0</h3><p class="kpi-label">Facturación</p></div></article>
+        <article class="kpi-card kpi-green"><div class="kpi-icon">📋</div><div><h3 id="kOT" class="kpi-value">0</h3><p class="kpi-label">Órdenes</p></div></article>
+        <article class="kpi-card kpi-amber"><div class="kpi-icon">🛠️</div><div><h3 id="kTopSrv" class="kpi-value">—</h3><p class="kpi-label">Servicio Top</p></div></article>
+        <article class="kpi-card kpi-blue"><div class="kpi-icon">👥</div><div><h3 id="kClientes" class="kpi-value">0</h3><p class="kpi-label">Clientes nuevos</p></div></article>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <div class="card-head"><h3>Ventas por día</h3></div>
+          <div class="card-body"><div id="ventasDia" class="bars"></div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Top servicios</h3></div>
+          <div class="card-body">
+            <div id="topServicios" class="table-wrap"><div class="skeleton"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <style>
+    /* Reusa tokens y componentes previos */
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    @media (max-width: 900px){.grid2{grid-template-columns:1fr}}
+    .bars{display:grid;grid-auto-rows:28px;gap:8px;padding:12px}
+    .bar{display:flex;gap:10px;align-items:center}
+    .bar .label{width:90px;font-size:12px;color:#64748b}
+    .bar .track{flex:1;background:#f1f5f9;border-radius:999px;overflow:hidden}
+    .bar .fill{height:10px;background:#fb923c}
+  </style>
+
+  <script>
+    // guard
+    function _hardLogout(){ try{localStorage.removeItem('token');localStorage.removeItem('user')}finally{location.replace('/')} }
+    window.logout=_hardLogout;
+    document.addEventListener('click',(e)=>{const b=e.target.closest('#btnLogout');if(!b)return;e.preventDefault();_hardLogout();});
+    (async()=>{
+      const t=localStorage.getItem('token');const u=localStorage.getItem('user'); if(!t||!u) return _hardLogout();
+      try{const r=await fetch('/api/auth/verify',{headers:{Authorization:`Bearer ${t}`}});const j=await r.json().catch(()=>({}));if(!r.ok||!j?.success)return _hardLogout();}catch{return _hardLogout();}
+      const user=JSON.parse(u); if(user.rol!=='admin') return _hardLogout();
+      document.getElementById('userWelcome').textContent=`Bienvenido, ${user.nombre}`;
+      apply();
+    })();
+
+    const money=new Intl.NumberFormat('es-EC',{style:'currency',currency:'USD'});
+    document.getElementById('btnAplicar').addEventListener('click', apply);
+    document.getElementById('btnExport').addEventListener('click', exportCSV);
+
+    async function apply(){
+      const t=localStorage.getItem('token');
+      const desde=document.getElementById('fDesde').value; const hasta=document.getElementById('fHasta').value;
+      const url=new URL('/api/admin/reportes', location.origin);
+      if(desde) url.searchParams.set('desde', desde);
+      if(hasta) url.searchParams.set('hasta', hasta);
+      const r=await fetch(url,{headers:{Authorization:`Bearer ${t}`}});
+      const data=await r.json().catch(()=>({resumen:{}, ventas_dia:[], top_servicios:[]}));
+      const {resumen, ventas_dia, top_servicios}=data;
+
+      document.getElementById('kTotal').textContent=money.format(resumen.total||0);
+      document.getElementById('kOT').textContent=resumen.ordenes||0;
+      document.getElementById('kClientes').textContent=resumen.clientes_nuevos||0;
+      document.getElementById('kTopSrv').textContent=top_servicios?.[0]?.nombre || '—';
+
+      renderVentasDia(ventas_dia||[]);
+      renderTopServicios(top_servicios||[]);
+    }
+
+    function renderVentasDia(rows){
+      const cont=document.getElementById('ventasDia');
+      if(!rows.length){ cont.innerHTML='<div class="muted">Sin datos</div>'; return; }
+      const max=Math.max(...rows.map(r=>+r.total||0), 1);
+      cont.innerHTML = rows.map(r=>{
+        const w=Math.round(((+r.total||0) / max) * 100);
+        return `<div class="bar"><div class="label">${new Date(r.fecha).toLocaleDateString()}</div><div class="track"><div class="fill" style="width:${w}%"></div></div><div class="label">${money.format(+r.total||0)}</div></div>`;
+      }).join('');
+    }
+
+    function renderTopServicios(items){
+      const wrap=document.getElementById('topServicios');
+      if(!items.length){ wrap.innerHTML='<div class="muted">Sin datos</div>'; return; }
+      wrap.innerHTML=`
+        <table>
+          <thead><tr><th>Servicio</th><th>Veces</th><th>Ingresos</th></tr></thead>
+          <tbody>
+            ${items.map(s=>`<tr><td>${s.nombre}</td><td>${s.cantidad}</td><td>${money.format(+s.total||0)}</td></tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    async function exportCSV(){
+      const t=localStorage.getItem('token');
+      const desde=document.getElementById('fDesde').value; const hasta=document.getElementById('fHasta').value;
+      const url=new URL('/api/admin/reportes/export', location.origin);
+      if(desde) url.searchParams.set('desde', desde); if(hasta) url.searchParams.set('hasta', hasta);
+      const r=await fetch(url,{headers:{Authorization:`Bearer ${t}`}}); 
+      if(!r.ok){ alert('No se pudo exportar'); return; }
+      const blob=await r.blob(); const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob); a.download='reportes.csv'; a.click(); URL.revokeObjectURL(a.href);
+    }
+  </script>
+</Layout>

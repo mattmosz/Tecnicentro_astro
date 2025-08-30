@@ -1,0 +1,134 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Facturación - TecniCentro Ibarra Express">
+  <header class="navbar"><div class="container">
+    <a href="/admin/dashboard" class="brand"><span class="logo-circle">🔧</span><span class="brand-text">TecniCentro Ibarra Express</span></a>
+    <div class="user-menu"><span id="userWelcome" class="user-chip">Cargando…</span><button id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">Cerrar Sesión</button></div>
+  </div></header>
+
+  <main class="page">
+    <div class="container">
+      <div class="header-row">
+        <div><h1>Facturación</h1><p class="muted">Emite y controla comprobantes</p></div>
+        <div class="actions">
+          <input id="q" class="input" placeholder="Buscar por #, cliente, CI" />
+          <input id="fDesde" type="date" class="input" />
+          <input id="fHasta" type="date" class="input" />
+          <button class="btn btn-outline" id="btnBuscar">Filtrar</button>
+          <button class="btn btn-orange" id="btnNueva">Nueva Factura</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <article class="kpi-card kpi-orange"><div class="kpi-icon">💵</div><div><h3 id="kpiHoy" class="kpi-value">$0</h3><p class="kpi-label">Hoy</p></div></article>
+        <article class="kpi-card kpi-amber"><div class="kpi-icon">📅</div><div><h3 id="kpiMes" class="kpi-value">$0</h3><p class="kpi-label">Este mes</p></div></article>
+        <article class="kpi-card kpi-green"><div class="kpi-icon">🧾</div><div><h3 id="kpiNum" class="kpi-value">0</h3><p class="kpi-label"># facturas</p></div></article>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Listado</h3></div>
+        <div class="card-body">
+          <div id="wrapTable" class="table-wrap"><div class="skeleton"></div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal rápida de factura (simple demo) -->
+  <dialog id="modalFAC">
+    <form id="frmFAC" method="dialog" class="modal">
+      <div class="modal-head"><h3>Nueva Factura</h3><button class="icon" type="button" id="closeFAC">✖</button></div>
+      <div class="modal-body grid2">
+        <label>Cliente (ID)<input name="id_cliente" required class="input"/></label>
+        <label>Orden (ID)<input name="id_orden" class="input"/></label>
+        <label>Fecha<input name="fecha" type="date" required class="input"/></label>
+        <label>Total (USD)<input name="total" type="number" step="0.01" required class="input"/></label>
+        <label>Detalle<textarea name="detalle" class="input" rows="3"></textarea></label>
+      </div>
+      <div class="modal-foot"><button class="btn btn-outline" value="cancel">Cancelar</button><button class="btn btn-orange" id="btnGuardar" value="default">Emitir</button></div>
+    </form>
+  </dialog>
+
+  <style>
+    /* Reusa tokens + kpi-card de tu dashboard */
+  </style>
+
+  <script>
+    function _hardLogout(){ try{localStorage.removeItem('token');localStorage.removeItem('user')}finally{location.replace('/')} }
+    window.logout=_hardLogout;
+    document.addEventListener('click',(e)=>{const b=e.target.closest('#btnLogout');if(!b)return;e.preventDefault();_hardLogout();});
+    (async()=>{
+      const t=localStorage.getItem('token');const u=localStorage.getItem('user'); if(!t||!u) return _hardLogout();
+      try{const r=await fetch('/api/auth/verify',{headers:{Authorization:`Bearer ${t}`}});const j=await r.json().catch(()=>({}));if(!r.ok||!j?.success)return _hardLogout();}catch{return _hardLogout();}
+      const user=JSON.parse(u); if(user.rol!=='admin') return _hardLogout();
+      document.getElementById('userWelcome').textContent=`Bienvenido, ${user.nombre}`;
+      await loadKPIs(); loadPage();
+    })();
+
+    const money=new Intl.NumberFormat('es-EC',{style:'currency',currency:'USD'});
+    async function loadKPIs(){
+      const t=localStorage.getItem('token');
+      const r=await fetch('/api/facturas/kpis',{headers:{Authorization:`Bearer ${t}`}});
+      const k=await r.json().catch(()=>({hoy:0,mes:0,num:0}));
+      document.getElementById('kpiHoy').textContent=money.format(k.hoy||0);
+      document.getElementById('kpiMes').textContent=money.format(k.mes||0);
+      document.getElementById('kpiNum').textContent=(k.num||0);
+    }
+
+    let q='', desde='', hasta='';
+    async function loadPage(){
+      const t=localStorage.getItem('token');
+      const url=new URL('/api/facturas', location.origin);
+      if(q) url.searchParams.set('q', q);
+      if(desde) url.searchParams.set('desde', desde);
+      if(hasta) url.searchParams.set('hasta', hasta);
+      const r=await fetch(url,{headers:{Authorization:`Bearer ${t}`}});
+      const items=await r.json().catch(()=>[]);
+      const wrap=document.getElementById('wrapTable');
+      if(!items.length){ wrap.innerHTML='<div class="muted">Sin resultados</div>'; return; }
+      wrap.innerHTML=`
+        <table>
+          <thead><tr><th>Número</th><th>Cliente</th><th>Total</th><th>Fecha</th><th>Estado</th><th></th></tr></thead>
+          <tbody>
+            ${items.map(f=>`
+              <tr>
+                <td>${f.numero||''}</td>
+                <td>${f.cliente_nombre||''}</td>
+                <td>${money.format(+f.total||0)}</td>
+                <td>${f.fecha? new Date(f.fecha).toLocaleDateString():'—'}</td>
+                <td>${f.estado||'—'}</td>
+                <td>
+                  <div class="row-actions">
+                    <a class="icon-btn" href="/api/facturas/${f.id}/pdf" target="_blank">⬇ PDF</a>
+                    <button class="icon-btn" data-del="${f.id}">🗑</button>
+                  </div>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    document.getElementById('btnBuscar').addEventListener('click',()=>{
+      q=document.getElementById('q').value.trim(); desde=document.getElementById('fDesde').value; hasta=document.getElementById('fHasta').value; loadPage();
+    });
+
+    // modal
+    const modal=document.getElementById('modalFAC');
+    document.getElementById('btnNueva').addEventListener('click',()=>modal.showModal());
+    document.getElementById('closeFAC').addEventListener('click',()=>modal.close());
+    document.getElementById('frmFAC').addEventListener('submit', async (e)=>{
+      e.preventDefault(); const f=e.target; const t=localStorage.getItem('token');
+      const payload=Object.fromEntries(new FormData(f).entries());
+      const r=await fetch('/api/facturas',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${t}`},body:JSON.stringify(payload)});
+      if(r.ok){ modal.close(); await loadKPIs(); loadPage(); } else alert('No se pudo emitir');
+    });
+
+    document.addEventListener('click', async (e)=>{
+      const bd=e.target.closest('button[data-del]'); if(!bd) return;
+      if(!confirm('¿Eliminar factura?')) return;
+      const t=localStorage.getItem('token'); const r=await fetch(`/api/facturas/${bd.dataset.del}`,{method:'DELETE',headers:{Authorization:`Bearer ${t}`}});
+      if(r.ok){ await loadKPIs(); loadPage(); } else alert('No se pudo eliminar');
+    });
+  </script>
+</Layout>

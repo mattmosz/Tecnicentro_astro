@@ -1,0 +1,139 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Servicios - TecniCentro Ibarra Express">
+  <header class="navbar"><div class="container">
+    <a href="/admin/dashboard" class="brand"><span class="logo-circle">🔧</span><span class="brand-text">TecniCentro Ibarra Express</span></a>
+    <div class="user-menu"><span id="userWelcome" class="user-chip">Cargando…</span><button id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">Cerrar Sesión</button></div>
+  </div></header>
+
+  <main class="page">
+    <div class="container">
+      <div class="header-row">
+        <div><h1>Servicios del Taller</h1><p class="muted">Catálogo y tarifas</p></div>
+        <div class="actions">
+          <input id="q" class="input" placeholder="Buscar servicio" />
+          <select id="fCat" class="input"><option value="">Todas las categorías</option></select>
+          <button class="btn btn-outline" id="btnBuscar">Buscar</button>
+          <button class="btn btn-orange" id="btnNuevo">Nuevo Servicio</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Listado</h3></div>
+        <div class="card-body">
+          <div id="wrapTable" class="table-wrap"><div class="skeleton"></div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Servicio -->
+  <dialog id="modalSrv">
+    <form id="frmSrv" method="dialog" class="modal">
+      <div class="modal-head"><h3 id="modalTitle">Nuevo Servicio</h3><button class="icon" type="button" id="closeSrv">✖</button></div>
+      <div class="modal-body grid2">
+        <label>Nombre<input name="nombre" required class="input"/></label>
+        <label>Categoría<select name="id_categoria" id="catSel" class="input"></select></label>
+        <label>Precio (USD)<input name="precio" type="number" step="0.01" class="input"/></label>
+        <label>Duración Estimada (min)<input name="duracion" type="number" class="input"/></label>
+        <label>Descripción<textarea name="descripcion" class="input" rows="3"></textarea></label>
+      </div>
+      <div class="modal-foot"><button class="btn btn-outline" value="cancel">Cancelar</button><button class="btn btn-orange" id="btnGuardar" value="default">Guardar</button></div>
+    </form>
+  </dialog>
+
+  <style>
+    /* Reusa estilos base de Clientes */
+    .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
+    .badge-cat{background:#eff6ff;color:#1e40af}
+  </style>
+
+  <script>
+    // guard
+    function _hardLogout(){ try{localStorage.removeItem('token');localStorage.removeItem('user')}finally{location.replace('/')} }
+    window.logout=_hardLogout;
+    document.addEventListener('click',(e)=>{const b=e.target.closest('#btnLogout');if(!b)return;e.preventDefault();_hardLogout();});
+    (async()=>{
+      const t=localStorage.getItem('token');const u=localStorage.getItem('user'); if(!t||!u) return _hardLogout();
+      try{const r=await fetch('/api/auth/verify',{headers:{Authorization:`Bearer ${t}`}});const j=await r.json().catch(()=>({}));if(!r.ok||!j?.success)return _hardLogout();}catch{return _hardLogout();}
+      const user=JSON.parse(u); if(user.rol!=='admin') return _hardLogout();
+      document.getElementById('userWelcome').textContent=`Bienvenido, ${user.nombre}`;
+      await loadCategorias(); loadPage();
+    })();
+
+    let q='', idcat='';
+    async function loadCategorias(){
+      const t=localStorage.getItem('token');
+      const [catsRes] = await Promise.all([
+        fetch('/api/categorias',{headers:{Authorization:`Bearer ${t}`}})
+      ]);
+      const cats=await catsRes.json().catch(()=>[]);
+      const f=document.getElementById('fCat'); const catSel=document.getElementById('catSel');
+      f.innerHTML = '<option value="">Todas las categorías</option>' + cats.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+      catSel.innerHTML = cats.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+    }
+
+    async function loadPage(){
+      const t=localStorage.getItem('token');
+      const url=new URL('/api/servicios', location.origin);
+      if(q) url.searchParams.set('q', q); if(idcat) url.searchParams.set('id_categoria', idcat);
+      const r=await fetch(url,{headers:{Authorization:`Bearer ${t}`}});
+      const items=await r.json().catch(()=>[]);
+      renderTable(items);
+    }
+
+    function renderTable(items){
+      const wrap=document.getElementById('wrapTable');
+      if(!items.length){ wrap.innerHTML = '<div class="muted">Sin resultados</div>'; return; }
+      wrap.innerHTML = `
+        <table>
+          <thead><tr><th>Servicio</th><th>Categoría</th><th>Precio</th><th>Duración</th><th></th></tr></thead>
+          <tbody>
+            ${items.map(s=>`
+              <tr>
+                <td>${s.nombre||''}</td>
+                <td><span class="badge badge-cat">${s.categoria||'—'}</span></td>
+                <td>$${(+s.precio||0).toFixed(2)}</td>
+                <td>${s.duracion? s.duracion+' min':'—'}</td>
+                <td>
+                  <div class="row-actions">
+                    <button class="icon-btn" data-edit='${JSON.stringify(s).replaceAll("'", "&apos;")}'>✎</button>
+                    <button class="icon-btn" data-del="${s.id}">🗑</button>
+                  </div>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    document.getElementById('btnBuscar').addEventListener('click',()=>{ q=document.getElementById('q').value.trim(); idcat=document.getElementById('fCat').value; loadPage(); });
+
+    // modal
+    const modal=document.getElementById('modalSrv');
+    document.getElementById('btnNuevo').addEventListener('click',()=>openModal());
+    document.getElementById('closeSrv').addEventListener('click',()=>modal.close());
+    function openModal(data=null){
+      const f=document.getElementById('frmSrv'); f.reset(); f.dataset.id=data?.id||'';
+      document.getElementById('modalTitle').textContent=data?'Editar Servicio':'Nuevo Servicio';
+      if(data){ f.nombre.value=data.nombre||''; f.id_categoria.value=data.id_categoria||''; f.precio.value=data.precio||''; f.duracion.value=data.duracion||''; f.descripcion.value=data.descripcion||''; }
+      modal.showModal();
+    }
+    document.addEventListener('click',(e)=>{
+      const be=e.target.closest('button[data-edit]'); if(be){ openModal(JSON.parse(be.dataset.edit)); return; }
+      const bd=e.target.closest('button[data-del]'); if(bd){ delSrv(bd.dataset.del); return; }
+    });
+    document.getElementById('frmSrv').addEventListener('submit', async (e)=>{
+      e.preventDefault(); const f=e.target; const id=f.dataset.id; const t=localStorage.getItem('token');
+      const payload=Object.fromEntries(new FormData(f).entries());
+      const r=await fetch(id? `/api/servicios/${id}`:'/api/servicios',{method:id?'PUT':'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${t}`},body:JSON.stringify(payload)});
+      if(r.ok){ modal.close(); loadPage(); } else alert('No se pudo guardar');
+    });
+    async function delSrv(id){
+      if(!confirm('¿Eliminar servicio?')) return;
+      const t=localStorage.getItem('token');
+      const r=await fetch(`/api/servicios/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${t}`}});
+      if(r.ok) loadPage(); else alert('No se pudo eliminar');
+    }
+  </script>
+</Layout>
