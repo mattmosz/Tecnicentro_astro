@@ -6,6 +6,28 @@ import db from '../config/database.js';
 
 const router = express.Router();
 
+// Endpoint de prueba para verificar conexión a BD
+router.get('/test-db', async (req, res) => {
+  try {
+    console.log('Probando conexión a la base de datos...');
+    const [result] = await db.execute('SELECT 1 as test');
+    console.log('Conexión exitosa:', result);
+    res.json({ success: true, message: 'Conexión a BD exitosa', data: result });
+  } catch (error) {
+    console.error('Error de conexión:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Endpoint de prueba para verificar usuarios
+router.get('/test-users', async (req, res) => {
+  try {
+    const [users] = await db.execute('SELECT id, usuario, nombre, apellido, rol, estado FROM usuarios LIMIT 5');
+    res.json({ success: true, users });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
 
 const SECRET = process.env.JWT_SECRET || 'DEV_SECRET_CAMBIA_ESTO';
 

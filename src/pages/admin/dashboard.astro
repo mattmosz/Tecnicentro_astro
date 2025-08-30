@@ -264,17 +264,25 @@ import Layout from '../../layouts/Layout.astro';
 
     async function loadDashboardData(){
       try{
+        console.log('Cargando datos del dashboard...');
         const token = localStorage.getItem('token');
+        console.log('Token:', token ? 'presente' : 'ausente');
         const statsRes = await fetch('/api/admin/stats', { headers:{ Authorization:`Bearer ${token}` }});
+        console.log('Response status:', statsRes.status);
         if (statsRes.ok){
           const s = await statsRes.json();
+          console.log('Stats recibidas:', s);
           document.getElementById('totalClientes').textContent  = fmtNum.format(s.clientes||0);
           document.getElementById('totalVehiculos').textContent = fmtNum.format(s.vehiculos||0);
           document.getElementById('ordenesActivas').textContent = fmtNum.format(s.ordenesActivas||0);
           document.getElementById('facturasHoy').textContent    = fmtMoney.format(s.facturacionHoy||0);
+        } else {
+          console.error('Error en respuesta:', await statsRes.text());
         }
         await loadRecentActivity();
-      }catch(err){ console.error(err); }
+      }catch(err){ 
+        console.error('Error cargando dashboard:', err); 
+      }
     }
 
     async function loadRecentActivity(){

@@ -1,28 +1,50 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 ---
-<Layout title="Vehículos - TecniCentro Ibarra Express">
-  <header class="navbar"><div class="container">
-    <a href="/admin/dashboard" class="brand"><span class="logo-circle">🔧</span><span class="brand-text">TecniCentro Ibarra Express</span></a>
-    <div class="user-menu"><span id="userWelcome" class="user-chip">Cargando…</span><button id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">Cerrar Sesión</button></div>
-  </div></header>
+
+<Layout title="Gestión de Vehículos - TecniCentro Ibarra Express">
+  <header class="navbar" role="banner">
+    <div class="container">
+      <a href="/admin/dashboard" class="brand">
+        <span class="logo-circle">🔧</span>
+        <span class="brand-text">TecniCentro Ibarra Express</span>
+      </a>
+      <div class="user-menu">
+        <span id="userWelcome" class="user-chip">Cargando…</span>
+        <button type="button" id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </header>
 
   <main class="page">
     <div class="container">
       <div class="header-row">
-        <div><h1>Gestión de Vehículos</h1><p class="muted">Registro y seguimiento de unidades</p></div>
+        <div>
+          <h1>Gestión de Vehículos</h1>
+          <p class="muted">Registro y seguimiento de unidades</p>
+        </div>
         <div class="actions">
           <input id="q" class="input" placeholder="Buscar por placa / marca / cliente" />
-          <select id="fMarca" class="input"><option value="">Todas las marcas</option></select>
           <button class="btn btn-outline" id="btnBuscar">Buscar</button>
           <button class="btn btn-orange" id="btnNuevo">Nuevo Vehículo</button>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-head"><h3>Listado</h3></div>
+        <div class="card-head">
+          <h3>Listado de Vehículos</h3>
+        </div>
         <div class="card-body">
-          <div id="wrapTable" class="table-wrap"><div class="skeleton"></div></div>
+          <div id="wrapTable" class="table-wrap">
+            <div class="skeleton"></div>
+          </div>
+          <div class="pager">
+            <button id="prev" class="btn btn-outline" disabled>Anterior</button>
+            <span id="pageInfo" class="muted">Página 1</span>
+            <button id="next" class="btn btn-outline" disabled>Siguiente</button>
+          </div>
         </div>
       </div>
     </div>
@@ -31,235 +53,499 @@ import Layout from '../../layouts/Layout.astro';
   <!-- Modal Vehículo -->
   <dialog id="modalVehiculo">
     <form id="frmVehiculo" method="dialog" class="modal">
-      <div class="modal-head"><h3 id="modalTitle">Nuevo Vehículo</h3><button class="icon" type="button" id="closeVehiculo">✖</button></div>
-      <div class="modal-body grid2">
-        <label>Cliente (ID)<input name="id_cliente" required class="input" /></label>
-        <label>Placa<input name="placa" required class="input" /></label>
-        <label>Marca<input name="marca" class="input" /></label>
-        <label>Modelo<input name="modelo" class="input" /></label>
-        <label>Año<input name="anio" type="number" class="input" /></label>
-        <label>Kilometraje<input name="km" type="number" class="input" /></label>
-        <label>Color<input name="color" class="input" /></label>
-        <label>VIN<input name="vin" class="input" /></label>
+      <div class="modal-head">
+        <h3 id="modalTitle">Nuevo Vehículo</h3>
+        <button class="icon" type="button" id="closeVehiculo">✖</button>
       </div>
-      <div class="modal-foot"><button class="btn btn-outline" value="cancel">Cancelar</button><button class="btn btn-orange" id="btnGuardar" value="default">Guardar</button></div>
+      <div class="modal-body grid2">
+        <label>Placa<input name="placa" required class="input" /></label>
+        <label>Marca<input name="marca" required class="input" /></label>
+        <label>Cliente
+          <select name="id_cliente" required class="input">
+            <option value="">Seleccionar cliente</option>
+          </select>
+        </label>
+        <label>Kilometraje<input name="kilometraje" type="number" class="input" /></label>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" value="cancel">Cancelar</button>
+        <button class="btn btn-orange" id="btnGuardarVehiculo" value="default">Guardar</button>
+      </div>
     </form>
   </dialog>
 
-<style>
-  /* ========= Light theme tokens ========= */
-  :root{
-    --bg:#f6f8fb;           /* fondo claro */
-    --card:#ffffff;         /* tarjetas */
-    --surface:#f9fbff;      /* superficies sutiles */
-    --text:#0f172a;         /* texto principal */
-    --muted:#64748b;        /* texto secundario */
-    --line:#e6ebf2;         /* bordes suaves */
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #fff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --orange-500: #fb923c;
+      --ring: 0 1px 2px rgba(0,0,0,.04), 0 10px 20px rgba(2,6,23,.08);
+      --radius: 16px;
+      --container: 1200px;
+    }
 
-    --brand-1:#fb923c;      /* naranja */
-    --brand-2:#f59e0b;      /* ámbar */
-    --accent:#2563eb;       /* azul acción */
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+    }
 
-    --ring:0 1px 2px rgba(2,6,23,.06), 0 10px 20px rgba(2,6,23,.06);
-    --radius:16px;
-    --container:1200px;
-  }
-
-  *{box-sizing:border-box}
-  body{
-    margin:0;background:var(--bg);color:var(--text);
-    font:14px/1.45 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial;
-  }
-  .container{max-width:var(--container);margin-inline:auto;padding:0 20px}
-
-  /* ========= Navbar (clara, sticky) ========= */
-  .navbar{
-    position:sticky;top:0;z-index:40;
-    background:rgba(255,255,255,.88);
-    backdrop-filter:saturate(160%) blur(10px);
-    border-bottom:1px solid var(--line);
-  }
-  .navbar .container{display:flex;align-items:center;justify-content:space-between;height:70px}
-  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);font-weight:800}
-  .logo-circle{
-    display:grid;place-items:center;width:40px;height:40px;border-radius:50%;
-    background:conic-gradient(from 160deg,var(--brand-1),var(--brand-2));
-    box-shadow:var(--ring)
-  }
-  .brand-text{letter-spacing:.2px}
-  .user-menu{display:flex;align-items:center;gap:12px}
-  .user-chip{
-    padding:8px 12px;border-radius:999px;
-    background:#f4f7fb;border:1px solid var(--line);color:#334155;font-weight:700;
-  }
-
-  /* ========= Page ========= */
-  .page{padding:28px 0 48px}
-  .header-row{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:12px 0 20px}
-  h1{margin:0 0 6px;font-size:28px}
-  .muted{color:var(--muted)}
-  .actions{display:flex;gap:10px;flex-wrap:wrap}
-
-  /* ========= Inputs & Buttons (claros) ========= */
-  .input{
-    width:auto;min-width:240px;appearance:none;outline:none;
-    padding:11px 12px;border-radius:12px;background:#fff;color:var(--text);
-    border:1px solid var(--line); box-shadow:0 1px 0 rgba(2,6,23,.02);
-    transition:border-color .12s ease, box-shadow .12s ease, transform .12s ease;
-  }
-  .input::placeholder{color:#9aa9bd}
-  .input:focus{
-    border-color:#bfdbfe; box-shadow:0 0 0 3px rgba(59,130,246,.25)
-  }
-  select.input{
-    padding-right:34px;background-image:
-      linear-gradient(45deg, transparent 50%, #64748b 50%),
-      linear-gradient(135deg, #64748b 50%, transparent 50%),
-      linear-gradient(to right, transparent, transparent);
-    background-position: calc(100% - 18px) 55%, calc(100% - 12px) 55%, 100% 0;
-    background-size:6px 6px, 6px 6px, 2.5em 2.5em; background-repeat:no-repeat;
-  }
-
-  .btn{
-    appearance:none;border:1px solid var(--line);border-radius:12px;
-    padding:10px 14px;font-weight:800;cursor:pointer;background:#fff;color:#0b1324;
-    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
-  }
-  .btn:hover{transform:translateY(-1px);box-shadow:var(--ring);border-color:#d7deea}
-  .btn:active{transform:translateY(0)}
-  .btn-outline{background:#fff}
-  .btn-orange{
-    color:#fff;border:1px solid #f59e0b;background:linear-gradient(180deg,var(--brand-1),#f97316);
-    box-shadow:0 6px 18px rgba(251,146,60,.18)
-  }
-  .btn-orange:hover{box-shadow:0 8px 28px rgba(251,146,60,.28)}
-
-  /* ========= Card ========= */
-  .card{
-    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    box-shadow:var(--ring);overflow:hidden;
-  }
-  .card-head{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:16px;border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg,#ffffff,#fcfdff)
-  }
-  .card-head h3{margin:0;font-size:16px;font-weight:800}
-  .card-body{padding:14px 16px 18px}
-
-  /* ========= Tabla clara ========= */
-  .table-wrap{overflow:auto;scrollbar-gutter:stable both-edges}
-  table{width:100%;border-collapse:separate;border-spacing:0}
-  thead th{
-    position:sticky;top:0;z-index:1;background:#f8fafc;color:#64748b;
-    text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.05em;
-    padding:12px 10px;border-bottom:1px solid var(--line)
-  }
-  tbody td{padding:14px 10px;border-top:1px solid var(--line);color:#0f172a}
-  tr:hover td{background:#f9fbff}
-  .row-actions{display:flex;gap:8px}
-  .icon-btn{
-    background:#fff;border:1px solid var(--line);color:#0f172a;border-radius:10px;padding:6px 9px;cursor:pointer;
-  }
-  .icon-btn:hover{border-color:#cdd6e5;box-shadow:0 4px 14px rgba(2,6,23,.08)}
-
-  /* ========= Empty / Skeleton ========= */
-  .skeleton{
-    height:64px;border-radius:12px;
-    background:linear-gradient(90deg,#f2f5fb 25%,#eaeef6 37%,#f2f5fb 63%);
-    background-size:400% 100%;animation:shimmer 1.2s infinite
-  }
-  @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
-  #wrapTable>.muted{
-    padding:18px;border:1px dashed var(--line);border-radius:12px;background:#fff
-  }
-
-  /* ========= Modal claro ========= */
-  dialog::backdrop{background:rgba(15,23,42,.25)}
-  dialog{
-    border:0;padding:0;width:min(860px,92vw);border-radius:18px;overflow:hidden;
-    background:#fff;border:1px solid var(--line);box-shadow:0 40px 80px rgba(2,6,23,.18)
-  }
-  .modal{background:transparent}
-  .modal-head{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:16px;border-bottom:1px solid var(--line);background:#f9fbff
-  }
-  .modal-head h3{margin:0}
-  .modal-body{padding:16px}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 16px;border-top:1px solid var(--line)}
-  .modal label{display:flex;flex-direction:column;gap:8px;font-weight:700;color:#0b1324}
-  .icon{
-    appearance:none;background:#fff;border:1px solid var(--line);color:#0f172a;border-radius:10px;padding:6px 10px;cursor:pointer;
-  }
-  .icon:hover{border-color:#cdd6e5}
-
-  /* ========= Badges (por si luego usas) ========= */
-  .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:800}
-  .badge-warning{background:#fff7ed;color:#c2410c;border:1px solid #fde7c6}
-  .badge-primary{background:#eff6ff;color:#1e40af;border:1px solid #dbeafe}
-  .badge-success{background:#ecfdf5;color:#065f46;border:1px solid #d1fae5}
-
-  /* ========= Responsive ========= */
-  @media (max-width:1024px){
-    .header-row{align-items:stretch;flex-direction:column}
-    .actions{justify-content:flex-start}
-  }
-  @media (max-width:640px){
-    .brand-text{display:none}
-    .input{min-width:unset;width:100%}
-    .grid2{grid-template-columns:1fr}
-    .actions{flex-direction:column}
-  }
-</style>
-
+    .muted { color: var(--muted); }
+    
+    .navbar {
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,.9);
+      backdrop-filter: saturate(180%) blur(10px);
+      border-bottom: 1px solid #eef2f7;
+      z-index: 20;
+    }
+    
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+    }
+    
+    .logo-circle {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--orange-500), #ffb07a);
+      box-shadow: var(--ring);
+    }
+    
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .user-chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #f4f7fb;
+      border: 1px solid #e6ebf2;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
+    
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 0.875rem;
+    }
+    
+    .btn-outline {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      color: var(--text);
+    }
+    
+    .btn-orange {
+      background: var(--orange-500);
+      color: #fff;
+    }
+    
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .container {
+      max-width: var(--container);
+      margin-inline: auto;
+      padding: 0 20px;
+    }
+    
+    .page {
+      padding: 24px 0 48px;
+    }
+    
+    .header-row {
+      display: flex;
+      gap: 12px;
+      align-items: end;
+      justify-content: space-between;
+      margin: 16px 0 18px;
+    }
+    
+    .header-row h1 {
+      margin: 0 0 6px;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .input {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px 12px;
+      min-width: 240px;
+      font-size: 0.875rem;
+      background: var(--card);
+      color: var(--text);
+    }
+    
+    .input:focus {
+      outline: none;
+      border-color: var(--orange-500);
+      box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+    }
+    
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--ring);
+      overflow: hidden;
+    }
+    
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid #eef2f7;
+    }
+    
+    .card-head h3 {
+      margin: 0;
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+    
+    .card-body {
+      padding: 12px 16px 16px;
+    }
+    
+    .table-wrap {
+      overflow: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    
+    thead th {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+      text-align: left;
+      padding: 10px;
+      background: #fafbfc;
+      font-weight: 600;
+    }
+    
+    tbody td {
+      padding: 12px 10px;
+      border-top: 1px solid #eef2f7;
+      font-size: 0.875rem;
+    }
+    
+    tr:hover td {
+      background: #fafafa;
+    }
+    
+    .row-actions {
+      display: flex;
+      gap: 6px;
+    }
+    
+    .icon-btn {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 6px 8px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.15s ease;
+    }
+    
+    .icon-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    
+    .skeleton {
+      height: 64px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #f2f4f8 25%, #e6eaf1 37%, #f2f4f8 63%);
+      background-size: 400% 100%;
+      animation: shimmer 1.2s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: 100% 0; }
+      100% { background-position: 0 0; }
+    }
+    
+    .pager {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: flex-end;
+      padding: 10px 0;
+      margin-top: 16px;
+      border-top: 1px solid #eef2f7;
+    }
+    
+    /* Modal */
+    dialog::backdrop {
+      background: rgba(0, 0, 0, .25);
+    }
+    
+    dialog {
+      border: 0;
+      border-radius: 14px;
+      padding: 0;
+      box-shadow: var(--ring);
+      max-width: 720px;
+      width: 100%;
+    }
+    
+    .modal {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid #eef2f7;
+    }
+    
+    .modal-head h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    
+    .icon {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+    }
+    
+    .icon:hover {
+      background: #f1f5f9;
+      color: var(--text);
+    }
+    
+    .modal-body {
+      padding: 16px;
+    }
+    
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    
+    .modal-body label {
+      display: block;
+      margin-bottom: 12px;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+    
+    .modal-body input {
+      display: block;
+      width: 100%;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+    
+    .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 12px 16px;
+      border-top: 1px solid #eef2f7;
+    }
+    
+    @media (max-width: 720px) {
+      .grid2 {
+        grid-template-columns: 1fr;
+      }
+      
+      .input {
+        min-width: unset;
+        width: 100%;
+      }
+      
+      .header-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .actions {
+        justify-content: flex-start;
+      }
+    }
+  </style>
 
   <script>
-    // Guard
-    function _hardLogout(){ try{localStorage.removeItem('token');localStorage.removeItem('user')}finally{location.replace('/')} }
-    window.logout=_hardLogout;
-    document.addEventListener('click',(e)=>{const b=e.target.closest('#btnLogout');if(!b)return;e.preventDefault();_hardLogout();});
-    (async()=>{
-      const t=localStorage.getItem('token');const u=localStorage.getItem('user'); if(!t||!u) return _hardLogout();
-      try{const r=await fetch('/api/auth/verify',{headers:{Authorization:`Bearer ${t}`}});const j=await r.json().catch(()=>({}));if(!r.ok||!j?.success)return _hardLogout();}catch{return _hardLogout();}
-      const user=JSON.parse(u); if(user.rol!=='admin') return _hardLogout();
-      document.getElementById('userWelcome').textContent=`Bienvenido, ${user.nombre}`;
-      await loadFiltros(); loadPage();
+    // -------- logout & guard ----------
+    function _hardLogout() {
+      try {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } finally {
+        location.replace('/');
+      }
+    }
+    
+    window.logout = _hardLogout;
+    
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('#btnLogout');
+      if (!b) return;
+      e.preventDefault();
+      _hardLogout();
+    });
+    
+    (async () => {
+      const token = localStorage.getItem('token');
+      const uStr = localStorage.getItem('user');
+      if (!token || !uStr) return _hardLogout();
+      
+      try {
+        const r = await fetch('/api/auth/verify', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j?.success) return _hardLogout();
+      } catch {
+        return _hardLogout();
+      }
+      
+      const user = JSON.parse(uStr);
+      if (user.rol !== 'admin') return _hardLogout();
+      
+      document.getElementById('userWelcome').textContent = `Bienvenido, ${user.nombre}`;
+      loadPage();
+      loadClientes(); // Cargar clientes para el select
     })();
 
-    let q='', marca='', list=[];
-    async function loadFiltros(){
-      const t=localStorage.getItem('token');
-      const r=await fetch('/api/vehiculos/marcas',{headers:{Authorization:`Bearer ${t}`}});
-      const marcas= await r.json().catch(()=>[]);
-      const sel=document.getElementById('fMarca');
-      sel.innerHTML = '<option value="">Todas las marcas</option>' + marcas.map(m=>`<option>${m}</option>`).join('');
+    // Función para cargar clientes en el select
+    async function loadClientes() {
+      const token = localStorage.getItem('token');
+      try {
+        const r = await fetch('/api/clientes?limit=1000', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await r.json().catch(() => ({ items: [] }));
+        
+        const select = document.querySelector('select[name="id_cliente"]');
+        if (select) {
+          // Limpiar opciones existentes excepto la primera
+          select.innerHTML = '<option value="">Seleccionar cliente</option>';
+          
+          // Agregar clientes al select
+          (data.items || []).forEach(cliente => {
+            const option = document.createElement('option');
+            option.value = cliente.id;
+            
+            // Mostrar nombre según el tipo de cliente
+            const nombre = cliente.tipo === 'particular' 
+              ? `${cliente.nombres || ''} ${cliente.apellidos || ''}`.trim()
+              : cliente.razon_social || '';
+            
+            option.textContent = `${cliente.identificacion} - ${nombre}`;
+            select.appendChild(option);
+          });
+        }
+      } catch (error) {
+        console.error('Error al cargar clientes:', error);
+      }
     }
 
-    async function loadPage(){
-      const t=localStorage.getItem('token');
-      const url=new URL('/api/vehiculos', location.origin);
-      if(q) url.searchParams.set('q', q); if(marca) url.searchParams.set('marca', marca);
-      const r=await fetch(url,{headers:{Authorization:`Bearer ${t}`}});
-      list=await r.json().catch(()=>[]);
-      renderTable(list);
+    // -------- page logic ----------
+    let page = 1, limit = 10, total = 0, q = '';
+    const fmt = new Intl.NumberFormat('es-EC');
+
+    async function loadPage() {
+      const token = localStorage.getItem('token');
+      const url = new URL('/api/vehiculos', location.origin);
+      url.searchParams.set('page', page);
+      url.searchParams.set('limit', limit);
+      if (q) url.searchParams.set('q', q);
+      
+      try {
+        const r = await fetch(url, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await r.json().catch(() => ({ items: [], total: 0 }));
+        total = data.total || 0;
+        renderTable(data.items || []);
+        updatePager();
+      } catch (error) {
+        console.error('Error loading vehicles:', error);
+        document.getElementById('wrapTable').innerHTML = '<div class="muted">Error al cargar vehículos</div>';
+      }
     }
 
-    function renderTable(items){
-      const wrap=document.getElementById('wrapTable');
-      if(!items.length){ wrap.innerHTML = '<div class="muted">Sin resultados</div>'; return; }
+    function renderTable(items) {
+      const wrap = document.getElementById('wrapTable');
+      if (!items.length) {
+        wrap.innerHTML = '<div class="muted">Sin resultados</div>';
+        return;
+      }
+      
       wrap.innerHTML = `
         <table>
-          <thead><tr><th>Placa</th><th>Marca/Modelo</th><th>Año</th><th>Cliente</th><th>KM</th><th></th></tr></thead>
+          <thead><tr>
+            <th>Placa</th><th>Marca</th><th>Cliente</th><th>Kilometraje</th><th></th>
+          </tr></thead>
           <tbody>
-            ${items.map(v=>`
+            ${items.map(v => `
               <tr>
-                <td>${v.placa||''}</td>
-                <td>${(v.marca||'')+' '+(v.modelo||'')}</td>
-                <td>${v.anio||''}</td>
-                <td>${v.cliente_nombre||''}</td>
-                <td>${v.km??''}</td>
+                <td><strong>${v.placa || ''}</strong></td>
+                <td>${v.marca || ''}</td>
+                <td>${v.cliente_nombre || 'N/A'}</td>
+                <td>${v.kilometraje ? Number(v.kilometraje).toLocaleString() + ' km' : 'N/A'}</td>
                 <td>
                   <div class="row-actions">
                     <button class="icon-btn" data-edit='${JSON.stringify(v).replaceAll("'", "&apos;")}'>✎</button>
@@ -271,33 +557,123 @@ import Layout from '../../layouts/Layout.astro';
         </table>`;
     }
 
-    document.getElementById('btnBuscar').addEventListener('click',()=>{ q=document.getElementById('q').value.trim(); marca=document.getElementById('fMarca').value; loadPage(); });
+    function updatePager() {
+      const pages = Math.max(1, Math.ceil(total / limit));
+      document.getElementById('pageInfo').textContent = `Página ${page} de ${fmt.format(pages)} (${fmt.format(total)} registros)`;
+      document.getElementById('prev').disabled = page <= 1;
+      document.getElementById('next').disabled = page >= pages;
+    }
 
-    // modal
-    const modal=document.getElementById('modalVehiculo');
-    document.getElementById('btnNuevo').addEventListener('click',()=>openModal());
-    document.getElementById('closeVehiculo').addEventListener('click',()=>modal.close());
-    function openModal(data=null){
-      const f=document.getElementById('frmVehiculo'); f.reset(); f.dataset.id=data?.id||'';
-      document.getElementById('modalTitle').textContent=data?'Editar Vehículo':'Nuevo Vehículo';
-      if(data){ for(const k of ['id_cliente','placa','marca','modelo','anio','km','color','vin']) f[k].value = data[k]??''; }
+    // search & pager
+    document.getElementById('btnBuscar').addEventListener('click', () => {
+      q = document.getElementById('q').value.trim();
+      page = 1;
+      loadPage();
+    });
+    
+    document.getElementById('prev').addEventListener('click', () => {
+      if (page > 1) {
+        page--;
+        loadPage();
+      }
+    });
+    
+    document.getElementById('next').addEventListener('click', () => {
+      page++;
+      loadPage();
+    });
+
+    // modal create/edit
+    const modal = document.getElementById('modalVehiculo');
+    document.getElementById('btnNuevo').addEventListener('click', () => {
+      openModal();
+    });
+    document.getElementById('closeVehiculo').addEventListener('click', () => modal.close());
+
+    function openModal(data = null) {
+      const frm = document.getElementById('frmVehiculo');
+      frm.reset();
+      frm.dataset.id = data?.id || '';
+      document.getElementById('modalTitle').textContent = data ? 'Editar Vehículo' : 'Nuevo Vehículo';
+      
+      if (data) {
+        frm.placa.value = data.placa || '';
+        frm.marca.value = data.marca || '';
+        frm.id_cliente.value = data.id_cliente || '';
+        frm.kilometraje.value = data.kilometraje || '';
+      }
+      
       modal.showModal();
     }
-    document.addEventListener('click',(e)=>{
-      const be=e.target.closest('button[data-edit]'); if(be){ openModal(JSON.parse(be.dataset.edit)); return; }
-      const bd=e.target.closest('button[data-del]'); if(bd){ delVehiculo(bd.dataset.del); return; }
+
+    document.addEventListener('click', (e) => {
+      const btnEdit = e.target.closest('button[data-edit]');
+      if (btnEdit) {
+        openModal(JSON.parse(btnEdit.dataset.edit));
+        return;
+      }
+      
+      const btnDel = e.target.closest('button[data-del]');
+      if (btnDel) {
+        delVehiculo(btnDel.dataset.del);
+        return;
+      }
     });
-    document.getElementById('frmVehiculo').addEventListener('submit', async (e)=>{
-      e.preventDefault(); const f=e.target; const id=f.dataset.id; const t=localStorage.getItem('token');
-      const payload=Object.fromEntries(new FormData(f).entries());
-      const r=await fetch(id? `/api/vehiculos/${id}`:'/api/vehiculos',{method:id?'PUT':'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${t}`},body:JSON.stringify(payload)});
-      if(r.ok){ modal.close(); loadPage(); } else alert('No se pudo guardar');
+
+    document.getElementById('frmVehiculo').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const frm = e.target;
+      const payload = {
+        placa: frm.placa.value.trim(),
+        marca: frm.marca.value.trim(),
+        id_cliente: frm.id_cliente.value.trim(),
+        kilometraje: frm.kilometraje.value.trim()
+      };
+      
+      const id = frm.dataset.id;
+      const token = localStorage.getItem('token');
+      
+      try {
+        const r = await fetch(id ? `/api/vehiculos/${id}` : '/api/vehiculos', {
+          method: id ? 'PUT' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+        
+        if (r.ok) {
+          modal.close();
+          loadPage();
+        } else {
+          alert('No se pudo guardar el vehículo');
+        }
+      } catch (error) {
+        console.error('Error saving vehicle:', error);
+        alert('Error al guardar el vehículo');
+      }
     });
-    async function delVehiculo(id){
-      if(!confirm('¿Eliminar vehículo?')) return;
-      const t=localStorage.getItem('token');
-      const r=await fetch(`/api/vehiculos/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${t}`}});
-      if(r.ok) loadPage(); else alert('No se pudo eliminar');
+
+    async function delVehiculo(id) {
+      if (!confirm('¿Eliminar vehículo?')) return;
+      
+      const token = localStorage.getItem('token');
+      try {
+        const r = await fetch(`/api/vehiculos/${id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (r.ok) {
+          loadPage();
+        } else {
+          alert('No se pudo eliminar el vehículo');
+        }
+      } catch (error) {
+        console.error('Error deleting vehicle:', error);
+        alert('Error al eliminar el vehículo');
+      }
     }
   </script>
 </Layout>

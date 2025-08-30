@@ -14,7 +14,7 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 import authRoutes from './routes/auth.js';
 import clientesRoutes from './routes/clientes.js';
 import vehiculosRoutes from './routes/vehiculos.js';
-// (si tienes más rutas, impórtalas aquí)
+import adminRoutes from './routes/admin.js';
 
 const app = express();
 const PORT = Number(process.env.PORT || 3001);
@@ -41,6 +41,7 @@ app.use((req, _res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/vehiculos', vehiculosRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health
 app.get('/api/health', (_req, res) => {

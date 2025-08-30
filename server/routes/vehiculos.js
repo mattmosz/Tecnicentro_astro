@@ -19,75 +19,64 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Obtener todos los vehículos con paginación y búsqueda
+// Obtener todos los vehículos
 router.get('/', verifyToken, async (req, res) => {
   try {
-    const { buscar, limite = 50, pagina = 1 } = req.query;
-    const offset = (pagina - 1) * limite;
+    const { q, page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
     
     let query = `
       SELECT v.*, 
-        c.nombres, c.apellidos, c.razon_social, c.tipo as cliente_tipo,
-        m.nombre_modelo
-      FROM vehiculos v 
-      JOIN clientes c ON v.id_cliente = c.id 
-      LEFT JOIN modelos_vehiculo m ON v.id_modelo = m.id
-      WHERE 1=1
+             CASE 
+               WHEN c.nombres IS NOT NULL THEN CONCAT(c.nombres, ' ', COALESCE(c.apellidos, ''))
+               WHEN c.razon_social IS NOT NULL THEN c.razon_social
+               ELSE 'Sin cliente'
+             END as cliente_nombre
+      FROM vehiculos v
+      LEFT JOIN clientes c ON v.id_cliente = c.id
     `;
     let params = [];
     
-    if (buscar) {
-      query += ` AND (
+    if (q && q.trim()) {
+      query += ` WHERE (
         v.placa LIKE ? OR 
         v.marca LIKE ? OR 
         c.nombres LIKE ? OR 
-        c.apellidos LIKE ? OR 
-        c.razon_social LIKE ? OR
-        m.nombre_modelo LIKE ?
+        c.apellidos LIKE ? OR
+        c.razon_social LIKE ?
       )`;
-      const searchTerm = `%${buscar}%`;
-      params = [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm];
+      const searchTerm = `%${q.trim()}%`;
+      params = [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm];
     }
     
     query += ' ORDER BY v.placa LIMIT ? OFFSET ?';
-    params.push(parseInt(limite), parseInt(offset));
+    params.push(parseInt(limit), parseInt(offset));
     
     const [vehiculos] = await db.execute(query, params);
     
     // Contar total para paginación
-    let countQuery = `
-      SELECT COUNT(*) as total 
-      FROM vehiculos v 
-      JOIN clientes c ON v.id_cliente = c.id 
-      LEFT JOIN modelos_vehiculo m ON v.id_modelo = m.id
-      WHERE 1=1
-    `;
+    let countQuery = 'SELECT COUNT(*) as total FROM vehiculos v LEFT JOIN clientes c ON v.id_cliente = c.id';
     let countParams = [];
-    if (buscar) {
-      countQuery += ` AND (
+    if (q && q.trim()) {
+      countQuery += ` WHERE (
         v.placa LIKE ? OR 
         v.marca LIKE ? OR 
         c.nombres LIKE ? OR 
-        c.apellidos LIKE ? OR 
-        c.razon_social LIKE ? OR
-        m.nombre_modelo LIKE ?
+        c.apellidos LIKE ? OR
+        c.razon_social LIKE ?
       )`;
-      const searchTerm = `%${buscar}%`;
-      countParams = [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm];
+      const searchTerm = `%${q.trim()}%`;
+      countParams = [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm];
     }
     
-    const [count] = await db.execute(countQuery, countParams);
+    const [countResult] = await db.execute(countQuery, countParams);
+    const total = countResult[0].total;
     
     res.json({ 
-      success: true, 
-      data: vehiculos,
-      pagination: {
-        total: count[0].total,
-        pagina: parseInt(pagina),
-        limite: parseInt(limite),
-        totalPaginas: Math.ceil(count[0].total / limite)
-      }
+      items: vehiculos,
+      total: total
     });
+    
   } catch (error) {
     console.error('Error al obtener vehículos:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
@@ -98,21 +87,13 @@ router.get('/', verifyToken, async (req, res) => {
 router.get('/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const [vehiculos] = await db.execute(`
-      SELECT v.*, 
-        c.nombres, c.apellidos, c.razon_social, c.tipo as cliente_tipo,
-        m.nombre_modelo
-      FROM vehiculos v 
-      JOIN clientes c ON v.id_cliente = c.id 
-      LEFT JOIN modelos_vehiculo m ON v.id_modelo = m.id
-      WHERE v.id = ?
-    `, [id]);
+    const [results] = await db.execute('SELECT * FROM vehiculos WHERE id = ?', [id]);
     
-    if (vehiculos.length === 0) {
+    if (results.length === 0) {
       return res.status(404).json({ success: false, message: 'Vehículo no encontrado' });
     }
     
-    res.json({ success: true, data: vehiculos[0] });
+    res.json({ success: true, data: results[0] });
   } catch (error) {
     console.error('Error al obtener vehículo:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
@@ -122,30 +103,47 @@ router.get('/:id', verifyToken, async (req, res) => {
 // Crear nuevo vehículo
 router.post('/', verifyToken, async (req, res) => {
   try {
-    const { id_cliente, marca, placa, kilometraje, id_modelo } = req.body;
-
-    if (!id_cliente || !marca || !placa) {
-      return res.status(400).json({ success: false, message: 'Cliente, marca y placa son requeridos' });
+    const { placa, marca, id_cliente, kilometraje } = req.body;
+    
+    if (!placa || !marca || !id_cliente) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Placa, marca y cliente son requeridos' 
+      });
     }
-
-    // Verificar si ya existe un vehículo con esa placa
+    
+    // Verificar si ya existe
     const [existing] = await db.execute('SELECT id FROM vehiculos WHERE placa = ?', [placa]);
     if (existing.length > 0) {
-      return res.status(400).json({ success: false, message: 'Ya existe un vehículo con esa placa' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Ya existe un vehículo con esa placa' 
+      });
     }
-
+    
     // Verificar que el cliente existe
-    const [cliente] = await db.execute('SELECT id FROM clientes WHERE id = ? AND estado = "activo"', [id_cliente]);
+    const [cliente] = await db.execute('SELECT id FROM clientes WHERE id = ?', [id_cliente]);
     if (cliente.length === 0) {
-      return res.status(400).json({ success: false, message: 'Cliente no encontrado o inactivo' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Cliente no encontrado' 
+      });
     }
-
-    const [result] = await db.execute(
-      'INSERT INTO vehiculos (id_cliente, marca, placa, kilometraje, id_modelo) VALUES (?, ?, ?, ?, ?)',
-      [id_cliente, marca, placa, kilometraje || '0', id_modelo || null]
-    );
-
-    res.json({ success: true, message: 'Vehículo creado exitosamente', id: result.insertId });
+    
+    const insertQuery = `
+      INSERT INTO vehiculos (placa, marca, id_cliente, kilometraje) 
+      VALUES (?, ?, ?, ?)
+    `;
+    const insertParams = [placa, marca, id_cliente, kilometraje || 0];
+    
+    const [result] = await db.execute(insertQuery, insertParams);
+    
+    res.status(201).json({ 
+      success: true, 
+      message: 'Vehículo creado exitosamente',
+      id: result.insertId
+    });
+    
   } catch (error) {
     console.error('Error al crear vehículo:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
@@ -156,36 +154,43 @@ router.post('/', verifyToken, async (req, res) => {
 router.put('/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const { id_cliente, marca, placa, kilometraje, id_modelo } = req.body;
-
-    if (!id_cliente || !marca || !placa) {
-      return res.status(400).json({ success: false, message: 'Cliente, marca y placa son requeridos' });
-    }
-
-    // Verificar si el vehículo existe
+    const { placa, marca, id_cliente, kilometraje } = req.body;
+    
+    // Verificar que el vehículo existe
     const [existing] = await db.execute('SELECT id FROM vehiculos WHERE id = ?', [id]);
     if (existing.length === 0) {
       return res.status(404).json({ success: false, message: 'Vehículo no encontrado' });
     }
-
-    // Verificar si la placa ya existe en otro vehículo
+    
+    // Verificar duplicados de placa
     const [duplicate] = await db.execute('SELECT id FROM vehiculos WHERE placa = ? AND id != ?', [placa, id]);
     if (duplicate.length > 0) {
-      return res.status(400).json({ success: false, message: 'Ya existe otro vehículo con esa placa' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Ya existe otro vehículo con esa placa' 
+      });
     }
-
+    
     // Verificar que el cliente existe
-    const [cliente] = await db.execute('SELECT id FROM clientes WHERE id = ? AND estado = "activo"', [id_cliente]);
+    const [cliente] = await db.execute('SELECT id FROM clientes WHERE id = ?', [id_cliente]);
     if (cliente.length === 0) {
-      return res.status(400).json({ success: false, message: 'Cliente no encontrado o inactivo' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Cliente no encontrado' 
+      });
     }
-
-    await db.execute(
-      'UPDATE vehiculos SET id_cliente = ?, marca = ?, placa = ?, kilometraje = ?, id_modelo = ? WHERE id = ?',
-      [id_cliente, marca, placa, kilometraje || '0', id_modelo || null, id]
-    );
-
+    
+    const updateQuery = `
+      UPDATE vehiculos 
+      SET placa = ?, marca = ?, id_cliente = ?, kilometraje = ?
+      WHERE id = ?
+    `;
+    const updateParams = [placa, marca, id_cliente, kilometraje || 0, id];
+    
+    await db.execute(updateQuery, updateParams);
+    
     res.json({ success: true, message: 'Vehículo actualizado exitosamente' });
+    
   } catch (error) {
     console.error('Error al actualizar vehículo:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
@@ -196,90 +201,20 @@ router.put('/:id', verifyToken, async (req, res) => {
 router.delete('/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Verificar si el vehículo existe
+    
+    // Verificar que el vehículo existe
     const [existing] = await db.execute('SELECT id FROM vehiculos WHERE id = ?', [id]);
     if (existing.length === 0) {
       return res.status(404).json({ success: false, message: 'Vehículo no encontrado' });
     }
-
-    // Verificar si el vehículo tiene órdenes de servicio asociadas
-    const [ordenes] = await db.execute('SELECT COUNT(*) as total FROM ordenes_servicio WHERE id_vehiculo = ?', [id]);
-    if (ordenes[0].total > 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'No se puede eliminar el vehículo porque tiene órdenes de servicio asociadas' 
-      });
-    }
-
+    
+    // Eliminar permanentemente
     await db.execute('DELETE FROM vehiculos WHERE id = ?', [id]);
-
+    
     res.json({ success: true, message: 'Vehículo eliminado exitosamente' });
+    
   } catch (error) {
     console.error('Error al eliminar vehículo:', error);
-    res.status(500).json({ success: false, message: 'Error interno del servidor' });
-  }
-});
-
-// Buscar vehículos por término
-router.get('/buscar/:termino', verifyToken, async (req, res) => {
-  try {
-    const { termino } = req.params;
-    const searchTerm = `%${termino}%`;
-    
-    const [vehiculos] = await db.execute(`
-      SELECT v.*, 
-        c.nombres, c.apellidos, c.razon_social, c.tipo as cliente_tipo,
-        m.nombre_modelo
-      FROM vehiculos v 
-      JOIN clientes c ON v.id_cliente = c.id 
-      LEFT JOIN modelos_vehiculo m ON v.id_modelo = m.id
-      WHERE v.placa LIKE ? OR 
-        v.marca LIKE ? OR 
-        c.nombres LIKE ? OR 
-        c.apellidos LIKE ? OR 
-        c.razon_social LIKE ? OR
-        m.nombre_modelo LIKE ?
-      ORDER BY v.placa
-      LIMIT 20
-    `, [searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm]);
-    
-    res.json({ success: true, data: vehiculos });
-  } catch (error) {
-    console.error('Error al buscar vehículos:', error);
-    res.status(500).json({ success: false, message: 'Error interno del servidor' });
-  }
-});
-
-// Obtener clientes para el select
-router.get('/data/clientes', verifyToken, async (req, res) => {
-  try {
-    const [clientes] = await db.execute(`
-      SELECT id, tipo, nombres, apellidos, razon_social 
-      FROM clientes 
-      WHERE estado = 'activo' 
-      ORDER BY nombres, apellidos, razon_social
-    `);
-    
-    res.json({ success: true, data: clientes });
-  } catch (error) {
-    console.error('Error al obtener clientes:', error);
-    res.status(500).json({ success: false, message: 'Error interno del servidor' });
-  }
-});
-
-// Obtener modelos para el select
-router.get('/data/modelos', verifyToken, async (req, res) => {
-  try {
-    const [modelos] = await db.execute(`
-      SELECT id, nombre_modelo 
-      FROM modelos_vehiculo 
-      ORDER BY nombre_modelo
-    `);
-    
-    res.json({ success: true, data: modelos });
-  } catch (error) {
-    console.error('Error al obtener modelos:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
