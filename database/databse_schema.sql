@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 30-08-2025 a las 17:03:46
+-- Tiempo de generación: 31-08-2025 a las 21:41:22
 -- Versión del servidor: 10.4.27-MariaDB
 -- Versión de PHP: 8.2.0
 
@@ -45,7 +45,9 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id`, `tipo`, `identificacion`, `nombres`, `apellidos`, `razon_social`, `telefono`, `correo`, `direccion`, `estado`) VALUES
-(1, 'particular', '1003540174', 'Matías Marcelo', 'Mosquera Báez', NULL, '0958849189', 'matias.mosquera619@gmail.com', 'Av. Atahualpa 20-41 y Carlos Proaño', 'activo');
+(1, 'particular', '1003540174', 'Matías Marcelo', 'Mosquera Báez', NULL, '0958849189', 'matias.mosquera619@gmail.com', 'Av. Atahualpa 20-41 y Carlos Proano', 'activo'),
+(2, 'particular', '1001250446', 'Jorge', 'Yepez', NULL, '2342342', 'hola@gmail.com', 'Sióm Bolivar 123 y Sucre', 'inactivo'),
+(3, 'particular', '100', 'hola', 'hola', NULL, '1231231', 'a@gmail.com', 'hola', 'inactivo');
 
 -- --------------------------------------------------------
 
@@ -99,24 +101,6 @@ CREATE TABLE `facturas` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `modelos_vehiculo`
---
-
-CREATE TABLE `modelos_vehiculo` (
-  `id` int(11) NOT NULL,
-  `nombre_modelo` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `modelos_vehiculo`
---
-
-INSERT INTO `modelos_vehiculo` (`id`, `nombre_modelo`) VALUES
-(1, 'LUV D-MAX DIESEL 4X4 3.0');
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `ordenes_servicio`
 --
 
@@ -129,456 +113,6 @@ CREATE TABLE `ordenes_servicio` (
   `observaciones` text DEFAULT NULL,
   `estado` enum('pendiente','facturada') DEFAULT 'pendiente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `precios_modelo_vehiculo`
---
-
-CREATE TABLE `precios_modelo_vehiculo` (
-  `id` int(11) NOT NULL,
-  `id_modelo` int(11) NOT NULL,
-  `id_servicio` int(11) NOT NULL,
-  `tipo_cliente` enum('particular','institucion') DEFAULT 'particular',
-  `precio_especial` decimal(10,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `precios_modelo_vehiculo`
---
-
-INSERT INTO `precios_modelo_vehiculo` (`id`, `id_modelo`, `id_servicio`, `tipo_cliente`, `precio_especial`) VALUES
-(5, 1, 6, 'particular', '2.17'),
-(6, 1, 7, 'particular', '2.17'),
-(7, 1, 8, 'particular', '2.17'),
-(8, 1, 9, 'particular', '2.79'),
-(9, 1, 10, 'particular', '2.79'),
-(10, 1, 11, 'particular', '2.79'),
-(11, 1, 12, 'particular', '2.79'),
-(12, 1, 13, 'particular', '3.41'),
-(13, 1, 14, 'particular', '3.41'),
-(14, 1, 15, 'particular', '3.41'),
-(15, 1, 16, 'particular', '83.59'),
-(16, 1, 17, 'particular', '6.19'),
-(17, 1, 18, 'particular', '61.92'),
-(18, 1, 19, 'particular', '184.52'),
-(19, 1, 20, 'particular', '30.96'),
-(20, 1, 21, 'particular', '30.96'),
-(21, 1, 22, 'particular', '1.24'),
-(22, 1, 23, 'particular', '3.10'),
-(23, 1, 24, 'particular', '3.10'),
-(24, 1, 25, 'particular', '3.10'),
-(25, 1, 26, 'particular', '3.10'),
-(26, 1, 27, 'particular', '61.92'),
-(27, 1, 28, 'particular', '182.67'),
-(28, 1, 29, 'particular', '15.48'),
-(29, 1, 30, 'particular', '11.15'),
-(30, 1, 31, 'particular', '13.62'),
-(31, 1, 32, 'particular', '182.67'),
-(32, 1, 33, 'particular', '48.30'),
-(33, 1, 34, 'particular', '46.44'),
-(34, 1, 35, 'particular', '12.38'),
-(35, 1, 36, 'particular', '12.38'),
-(36, 1, 37, 'particular', '27.86'),
-(37, 1, 38, 'particular', '21.67'),
-(38, 1, 39, 'particular', '21.67'),
-(39, 1, 40, 'particular', '15.48'),
-(40, 1, 41, 'particular', '89.79'),
-(41, 1, 42, 'particular', '18.58'),
-(42, 1, 43, 'particular', '18.58'),
-(43, 1, 44, 'particular', '18.58'),
-(44, 1, 45, 'particular', '18.58'),
-(45, 1, 46, 'particular', '18.58'),
-(46, 1, 47, 'particular', '9.29'),
-(47, 1, 48, 'particular', '24.77'),
-(48, 1, 49, 'particular', '117.65'),
-(49, 1, 50, 'particular', '49.54'),
-(50, 1, 51, 'particular', '681.13'),
-(51, 1, 52, 'particular', '154.80'),
-(52, 1, 53, 'particular', '4.33'),
-(53, 1, 54, 'particular', '4.95'),
-(54, 1, 55, 'particular', '3.10'),
-(55, 1, 56, 'particular', '3.10'),
-(56, 1, 57, 'particular', '18.58'),
-(57, 1, 58, 'particular', '74.31'),
-(58, 1, 59, 'particular', '6.19'),
-(59, 1, 60, 'particular', '6.81'),
-(60, 1, 61, 'particular', '7.43'),
-(61, 1, 62, 'particular', '8.05'),
-(62, 1, 63, 'particular', '6.19'),
-(63, 1, 64, 'particular', '43.34'),
-(64, 1, 65, 'particular', '49.54'),
-(65, 1, 66, 'particular', '61.92'),
-(66, 1, 67, 'particular', '247.68'),
-(67, 1, 68, 'particular', '6.19'),
-(68, 1, 69, 'particular', '6.19'),
-(69, 1, 70, 'particular', '18.58'),
-(70, 1, 71, 'particular', '24.77'),
-(71, 1, 72, 'particular', '12.38'),
-(72, 1, 73, 'particular', '30.96'),
-(73, 1, 74, 'particular', '12.38'),
-(74, 1, 75, 'particular', '185.76'),
-(75, 1, 76, 'particular', '309.61'),
-(76, 1, 77, 'particular', '74.31'),
-(77, 1, 78, 'particular', '6.19'),
-(78, 1, 79, 'particular', '6.19'),
-(79, 1, 80, 'particular', '12.38'),
-(80, 1, 81, 'particular', '12.38'),
-(81, 1, 82, 'particular', '49.54'),
-(82, 1, 83, 'particular', '61.92'),
-(83, 1, 84, 'particular', '15.48'),
-(84, 1, 85, 'particular', '61.92'),
-(85, 1, 86, 'particular', '74.31'),
-(86, 1, 87, 'particular', '30.96'),
-(87, 1, 88, 'particular', '1.86'),
-(88, 1, 89, 'particular', '12.38'),
-(89, 1, 90, 'particular', '6.19'),
-(90, 1, 91, 'particular', '49.54'),
-(91, 1, 92, 'particular', '619.21'),
-(92, 1, 93, 'particular', '6.19'),
-(93, 1, 94, 'particular', '18.58'),
-(94, 1, 95, 'particular', '18.58'),
-(95, 1, 96, 'particular', '0.62'),
-(96, 1, 97, 'particular', '12.38'),
-(97, 1, 98, 'particular', '12.38'),
-(98, 1, 99, 'particular', '12.38'),
-(99, 1, 100, 'particular', '30.96'),
-(100, 1, 101, 'particular', '309.61'),
-(101, 1, 102, 'particular', '309.61'),
-(102, 1, 103, 'particular', '3.10'),
-(103, 1, 104, 'particular', '12.38'),
-(104, 1, 105, 'particular', '12.38'),
-(105, 1, 106, 'particular', '27.86'),
-(106, 1, 107, 'particular', '136.23'),
-(107, 1, 108, 'particular', '24.77'),
-(108, 1, 109, 'particular', '61.92'),
-(109, 1, 110, 'particular', '3.10'),
-(110, 1, 111, 'particular', '34.06'),
-(111, 1, 112, 'particular', '12.38'),
-(112, 1, 113, 'particular', '12.38'),
-(113, 1, 114, 'particular', '15.48'),
-(114, 1, 115, 'particular', '6.19'),
-(115, 1, 116, 'particular', '11.15'),
-(116, 1, 117, 'particular', '11.15'),
-(117, 1, 118, 'particular', '6.19'),
-(118, 1, 119, 'particular', '6.19'),
-(119, 1, 120, 'particular', '92.88'),
-(120, 1, 121, 'particular', '12.38'),
-(121, 1, 122, 'particular', '18.58'),
-(122, 1, 123, 'particular', '6.19'),
-(123, 1, 124, 'particular', '37.15'),
-(124, 1, 125, 'particular', '37.15'),
-(125, 1, 126, 'particular', '3.10'),
-(126, 1, 127, 'particular', '68.11'),
-(127, 1, 128, 'particular', '40.25'),
-(128, 1, 129, 'particular', '5.26'),
-(129, 1, 130, 'particular', '7.74'),
-(130, 1, 131, 'particular', '4.95'),
-(131, 1, 132, 'particular', '7.43'),
-(132, 1, 133, 'particular', '7.43'),
-(133, 1, 134, 'particular', '30.96'),
-(134, 1, 135, 'particular', '6.19'),
-(135, 1, 136, 'particular', '6.19'),
-(136, 1, 137, 'particular', '5.26'),
-(137, 1, 138, 'particular', '4.95'),
-(138, 1, 139, 'particular', '4.95'),
-(139, 1, 140, 'particular', '9.29'),
-(140, 1, 141, 'particular', '278.64'),
-(141, 1, 142, 'particular', '12.38'),
-(142, 1, 143, 'particular', '1.55'),
-(143, 1, 144, 'particular', '1.55'),
-(144, 1, 145, 'particular', '2.79'),
-(145, 1, 146, 'particular', '2.79'),
-(146, 1, 147, 'particular', '2.79'),
-(147, 1, 148, 'particular', '30.96'),
-(148, 1, 149, 'particular', '9.29'),
-(149, 1, 150, 'particular', '9.29'),
-(150, 1, 151, 'particular', '173.38'),
-(151, 1, 152, 'particular', '15.48'),
-(152, 1, 153, 'particular', '15.48'),
-(153, 1, 154, 'particular', '15.48'),
-(154, 1, 155, 'particular', '24.77'),
-(155, 1, 156, 'particular', '30.96'),
-(156, 1, 157, 'particular', '30.96'),
-(157, 1, 158, 'particular', '30.96'),
-(158, 1, 159, 'particular', '30.96'),
-(159, 1, 160, 'particular', '30.96'),
-(160, 1, 161, 'particular', '24.77'),
-(161, 1, 162, 'particular', '24.77'),
-(162, 1, 163, 'particular', '24.77'),
-(163, 1, 164, 'particular', '24.77'),
-(164, 1, 165, 'particular', '24.77'),
-(165, 1, 166, 'particular', '24.77'),
-(166, 1, 167, 'particular', '160.99'),
-(167, 1, 168, 'particular', '74.31'),
-(168, 1, 169, 'particular', '185.76'),
-(169, 1, 170, 'particular', '3.10'),
-(170, 1, 171, 'particular', '3.10'),
-(171, 1, 172, 'particular', '6.19'),
-(172, 1, 173, 'particular', '123.84'),
-(173, 1, 174, 'particular', '18.58'),
-(174, 1, 175, 'particular', '12.38'),
-(175, 1, 176, 'particular', '3.10'),
-(176, 1, 177, 'particular', '9.29'),
-(177, 1, 178, 'particular', '27.86'),
-(178, 1, 179, 'particular', '29.72'),
-(179, 1, 180, 'particular', '37.15'),
-(180, 1, 181, 'particular', '74.31'),
-(181, 1, 182, 'particular', '55.73'),
-(182, 1, 183, 'particular', '55.73'),
-(183, 1, 184, 'particular', '32.20'),
-(184, 1, 185, 'particular', '433.45'),
-(185, 1, 186, 'particular', '160.99'),
-(186, 1, 187, 'particular', '49.54'),
-(187, 1, 188, 'particular', '49.54'),
-(188, 1, 189, 'particular', '27.86'),
-(189, 1, 190, 'particular', '24.77'),
-(190, 1, 191, 'particular', '2167.24'),
-(191, 1, 192, 'particular', '29.72'),
-(192, 1, 193, 'particular', '0.62'),
-(193, 1, 194, 'particular', '92.88'),
-(194, 1, 195, 'particular', '92.88'),
-(195, 1, 196, 'particular', '92.88'),
-(196, 1, 197, 'particular', '92.88'),
-(197, 1, 198, 'particular', '9.29'),
-(198, 1, 199, 'particular', '9.29'),
-(199, 1, 200, 'particular', '9.29'),
-(200, 1, 201, 'particular', '6.19'),
-(201, 1, 202, 'particular', '5.88'),
-(202, 1, 203, 'particular', '5.88'),
-(203, 1, 204, 'particular', '5.88'),
-(204, 1, 205, 'particular', '2.48'),
-(205, 1, 206, 'particular', '5.88'),
-(206, 1, 207, 'particular', '40.25'),
-(207, 1, 208, 'particular', '40.25'),
-(208, 1, 209, 'particular', '40.25'),
-(209, 1, 210, 'particular', '37.15'),
-(210, 1, 211, 'particular', '12.38'),
-(211, 1, 212, 'particular', '30.96'),
-(212, 1, 213, 'particular', '30.96'),
-(213, 1, 214, 'particular', '15.48'),
-(214, 1, 215, 'particular', '92.88'),
-(215, 1, 216, 'particular', '92.88'),
-(216, 1, 217, 'particular', '15.48'),
-(217, 1, 218, 'particular', '154.80'),
-(218, 1, 219, 'particular', '15.48'),
-(219, 1, 220, 'particular', '92.88'),
-(220, 1, 221, 'particular', '30.96'),
-(221, 1, 222, 'particular', '30.96'),
-(222, 1, 223, 'particular', '30.96'),
-(223, 1, 224, 'particular', '30.96'),
-(224, 1, 225, 'particular', '17.34'),
-(225, 1, 226, 'particular', '17.34'),
-(226, 1, 227, 'particular', '17.34'),
-(227, 1, 228, 'particular', '17.34'),
-(228, 1, 229, 'particular', '18.58'),
-(229, 1, 230, 'particular', '18.58'),
-(230, 1, 231, 'particular', '99.07'),
-(231, 1, 232, 'particular', '49.54'),
-(232, 1, 233, 'particular', '89.79'),
-(233, 1, 234, 'particular', '89.79'),
-(234, 1, 235, 'particular', '495.37'),
-(235, 1, 236, 'particular', '185.76'),
-(236, 1, 237, 'particular', '619.21'),
-(237, 1, 238, 'particular', '49.54'),
-(238, 1, 239, 'particular', '154.80'),
-(239, 1, 240, 'particular', '154.80'),
-(240, 1, 241, 'particular', '111.46'),
-(241, 1, 242, 'particular', '4.95'),
-(242, 1, 243, 'particular', '4.95'),
-(243, 1, 244, 'particular', '4.95'),
-(244, 1, 245, 'particular', '37.15'),
-(245, 1, 246, 'particular', '37.15'),
-(246, 1, 247, 'particular', '37.15'),
-(247, 1, 248, 'particular', '3.10'),
-(248, 1, 249, 'particular', '3.10'),
-(249, 1, 250, 'particular', '3.10'),
-(250, 1, 251, 'particular', '1.24'),
-(251, 1, 252, 'particular', '1.24'),
-(252, 1, 253, 'particular', '1.24'),
-(253, 1, 254, 'particular', '1.24'),
-(254, 1, 255, 'particular', '1.24'),
-(255, 1, 256, 'particular', '1.24'),
-(256, 1, 257, 'particular', '1.24'),
-(257, 1, 258, 'particular', '1.24'),
-(258, 1, 259, 'particular', '1.24'),
-(259, 1, 260, 'particular', '2.17'),
-(260, 1, 261, 'particular', '2.17'),
-(261, 1, 262, 'particular', '2.17'),
-(262, 1, 263, 'particular', '1.24'),
-(263, 1, 264, 'particular', '1.86'),
-(264, 1, 265, 'particular', '1.86'),
-(265, 1, 266, 'particular', '1.86'),
-(266, 1, 267, 'particular', '1.86'),
-(267, 1, 268, 'particular', '1.86'),
-(268, 1, 269, 'particular', '1.86'),
-(269, 1, 270, 'particular', '1.86'),
-(270, 1, 271, 'particular', '1.86'),
-(271, 1, 272, 'particular', '1.86'),
-(272, 1, 273, 'particular', '154.80'),
-(273, 1, 274, 'particular', '154.80'),
-(274, 1, 275, 'particular', '154.80'),
-(275, 1, 276, 'particular', '154.80'),
-(276, 1, 277, 'particular', '154.80'),
-(277, 1, 278, 'particular', '154.80'),
-(278, 1, 279, 'particular', '92.88'),
-(279, 1, 280, 'particular', '49.54'),
-(280, 1, 281, 'particular', '92.88'),
-(281, 1, 282, 'particular', '49.54'),
-(282, 1, 283, 'particular', '18.58'),
-(283, 1, 284, 'particular', '300.32'),
-(284, 1, 285, 'particular', '74.31'),
-(285, 1, 286, 'particular', '18.58'),
-(286, 1, 287, 'particular', '30.96'),
-(287, 1, 288, 'particular', '92.88'),
-(288, 1, 289, 'particular', '52.63'),
-(289, 1, 290, 'particular', '27.86'),
-(290, 1, 291, 'particular', '27.86'),
-(291, 1, 292, 'particular', '52.63'),
-(292, 1, 293, 'particular', '24.77'),
-(293, 1, 294, 'particular', '6.19'),
-(294, 1, 295, 'particular', '77.40'),
-(295, 1, 296, 'particular', '11.15'),
-(296, 1, 297, 'particular', '46.44'),
-(297, 1, 298, 'particular', '18.58'),
-(298, 1, 299, 'particular', '15.48'),
-(299, 1, 300, 'particular', '15.48'),
-(300, 1, 301, 'particular', '15.48'),
-(301, 1, 302, 'particular', '9.29'),
-(302, 1, 303, 'particular', '9.29'),
-(303, 1, 304, 'particular', '9.29'),
-(304, 1, 305, 'particular', '9.29'),
-(305, 1, 306, 'particular', '18.58'),
-(306, 1, 307, 'particular', '9.29'),
-(307, 1, 308, 'particular', '9.29'),
-(308, 1, 309, 'particular', '9.29'),
-(309, 1, 310, 'particular', '9.29'),
-(310, 1, 311, 'particular', '6.19'),
-(311, 1, 312, 'particular', '3.10'),
-(312, 1, 313, 'particular', '6.19'),
-(313, 1, 314, 'particular', '6.19'),
-(314, 1, 315, 'particular', '6.19'),
-(315, 1, 316, 'particular', '6.19'),
-(316, 1, 317, 'particular', '9.29'),
-(317, 1, 318, 'particular', '15.48'),
-(318, 1, 319, 'particular', '3.10'),
-(319, 1, 320, 'particular', '27.86'),
-(320, 1, 321, 'particular', '6.19'),
-(321, 1, 322, 'particular', '6.19'),
-(322, 1, 323, 'particular', '9.29'),
-(323, 1, 324, 'particular', '9.29'),
-(324, 1, 325, 'particular', '9.29'),
-(325, 1, 326, 'particular', '6.19'),
-(326, 1, 327, 'particular', '18.58'),
-(327, 1, 328, 'particular', '18.58'),
-(328, 1, 329, 'particular', '9.29'),
-(329, 1, 330, 'particular', '37.15'),
-(330, 1, 331, 'particular', '74.31'),
-(331, 1, 332, 'particular', '37.15'),
-(332, 1, 333, 'particular', '24.77'),
-(333, 1, 334, 'particular', '15.48'),
-(334, 1, 335, 'particular', '15.48'),
-(335, 1, 336, 'particular', '15.48'),
-(336, 1, 337, 'particular', '29.72'),
-(337, 1, 338, 'particular', '29.72'),
-(338, 1, 339, 'particular', '55.73'),
-(339, 1, 340, 'particular', '6.19'),
-(340, 1, 341, 'particular', '6.19'),
-(341, 1, 342, 'particular', '6.19'),
-(342, 1, 343, 'particular', '17.34'),
-(343, 1, 344, 'particular', '17.34'),
-(344, 1, 345, 'particular', '55.73'),
-(345, 1, 346, 'particular', '6.19'),
-(346, 1, 347, 'particular', '6.19'),
-(347, 1, 348, 'particular', '1.86'),
-(348, 1, 349, 'particular', '114.55'),
-(349, 1, 350, 'particular', '99.07'),
-(350, 1, 351, 'particular', '99.07'),
-(351, 1, 352, 'particular', '114.55'),
-(352, 1, 353, 'particular', '52.63'),
-(353, 1, 354, 'particular', '148.61'),
-(354, 1, 355, 'particular', '77.40'),
-(355, 1, 356, 'particular', '173.38'),
-(356, 1, 357, 'particular', '148.61'),
-(357, 1, 358, 'particular', '92.88'),
-(358, 1, 359, 'particular', '43.34'),
-(359, 1, 360, 'particular', '154.80'),
-(360, 1, 361, 'particular', '6.19'),
-(361, 1, 362, 'particular', '6.19'),
-(362, 1, 363, 'particular', '92.88'),
-(363, 1, 364, 'particular', '111.46'),
-(364, 1, 365, 'particular', '167.19'),
-(365, 1, 366, 'particular', '4.95'),
-(366, 1, 367, 'particular', '4.95'),
-(367, 1, 368, 'particular', '4.95'),
-(368, 1, 369, 'particular', '4.95'),
-(369, 1, 370, 'particular', '5.57'),
-(370, 1, 371, 'particular', '5.57'),
-(371, 1, 372, 'particular', '27.86'),
-(372, 1, 373, 'particular', '18.58'),
-(373, 1, 374, 'particular', '18.58'),
-(374, 1, 375, 'particular', '18.58'),
-(375, 1, 376, 'particular', '6.19'),
-(376, 1, 377, 'particular', '6.19'),
-(377, 1, 378, 'particular', '6.19'),
-(378, 1, 379, 'particular', '6.19'),
-(379, 1, 380, 'particular', '6.19'),
-(380, 1, 381, 'particular', '6.19'),
-(381, 1, 382, 'particular', '6.19'),
-(382, 1, 383, 'particular', '9.29'),
-(383, 1, 384, 'particular', '43.34'),
-(384, 1, 385, 'particular', '37.15'),
-(385, 1, 386, 'particular', '12.38'),
-(386, 1, 387, 'particular', '13.62'),
-(387, 1, 388, 'particular', '3.10'),
-(388, 1, 389, 'particular', '173.38'),
-(389, 1, 390, 'particular', '1.86'),
-(390, 1, 391, 'particular', '43.34'),
-(391, 1, 392, 'particular', '6.19'),
-(392, 1, 393, 'particular', '6.19'),
-(393, 1, 394, 'particular', '15.48'),
-(394, 1, 395, 'particular', '15.48'),
-(395, 1, 396, 'particular', '9.29'),
-(396, 1, 397, 'particular', '9.29'),
-(397, 1, 398, 'particular', '26.01'),
-(398, 1, 399, 'particular', '6.19'),
-(399, 1, 400, 'particular', '6.19'),
-(400, 1, 401, 'particular', '1.86'),
-(401, 1, 402, 'particular', '1.86'),
-(402, 1, 403, 'particular', '30.96'),
-(403, 1, 404, 'particular', '30.96'),
-(404, 1, 405, 'particular', '30.96'),
-(405, 1, 406, 'particular', '30.96'),
-(406, 1, 407, 'particular', '24.77'),
-(407, 1, 408, 'particular', '18.58'),
-(408, 1, 409, 'particular', '18.58'),
-(409, 1, 410, 'particular', '18.58'),
-(410, 1, 411, 'particular', '18.58'),
-(411, 1, 412, 'particular', '6.19'),
-(412, 1, 413, 'particular', '0.62'),
-(413, 1, 414, 'particular', '0.62'),
-(414, 1, 415, 'particular', '0.62'),
-(415, 1, 416, 'particular', '0.62'),
-(416, 1, 417, 'particular', '588.25'),
-(417, 1, 418, 'particular', '6.19'),
-(418, 1, 419, 'particular', '74.31'),
-(419, 1, 420, 'particular', '74.31'),
-(420, 1, 421, 'particular', '74.31'),
-(421, 1, 422, 'particular', '86.69'),
-(422, 1, 423, 'particular', '68.11'),
-(423, 1, 424, 'particular', '61.92'),
-(424, 1, 425, 'particular', '61.92'),
-(425, 1, 426, 'particular', '30.96'),
-(426, 1, 427, 'particular', '30.96'),
-(427, 1, 428, 'particular', '9.29'),
-(428, 1, 429, 'particular', '9.29'),
-(429, 1, 430, 'particular', '30.96'),
-(430, 1, 431, 'particular', '30.96'),
-(431, 1, 432, 'particular', '6.19'),
-(432, 1, 433, 'particular', '3.10'),
-(433, 1, 434, 'particular', '6.19'),
-(434, 1, 435, 'particular', '6.19');
 
 -- --------------------------------------------------------
 
@@ -1066,16 +600,16 @@ CREATE TABLE `vehiculos` (
   `id_cliente` int(11) NOT NULL,
   `marca` varchar(50) NOT NULL,
   `placa` varchar(20) NOT NULL,
-  `kilometraje` varchar(20) DEFAULT '0',
-  `id_modelo` int(11) DEFAULT NULL
+  `kilometraje` varchar(20) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `vehiculos`
 --
 
-INSERT INTO `vehiculos` (`id`, `id_cliente`, `marca`, `placa`, `kilometraje`, `id_modelo`) VALUES
-(1, 1, 'Chevrolet', 'PLJ-4444', '10.000', 1);
+INSERT INTO `vehiculos` (`id`, `id_cliente`, `marca`, `placa`, `kilometraje`) VALUES
+(1, 1, 'Chevrolet', 'PLJ-4444', '10.000'),
+(2, 1, 'Nissan', 'IBE-6649', '20000');
 
 --
 -- Índices para tablas volcadas
@@ -1112,13 +646,6 @@ ALTER TABLE `facturas`
   ADD KEY `id_orden` (`id_orden`);
 
 --
--- Indices de la tabla `modelos_vehiculo`
---
-ALTER TABLE `modelos_vehiculo`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `nombre_modelo` (`nombre_modelo`);
-
---
 -- Indices de la tabla `ordenes_servicio`
 --
 ALTER TABLE `ordenes_servicio`
@@ -1126,14 +653,6 @@ ALTER TABLE `ordenes_servicio`
   ADD UNIQUE KEY `numero_orden` (`numero_orden`),
   ADD KEY `id_vehiculo` (`id_vehiculo`),
   ADD KEY `id_tecnico` (`id_tecnico`);
-
---
--- Indices de la tabla `precios_modelo_vehiculo`
---
-ALTER TABLE `precios_modelo_vehiculo`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_modelo` (`id_modelo`),
-  ADD KEY `id_servicio` (`id_servicio`);
 
 --
 -- Indices de la tabla `servicios`
@@ -1155,8 +674,7 @@ ALTER TABLE `usuarios`
 ALTER TABLE `vehiculos`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `placa` (`placa`),
-  ADD KEY `id_cliente` (`id_cliente`),
-  ADD KEY `fk_vehiculos_modelo` (`id_modelo`);
+  ADD KEY `id_cliente` (`id_cliente`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -1166,7 +684,7 @@ ALTER TABLE `vehiculos`
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_facturas`
@@ -1187,22 +705,10 @@ ALTER TABLE `facturas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `modelos_vehiculo`
---
-ALTER TABLE `modelos_vehiculo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
 -- AUTO_INCREMENT de la tabla `ordenes_servicio`
 --
 ALTER TABLE `ordenes_servicio`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT de la tabla `precios_modelo_vehiculo`
---
-ALTER TABLE `precios_modelo_vehiculo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=435;
 
 --
 -- AUTO_INCREMENT de la tabla `servicios`
@@ -1220,7 +726,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `vehiculos`
 --
 ALTER TABLE `vehiculos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restricciones para tablas volcadas
@@ -1253,21 +759,12 @@ ALTER TABLE `ordenes_servicio`
   ADD CONSTRAINT `ordenes_servicio_ibfk_2` FOREIGN KEY (`id_tecnico`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL;
 
 --
--- Filtros para la tabla `precios_modelo_vehiculo`
---
-ALTER TABLE `precios_modelo_vehiculo`
-  ADD CONSTRAINT `precios_modelo_vehiculo_ibfk_1` FOREIGN KEY (`id_modelo`) REFERENCES `modelos_vehiculo` (`id`),
-  ADD CONSTRAINT `precios_modelo_vehiculo_ibfk_2` FOREIGN KEY (`id_servicio`) REFERENCES `servicios` (`id`);
-
---
 -- Filtros para la tabla `vehiculos`
 --
 ALTER TABLE `vehiculos`
-  ADD CONSTRAINT `fk_vehiculos_modelo` FOREIGN KEY (`id_modelo`) REFERENCES `modelos_vehiculo` (`id`),
   ADD CONSTRAINT `vehiculos_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNEC

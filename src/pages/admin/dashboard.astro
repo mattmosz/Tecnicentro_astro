@@ -294,7 +294,8 @@ import Layout from '../../layouts/Layout.astro';
         ]);
 
         if (ordenesRes.ok){
-          const list = await ordenesRes.json();
+          const response = await ordenesRes.json();
+          const list = response.success ? response.data : [];
           renderOrdenes(list);
         }
         if (facturasRes.ok){

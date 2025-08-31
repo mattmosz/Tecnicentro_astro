@@ -67,10 +67,32 @@ router.get('/', verifyToken, async (req, res) => {
     const total = countResult[0].total;
     
     res.json({ 
+      success: true,
       items: clientes,
       total: total
     });
     
+  } catch (error) {
+    console.error('Error al obtener clientes:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+// Obtener todos los clientes (sin paginación) para dropdowns
+router.get('/all', verifyToken, async (req, res) => {
+  try {
+    const [clientes] = await db.execute(`
+      SELECT id, nombres, apellidos, razon_social, tipo, identificacion
+      FROM clientes 
+      WHERE estado = 'activo'
+      ORDER BY 
+        CASE 
+          WHEN nombres IS NOT NULL THEN CONCAT(nombres, ' ', COALESCE(apellidos, ''))
+          ELSE razon_social
+        END
+    `);
+    
+    res.json({ success: true, data: clientes });
   } catch (error) {
     console.error('Error al obtener clientes:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });

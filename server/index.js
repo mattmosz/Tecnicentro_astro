@@ -15,6 +15,7 @@ import authRoutes from './routes/auth.js';
 import clientesRoutes from './routes/clientes.js';
 import vehiculosRoutes from './routes/vehiculos.js';
 import serviciosRoutes from './routes/servicios.js';
+import ordenesRoutes from './routes/ordenes.js';
 import adminRoutes from './routes/admin.js';
 
 const app = express();
@@ -43,6 +44,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/vehiculos', vehiculosRoutes);
 app.use('/api/servicios', serviciosRoutes);
+app.use('/api/ordenes', ordenesRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Health

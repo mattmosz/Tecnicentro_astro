@@ -73,12 +73,38 @@ router.get('/', verifyToken, async (req, res) => {
     const total = countResult[0].total;
     
     res.json({ 
+      success: true,
       items: vehiculos,
       total: total
     });
     
   } catch (error) {
     console.error('Error al obtener vehículos:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+// Obtener vehículos por cliente
+router.get('/cliente/:id_cliente', verifyToken, async (req, res) => {
+  try {
+    const { id_cliente } = req.params;
+    
+    const [vehiculos] = await db.execute(`
+      SELECT v.*, 
+             CASE 
+               WHEN c.nombres IS NOT NULL THEN CONCAT(c.nombres, ' ', COALESCE(c.apellidos, ''))
+               WHEN c.razon_social IS NOT NULL THEN c.razon_social
+               ELSE 'Sin cliente'
+             END as cliente_nombre
+      FROM vehiculos v
+      LEFT JOIN clientes c ON v.id_cliente = c.id
+      WHERE v.id_cliente = ?
+      ORDER BY v.placa
+    `, [id_cliente]);
+    
+    res.json({ success: true, data: vehiculos });
+  } catch (error) {
+    console.error('Error al obtener vehículos por cliente:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });

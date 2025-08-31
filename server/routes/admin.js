@@ -33,11 +33,27 @@ router.get('/stats', authenticateToken, async (req, res) => {
     // Contar vehículos
     const [vehiculosResult] = await db.execute('SELECT COUNT(*) as total FROM vehiculos');
 
+    // Contar órdenes activas (pendientes)
+    const [ordenesResult] = await db.execute('SELECT COUNT(*) as total FROM ordenes_servicio WHERE estado = "pendiente"');
+
+    // Facturación de hoy (si existe la tabla facturas)
+    let facturacionHoy = 0;
+    try {
+      const [facturacionResult] = await db.execute(`
+        SELECT COALESCE(SUM(total), 0) as total 
+        FROM facturas 
+        WHERE DATE(fecha) = CURDATE()
+      `);
+      facturacionHoy = facturacionResult[0].total || 0;
+    } catch (error) {
+      console.log('Tabla facturas no existe aún, facturación = 0');
+    }
+
     const stats = {
       clientes: clientesResult[0].total,
       vehiculos: vehiculosResult[0].total,
-      ordenesActivas: 0, // Por ahora 0 hasta crear la tabla
-      facturacionHoy: 0  // Por ahora 0 hasta crear la tabla
+      ordenesActivas: ordenesResult[0].total,
+      facturacionHoy: facturacionHoy
     };
 
     res.json(stats);

@@ -473,10 +473,10 @@ import Layout from '../../layouts/Layout.astro';
     async function loadClientes() {
       const token = localStorage.getItem('token');
       try {
-        const r = await fetch('/api/clientes?limit=1000', {
+        const r = await fetch('/api/clientes/all', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        const data = await r.json().catch(() => ({ items: [] }));
+        const data = await r.json().catch(() => ({ data: [] }));
         
         const select = document.querySelector('select[name="id_cliente"]');
         if (select) {
@@ -484,7 +484,7 @@ import Layout from '../../layouts/Layout.astro';
           select.innerHTML = '<option value="">Seleccionar cliente</option>';
           
           // Agregar clientes al select
-          (data.items || []).forEach(cliente => {
+          (data.data || []).forEach(cliente => {
             const option = document.createElement('option');
             option.value = cliente.id;
             

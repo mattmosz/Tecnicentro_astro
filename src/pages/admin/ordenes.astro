@@ -1,21 +1,36 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 ---
-<Layout title="Órdenes de Trabajo - TecniCentro Ibarra Express">
-  <header class="navbar"><div class="container">
-    <a href="/admin/dashboard" class="brand"><span class="logo-circle">🔧</span><span class="brand-text">TecniCentro Ibarra Express</span></a>
-    <div class="user-menu"><span id="userWelcome" class="user-chip">Cargando…</span><button id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">Cerrar Sesión</button></div>
-  </div></header>
+
+<Layout title="Gestión de Órdenes de Trabajo - TecniCentro Ibarra Express">
+  <header class="navbar" role="banner">
+    <div class="container">
+      <a href="/admin/dashboard" class="brand">
+        <span class="logo-circle">🔧</span>
+        <span class="brand-text">TecniCentro Ibarra Express</span>
+      </a>
+      <div class="user-menu">
+        <span id="userWelcome" class="user-chip">Cargando…</span>
+        <button type="button" id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </header>
 
   <main class="page">
     <div class="container">
       <div class="header-row">
-        <div><h1>Órdenes de Trabajo</h1><p class="muted">Crea, asigna y controla el estado</p></div>
+        <div>
+          <h1>Gestión de Órdenes de Trabajo</h1>
+          <p class="muted">Administra las órdenes de servicio del taller</p>
+        </div>
         <div class="actions">
-          <input id="q" class="input" placeholder="Buscar por #OT / cliente / placa" />
-          <select id="fEstado" class="input">
-            <option value="">Todos</option>
-            <option>Pendiente</option><option>En Proceso</option><option>Completado</option><option>Entregado</option>
+          <input id="searchInput" class="input" placeholder="Buscar por número, cliente o placa" />
+          <select id="estadoFilter" class="input">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="facturada">Facturadas</option>
           </select>
           <button class="btn btn-outline" id="btnBuscar">Buscar</button>
           <button class="btn btn-orange" id="btnNuevo">Nueva Orden</button>
@@ -23,109 +38,926 @@ import Layout from '../../layouts/Layout.astro';
       </div>
 
       <div class="card">
-        <div class="card-head"><h3>Listado</h3></div>
+        <div class="card-head">
+          <h3>Lista de Órdenes de Trabajo</h3>
+        </div>
         <div class="card-body">
-          <div id="wrapTable" class="table-wrap"><div class="skeleton"></div></div>
+          <div id="tableContainer" class="table-wrap">
+            <div class="skeleton"></div>
+          </div>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- Modal Orden -->
-  <dialog id="modalOT">
-    <form id="frmOT" method="dialog" class="modal">
-      <div class="modal-head"><h3 id="modalTitle">Nueva Orden</h3><button class="icon" type="button" id="closeOT">✖</button></div>
-      <div class="modal-body grid2">
-        <label>Cliente (ID)<input name="id_cliente" required class="input"/></label>
-        <label>Vehículo (ID)<input name="id_vehiculo" required class="input"/></label>
-        <label>Fecha Ingreso<input name="fecha_ingreso" type="date" required class="input"/></label>
-        <label>Estado<select name="estado" class="input"><option>Pendiente</option><option>En Proceso</option><option>Completado</option><option>Entregado</option></select></label>
-        <label>Servicios<textarea name="servicios" class="input" rows="3" placeholder="IDs o descripciones"></textarea></label>
-        <label>Notas<textarea name="notas" class="input" rows="3"></textarea></label>
+  <!-- Modal para crear/editar orden -->
+  <dialog id="ordenModal">
+    <form id="ordenForm" method="dialog" class="modal">
+      <div class="modal-head">
+        <h3 id="modalTitle">Nueva Orden de Trabajo</h3>
+        <button class="icon" type="button" id="closeModal">✖</button>
       </div>
-      <div class="modal-foot"><button class="btn btn-outline" value="cancel">Cancelar</button><button class="btn btn-orange" id="btnGuardar" value="default">Guardar</button></div>
+      <div class="modal-body">
+        <div class="grid2">
+          <label>
+            Cliente *
+            <select name="id_cliente" id="clienteSelect" required class="input">
+              <option value="">Seleccionar cliente</option>
+            </select>
+          </label>
+          <label>
+            Vehículo *
+            <select name="id_vehiculo" id="vehiculoSelect" required class="input" disabled>
+              <option value="">Primero seleccione un cliente</option>
+            </select>
+          </label>
+        </div>
+        <div class="grid2">
+          <label>
+            Técnico Asignado
+            <select name="id_tecnico" id="tecnicoSelect" class="input">
+              <option value="">Sin asignar</option>
+            </select>
+          </label>
+          <label>
+            Estado
+            <select name="estado" class="input">
+              <option value="pendiente">Pendiente</option>
+              <option value="facturada">Facturada</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          Observaciones
+          <textarea name="observaciones" class="input" rows="3" placeholder="Observaciones sobre el vehículo o trabajo a realizar"></textarea>
+        </label>
+        
+        <div class="servicios-section">
+          <div class="section-header">
+            <h4>Servicios a Realizar</h4>
+            <button type="button" id="btnAgregarServicio" class="btn btn-small btn-outline">+ Agregar Servicio</button>
+          </div>
+          <div id="serviciosContainer">
+            <!-- Los servicios se agregarán dinámicamente aquí -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" value="cancel">Cancelar</button>
+        <button class="btn btn-orange" id="btnGuardar" value="default">Guardar</button>
+      </div>
     </form>
   </dialog>
 
+  <!-- Modal para ver detalle de orden -->
+  <dialog id="detalleModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="detalleTitle">Detalle de Orden</h3>
+        <button class="icon" type="button" id="closeDetalle">✖</button>
+      </div>
+      <div class="modal-body" id="detalleContent">
+        <!-- El contenido se carga dinámicamente -->
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" onclick="document.getElementById('detalleModal').close()">Cerrar</button>
+      </div>
+    </div>
+  </dialog>
+
   <style>
-    /* Reusa estilos base + badge estado */
-    .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
-    .b-pend{background:#fff7ed;color:#c2410c}.b-proc{background:#eff6ff;color:#1e40af}.b-comp{background:#ecfdf5;color:#065f46}
+    .navbar {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .logo-circle {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .user-chip {
+      background: rgba(255,255,255,0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 1rem;
+      font-size: 0.9rem;
+    }
+    .page {
+      padding: 2rem 0;
+      min-height: calc(100vh - 80px);
+      background: #f8fafc;
+    }
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+      gap: 2rem;
+    }
+    .actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .card-head {
+      padding: 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+    .card-body {
+      padding: 1.5rem;
+    }
+    .table-wrap {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.75rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th {
+      font-weight: 600;
+      background: #f9fafb;
+      color: #374151;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-pendiente {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .badge-facturada {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .row-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .icon-btn {
+      padding: 0.5rem;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-radius: 0.375rem;
+      transition: background-color 0.15s;
+    }
+    .icon-btn:hover {
+      background: #f3f4f6;
+    }
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.15s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-orange {
+      background: #ea580c;
+      color: white;
+    }
+    .btn-orange:hover {
+      background: #dc2626;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #d1d5db;
+      color: #374151;
+    }
+    .btn-outline:hover {
+      background: #f9fafb;
+    }
+    .btn-small {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+    }
+    .input {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+    }
+    .input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px #3b82f6;
+    }
+    .modal {
+      max-width: 800px;
+      width: 90vw;
+      border: none;
+      border-radius: 12px;
+      padding: 0;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .modal::backdrop {
+      background: rgba(0,0,0,0.5);
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+    .modal-body {
+      padding: 1.5rem;
+    }
+    .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      padding: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .servicios-section {
+      margin-top: 1.5rem;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .servicio-item {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.375rem;
+      margin-bottom: 0.5rem;
+      background: #f9fafb;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-weight: 500;
+      color: #374151;
+    }
+    .skeleton {
+      height: 300px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 0.375rem;
+    }
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .muted {
+      color: #6b7280;
+      margin: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    h1 {
+      margin: 0 0 0.5rem 0;
+      color: #1f2937;
+    }
+    h3, h4 {
+      margin: 0;
+      color: #1f2937;
+    }
+    .icon {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.25rem;
+      border-radius: 0.25rem;
+    }
+    .icon:hover {
+      background: #f3f4f6;
+    }
+    .total-orden {
+      text-align: right;
+      font-weight: 600;
+      color: #1f2937;
+      border-top: 2px solid #e5e7eb;
+      padding-top: 0.5rem;
+      margin-top: 0.5rem;
+    }
   </style>
 
   <script>
-    // guard
-    function _hardLogout(){ try{localStorage.removeItem('token');localStorage.removeItem('user')}finally{location.replace('/')} }
-    window.logout=_hardLogout;
-    document.addEventListener('click',(e)=>{const b=e.target.closest('#btnLogout');if(!b)return;e.preventDefault();_hardLogout();});
-    (async()=>{
-      const t=localStorage.getItem('token');const u=localStorage.getItem('user'); if(!t||!u) return _hardLogout();
-      try{const r=await fetch('/api/auth/verify',{headers:{Authorization:`Bearer ${t}`}});const j=await r.json().catch(()=>({}));if(!r.ok||!j?.success)return _hardLogout();}catch{return _hardLogout();}
-      const user=JSON.parse(u); if(user.rol!=='admin') return _hardLogout();
-      document.getElementById('userWelcome').textContent=`Bienvenido, ${user.nombre}`;
-      loadPage();
+    // Autenticación y logout
+    function _hardLogout() {
+      try {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } finally {
+        location.replace('/');
+      }
+    }
+
+    window.logout = _hardLogout;
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('#btnLogout');
+      if (!btn) return;
+      e.preventDefault();
+      _hardLogout();
+    });
+
+    // Variables globales
+    let currentSearch = '';
+    let currentEstado = '';
+    let editingId = null;
+    let vehiculos = [];
+    let clientes = [];
+    let servicios = [];
+    let tecnicos = [];
+
+    // Verificación inicial
+    (async () => {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      
+      if (!token || !user) return _hardLogout();
+      
+      try {
+        const response = await fetch('/api/auth/verify', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = await response.json().catch(() => ({}));
+        
+        if (!response.ok || !result?.success) return _hardLogout();
+      } catch {
+        return _hardLogout();
+      }
+      
+      const userData = JSON.parse(user);
+      if (userData.rol !== 'admin') return _hardLogout();
+      
+      document.getElementById('userWelcome').textContent = `Bienvenido, ${userData.nombre}`;
+      
+      await Promise.all([
+        loadClientes(),
+        loadServicios(),
+        loadTecnicos(),
+        loadOrdenes()
+      ]);
     })();
 
-    let q='', estado='';
-    function bcls(s){ s=(s||'').toLowerCase(); if(s==='pendiente')return 'b-pend'; if(s==='en proceso')return'b-proc'; return 'b-comp'; }
+    // Cargar datos auxiliares
+    async function loadClientes() {
+      const token = localStorage.getItem('token');
+      console.log('Cargando clientes...');
+      try {
+        const response = await fetch('/api/clientes/all', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = await response.json();
+        console.log('Clientes recibidos:', result);
+        if (result.success) {
+          clientes = result.data || [];
+          console.log('Clientes cargados:', clientes.length);
+          populateClientesSelect();
+        } else {
+          console.error('Error en la respuesta de clientes:', result.message);
+        }
+      } catch (error) {
+        console.error('Error cargando clientes:', error);
+      }
+    }
 
-    async function loadPage(){
-      const t=localStorage.getItem('token');
-      const url=new URL('/api/ordenes', location.origin);
-      if(q) url.searchParams.set('q', q); if(estado) url.searchParams.set('estado', estado);
-      const r=await fetch(url,{headers:{Authorization:`Bearer ${t}`}});
-      const items=await r.json().catch(()=>[]);
-      const wrap=document.getElementById('wrapTable');
-      if(!items.length){ wrap.innerHTML='<div class="muted">Sin resultados</div>'; return; }
-      wrap.innerHTML=`
+    async function loadVehiculos(id_cliente = null) {
+      const token = localStorage.getItem('token');
+      console.log('Iniciando carga de vehículos para cliente:', id_cliente);
+      
+      if (!id_cliente) {
+        // Si no hay cliente seleccionado, limpiar el select
+        const select = document.getElementById('vehiculoSelect');
+        select.innerHTML = '<option value="">Primero seleccione un cliente</option>';
+        select.disabled = true;
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/vehiculos/cliente/${id_cliente}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        console.log('Respuesta del servidor:', response.status);
+        const result = await response.json();
+        console.log('Datos recibidos:', result);
+        if (result.success) {
+          vehiculos = result.data || [];
+          console.log('Vehículos cargados:', vehiculos.length);
+          populateVehiculosSelect();
+        } else {
+          console.error('Error en la respuesta:', result.message);
+        }
+      } catch (error) {
+        console.error('Error cargando vehículos:', error);
+      }
+    }
+
+    async function loadServicios() {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('/api/servicios', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = await response.json();
+        if (result.success) {
+          servicios = result.data || [];
+        }
+      } catch (error) {
+        console.error('Error cargando servicios:', error);
+      }
+    }
+
+    async function loadTecnicos() {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('/api/ordenes/tecnicos', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = await response.json();
+        if (result.success) {
+          tecnicos = result.data || [];
+          populateTecnicosSelect();
+        }
+      } catch (error) {
+        console.error('Error cargando técnicos:', error);
+      }
+    }
+
+    function populateClientesSelect() {
+      console.log('Poblando select de clientes...');
+      const select = document.getElementById('clienteSelect');
+      select.innerHTML = '<option value="">Seleccionar cliente</option>';
+      
+      clientes.forEach(cliente => {
+        const option = document.createElement('option');
+        option.value = cliente.id;
+        const nombre = cliente.tipo === 'particular' 
+          ? `${cliente.nombres} ${cliente.apellidos || ''}`.trim()
+          : cliente.razon_social;
+        option.textContent = `${nombre} (${cliente.identificacion})`;
+        select.appendChild(option);
+      });
+      console.log('Select de clientes poblado con', clientes.length, 'clientes');
+    }
+
+    function populateVehiculosSelect() {
+      console.log('Poblando select de vehículos...');
+      const select = document.getElementById('vehiculoSelect');
+      console.log('Select encontrado:', select);
+      
+      if (vehiculos.length === 0) {
+        select.innerHTML = '<option value="">No hay vehículos registrados para este cliente</option>';
+        select.disabled = true;
+        return;
+      }
+      
+      select.innerHTML = '<option value="">Seleccionar vehículo</option>';
+      select.disabled = false;
+      
+      console.log('Vehículos a mostrar:', vehiculos);
+      vehiculos.forEach(vehiculo => {
+        console.log('Procesando vehículo:', vehiculo);
+        const option = document.createElement('option');
+        option.value = vehiculo.id;
+        option.textContent = `${vehiculo.placa} - ${vehiculo.marca}`;
+        select.appendChild(option);
+      });
+      console.log('Select poblado con', vehiculos.length, 'vehículos');
+    }
+
+    function populateTecnicosSelect() {
+      const select = document.getElementById('tecnicoSelect');
+      select.innerHTML = '<option value="">Sin asignar</option>';
+      
+      tecnicos.forEach(tecnico => {
+        const option = document.createElement('option');
+        option.value = tecnico.id;
+        option.textContent = `${tecnico.nombre} ${tecnico.apellido}`;
+        select.appendChild(option);
+      });
+    }
+
+    // Cargar órdenes
+    async function loadOrdenes() {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('/api/ordenes', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          let ordenes = result.data || [];
+          
+          // Filtrar por búsqueda
+          if (currentSearch) {
+            ordenes = ordenes.filter(orden => 
+              orden.numero_orden.toLowerCase().includes(currentSearch.toLowerCase()) ||
+              orden.cliente_nombre.toLowerCase().includes(currentSearch.toLowerCase()) ||
+              orden.placa.toLowerCase().includes(currentSearch.toLowerCase())
+            );
+          }
+          
+          // Filtrar por estado
+          if (currentEstado) {
+            ordenes = ordenes.filter(orden => orden.estado === currentEstado);
+          }
+          
+          renderTable(ordenes);
+        } else {
+          renderTable([]);
+        }
+      } catch (error) {
+        console.error('Error cargando órdenes:', error);
+        renderTable([]);
+      }
+    }
+
+    // Renderizar tabla
+    function renderTable(ordenes) {
+      const container = document.getElementById('tableContainer');
+      
+      if (!ordenes || ordenes.length === 0) {
+        container.innerHTML = '<div class="muted">No se encontraron órdenes de trabajo</div>';
+        return;
+      }
+
+      const tableHTML = `
         <table>
-          <thead><tr><th>#OT</th><th>Cliente</th><th>Vehículo</th><th>Estado</th><th>Ingreso</th><th></th></tr></thead>
+          <thead>
+            <tr>
+              <th>Número</th>
+              <th>Cliente</th>
+              <th>Vehículo</th>
+              <th>Técnico</th>
+              <th>Fecha Ingreso</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
           <tbody>
-            ${items.map(o=>`
+            ${ordenes.map(orden => `
               <tr>
-                <td>#${o.id}</td>
-                <td>${o.cliente_nombre||''}</td>
-                <td>${o.vehiculo_placa||''}</td>
-                <td><span class="badge ${bcls(o.estado)}">${o.estado}</span></td>
-                <td>${o.fecha_ingreso? new Date(o.fecha_ingreso).toLocaleDateString(): '—'}</td>
+                <td>${orden.numero_orden}</td>
+                <td>${orden.cliente_nombre}</td>
+                <td>${orden.placa} - ${orden.marca}</td>
+                <td>${orden.tecnico_nombre ? `${orden.tecnico_nombre} ${orden.tecnico_apellido}` : 'Sin asignar'}</td>
+                <td>${new Date(orden.fecha_ingreso).toLocaleDateString()}</td>
+                <td><span class="badge badge-${orden.estado}">${orden.estado}</span></td>
                 <td>
                   <div class="row-actions">
-                    <button class="icon-btn" data-edit='${JSON.stringify(o).replaceAll("'", "&apos;")}'>✎</button>
-                    <button class="icon-btn" data-del="${o.id}">🗑</button>
+                    <button class="icon-btn" onclick="verDetalle(${orden.id})" title="Ver detalle">👁</button>
+                    <button class="icon-btn" onclick="editOrden(${orden.id})" title="Editar">✎</button>
+                    <button class="icon-btn" onclick="deleteOrden(${orden.id})" title="Eliminar">🗑</button>
                   </div>
                 </td>
-              </tr>`).join('')}
+              </tr>
+            `).join('')}
           </tbody>
-        </table>`;
+        </table>
+      `;
+      
+      container.innerHTML = tableHTML;
     }
 
-    document.getElementById('btnBuscar').addEventListener('click',()=>{ q=document.getElementById('q').value.trim(); estado=document.getElementById('fEstado').value; loadPage(); });
+    // Event listeners
+    document.getElementById('btnBuscar').addEventListener('click', () => {
+      currentSearch = document.getElementById('searchInput').value.trim();
+      currentEstado = document.getElementById('estadoFilter').value;
+      loadOrdenes();
+    });
 
-    // modal
-    const modal=document.getElementById('modalOT');
-    document.getElementById('btnNuevo').addEventListener('click',()=>openModal());
-    document.getElementById('closeOT').addEventListener('click',()=>modal.close());
-    function openModal(data=null){
-      const f=document.getElementById('frmOT'); f.reset(); f.dataset.id=data?.id||'';
-      document.getElementById('modalTitle').textContent=data?'Editar Orden':'Nueva Orden';
-      if(data){ for(const k of ['id_cliente','id_vehiculo','fecha_ingreso','estado','servicios','notas']) if(f[k]) f[k].value=data[k]??''; }
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('btnBuscar').click();
+      }
+    });
+
+    // Modal de orden
+    const modal = document.getElementById('ordenModal');
+    const form = document.getElementById('ordenForm');
+
+    document.getElementById('btnNuevo').addEventListener('click', () => {
+      editingId = null;
+      form.reset();
+      document.getElementById('modalTitle').textContent = 'Nueva Orden de Trabajo';
+      clearServicios();
+      addServicioItem();
       modal.showModal();
-    }
-    document.addEventListener('click',(e)=>{
-      const be=e.target.closest('button[data-edit]'); if(be){ openModal(JSON.parse(be.dataset.edit)); return; }
-      const bd=e.target.closest('button[data-del]'); if(bd){ delOT(bd.dataset.del); return; }
     });
-    document.getElementById('frmOT').addEventListener('submit', async (e)=>{
-      e.preventDefault(); const f=e.target; const id=f.dataset.id; const t=localStorage.getItem('token');
-      const payload=Object.fromEntries(new FormData(f).entries());
-      const r=await fetch(id? `/api/ordenes/${id}`:'/api/ordenes',{method:id?'PUT':'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${t}`},body:JSON.stringify(payload)});
-      if(r.ok){ modal.close(); loadPage(); } else alert('No se pudo guardar');
+
+    document.getElementById('closeModal').addEventListener('click', () => {
+      modal.close();
     });
-    async function delOT(id){
-      if(!confirm('¿Eliminar orden?')) return;
-      const t=localStorage.getItem('token');
-      const r=await fetch(`/api/ordenes/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${t}`}});
-      if(r.ok) loadPage(); else alert('No se pudo eliminar');
+
+    // Event listener para el select de clientes
+    document.getElementById('clienteSelect').addEventListener('change', async (e) => {
+      const id_cliente = e.target.value;
+      console.log('Cliente seleccionado:', id_cliente);
+      if (id_cliente) {
+        await loadVehiculos(id_cliente);
+      } else {
+        await loadVehiculos(); // Esto limpiará el select de vehículos
+      }
+    });
+
+    // Gestión de servicios en el modal
+    function clearServicios() {
+      document.getElementById('serviciosContainer').innerHTML = '';
     }
+
+    function addServicioItem(servicio = null) {
+      const container = document.getElementById('serviciosContainer');
+      const index = container.children.length;
+      
+      const servicioDiv = document.createElement('div');
+      servicioDiv.className = 'servicio-item';
+      servicioDiv.innerHTML = `
+        <select name="servicios[${index}][id_servicio]" required class="input">
+          <option value="">Seleccionar servicio</option>
+          ${servicios.map(s => `
+            <option value="${s.id}" data-precio="${s.precio_unitario}" 
+              ${servicio && servicio.id_servicio == s.id ? 'selected' : ''}>
+              ${s.codigo} - ${s.descripcion} ($${parseFloat(s.precio_unitario).toFixed(2)})
+            </option>
+          `).join('')}
+        </select>
+        <input type="number" name="servicios[${index}][cantidad]" 
+               value="${servicio ? servicio.cantidad : 1}" 
+               min="1" required class="input" placeholder="Cantidad" 
+               onchange="updateSubtotal(this)">
+        <input type="number" name="servicios[${index}][precio_unitario]" 
+               value="${servicio ? servicio.precio_unitario : ''}" 
+               step="0.01" min="0" required class="input" placeholder="Precio" 
+               onchange="updateSubtotal(this)">
+        <button type="button" onclick="removeServicio(this)" class="icon-btn">🗑</button>
+      `;
+      
+      container.appendChild(servicioDiv);
+      
+      // Auto-llenar precio cuando se selecciona un servicio
+      const select = servicioDiv.querySelector('select');
+      const precioInput = servicioDiv.querySelector('input[name*="precio_unitario"]');
+      
+      select.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.dataset.precio) {
+          precioInput.value = selectedOption.dataset.precio;
+          updateSubtotal(precioInput);
+        }
+      });
+    }
+
+    window.updateSubtotal = function(input) {
+      // Función para actualizar subtotales si es necesario
+    };
+
+    window.removeServicio = function(button) {
+      button.closest('.servicio-item').remove();
+    };
+
+    document.getElementById('btnAgregarServicio').addEventListener('click', () => {
+      addServicioItem();
+    });
+
+    // Ver detalle de orden
+    window.verDetalle = async function(id) {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch(`/api/ordenes/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          const orden = result.data;
+          
+          let detalleHTML = `
+            <div class="grid2">
+              <div><strong>Número:</strong> ${orden.numero_orden}</div>
+              <div><strong>Estado:</strong> <span class="badge badge-${orden.estado}">${orden.estado}</span></div>
+              <div><strong>Cliente:</strong> ${orden.cliente_nombre}</div>
+              <div><strong>Vehículo:</strong> ${orden.placa} - ${orden.marca}</div>
+              <div><strong>Técnico:</strong> ${orden.tecnico_nombre ? `${orden.tecnico_nombre} ${orden.tecnico_apellido}` : 'Sin asignar'}</div>
+              <div><strong>Fecha:</strong> ${new Date(orden.fecha_ingreso).toLocaleDateString()}</div>
+            </div>
+            
+            ${orden.observaciones ? `<div style="margin: 1rem 0;"><strong>Observaciones:</strong><br>${orden.observaciones}</div>` : ''}
+            
+            <h4 style="margin-top: 1.5rem;">Servicios</h4>
+            <table style="margin-top: 0.5rem;">
+              <thead>
+                <tr>
+                  <th>Servicio</th>
+                  <th>Cantidad</th>
+                  <th>Precio Unit.</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${orden.detalle_servicios.map(detalle => `
+                  <tr>
+                    <td>${detalle.codigo} - ${detalle.descripcion}</td>
+                    <td>${detalle.cantidad}</td>
+                    <td>$${parseFloat(detalle.precio_unitario).toFixed(2)}</td>
+                    <td>$${parseFloat(detalle.subtotal).toFixed(2)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+            
+            <div class="total-orden">
+              <strong>Total: $${orden.detalle_servicios.reduce((total, d) => total + parseFloat(d.subtotal), 0).toFixed(2)}</strong>
+            </div>
+          `;
+          
+          document.getElementById('detalleTitle').textContent = `Orden ${orden.numero_orden}`;
+          document.getElementById('detalleContent').innerHTML = detalleHTML;
+          document.getElementById('detalleModal').showModal();
+        }
+      } catch (error) {
+        console.error('Error cargando detalle:', error);
+      }
+    };
+
+    document.getElementById('closeDetalle').addEventListener('click', () => {
+      document.getElementById('detalleModal').close();
+    });
+
+    // Editar orden
+    window.editOrden = async function(id) {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch(`/api/ordenes/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          const orden = result.data;
+          editingId = id;
+          
+          form.id_vehiculo.value = orden.id_vehiculo;
+          form.id_tecnico.value = orden.id_tecnico || '';
+          form.estado.value = orden.estado;
+          form.observaciones.value = orden.observaciones || '';
+          
+          // Limpiar y llenar servicios
+          clearServicios();
+          orden.detalle_servicios.forEach(detalle => {
+            addServicioItem({
+              id_servicio: detalle.id_servicio,
+              cantidad: detalle.cantidad,
+              precio_unitario: detalle.precio_unitario
+            });
+          });
+          
+          document.getElementById('modalTitle').textContent = 'Editar Orden de Trabajo';
+          modal.showModal();
+        }
+      } catch (error) {
+        console.error('Error cargando orden:', error);
+        alert('Error al cargar la orden');
+      }
+    };
+
+    // Eliminar orden
+    window.deleteOrden = async function(id) {
+      if (!confirm('¿Está seguro de que desea eliminar esta orden? Esta acción no se puede deshacer.')) return;
+      
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch(`/api/ordenes/${id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          await loadOrdenes();
+        } else {
+          alert('Error al eliminar la orden: ' + (result.message || 'Error desconocido'));
+        }
+      } catch (error) {
+        console.error('Error eliminando orden:', error);
+        alert('Error al eliminar la orden');
+      }
+    };
+
+    // Guardar orden
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(form);
+      const data = {
+        id_vehiculo: formData.get('id_vehiculo'),
+        id_tecnico: formData.get('id_tecnico') || null,
+        estado: formData.get('estado'),
+        observaciones: formData.get('observaciones'),
+        servicios: []
+      };
+      
+      // Recopilar servicios
+      const servicioItems = document.querySelectorAll('.servicio-item');
+      servicioItems.forEach((item, index) => {
+        const idServicio = formData.get(`servicios[${index}][id_servicio]`);
+        const cantidad = formData.get(`servicios[${index}][cantidad]`);
+        const precioUnitario = formData.get(`servicios[${index}][precio_unitario]`);
+        
+        if (idServicio && cantidad && precioUnitario) {
+          data.servicios.push({
+            id_servicio: parseInt(idServicio),
+            cantidad: parseInt(cantidad),
+            precio_unitario: parseFloat(precioUnitario)
+          });
+        }
+      });
+      
+      if (data.servicios.length === 0) {
+        alert('Debe agregar al menos un servicio');
+        return;
+      }
+      
+      const token = localStorage.getItem('token');
+      try {
+        const url = editingId ? `/api/ordenes/${editingId}` : '/api/ordenes';
+        const method = editingId ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          modal.close();
+          await loadOrdenes();
+        } else {
+          alert('Error al guardar la orden: ' + (result.message || 'Error desconocido'));
+        }
+      } catch (error) {
+        console.error('Error guardando orden:', error);
+        alert('Error al guardar la orden');
+      }
+    });
   </script>
 </Layout>
