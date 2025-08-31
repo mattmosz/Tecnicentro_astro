@@ -129,7 +129,46 @@ import Layout from '../../layouts/Layout.astro';
         <button class="icon" type="button" id="closeDetalle">✖</button>
       </div>
       <div class="modal-body">
-        <div id="detalleFacturaContent"></div>
+        <div class="detalle-grid">
+          <div class="info-section">
+            <h4>Información de la Factura</h4>
+            <p><strong>Número:</strong> <span id="facturaNumero">-</span></p>
+            <p><strong>Fecha:</strong> <span id="facturaFecha">-</span></p>
+            <p><strong>Cliente:</strong> <span id="facturaCliente">-</span></p>
+            <p><strong>Vehículo:</strong> <span id="facturaVehiculo">-</span></p>
+          </div>
+          
+          <div class="servicios-section">
+            <h4>Servicios Realizados</h4>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Servicio</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unit.</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody id="detalleServicios">
+                  <!-- Servicios se cargan dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="totales-section">
+              <div class="totales-row">
+                <strong>Subtotal: <span id="facturaSubtotal">$0.00</span></strong>
+              </div>
+              <div class="totales-row">
+                <strong>IVA (15%): <span id="facturaIva">$0.00</span></strong>
+              </div>
+              <div class="totales-row total-final">
+                <strong>TOTAL: <span id="facturaTotal">$0.00</span></strong>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-foot">
         <button class="btn btn-outline" id="btnCerrarDetalle">Cerrar</button>
@@ -719,6 +758,13 @@ import Layout from '../../layouts/Layout.astro';
         if (facturaId) await mostrarDetalleFactura(facturaId);
         return;
       }
+
+      const btnPdf = e.target.closest('[data-pdf]');
+      if (btnPdf) {
+        const facturaId = btnPdf.dataset.pdf;
+        if (facturaId) generarPdfFactura(facturaId);
+        return;
+      }
     });
 
     // Modal de facturación
@@ -782,8 +828,103 @@ import Layout from '../../layouts/Layout.astro';
     }
 
     async function mostrarDetalleFactura(facturaId) {
-      // Implementar si es necesario
-      console.log('Ver detalle de factura:', facturaId);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/facturas/detalle/${facturaId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          const factura = result.data;
+          
+          // Llenar el modal con los datos de la factura
+          document.getElementById('facturaNumero').textContent = factura.numero_factura;
+          document.getElementById('facturaFecha').textContent = new Date(factura.fecha_emision).toLocaleDateString();
+          document.getElementById('facturaCliente').textContent = factura.cliente_nombre;
+          document.getElementById('facturaVehiculo').textContent = `${factura.marca} (${factura.placa})`;
+          
+          // Mostrar detalles de servicios
+          let detallesHtml = '';
+          let subtotal = 0;
+          
+          factura.detalles.forEach(detalle => {
+            const cantidad = parseInt(detalle.cantidad) || 0;
+            const precioUnitario = parseFloat(detalle.precio_unitario) || 0;
+            const total = cantidad * precioUnitario;
+            subtotal += total;
+            detallesHtml += `
+              <tr>
+                <td>${detalle.servicio_nombre}</td>
+                <td>${cantidad}</td>
+                <td>$${precioUnitario.toFixed(2)}</td>
+                <td>$${total.toFixed(2)}</td>
+              </tr>
+            `;
+          });
+          
+          const iva = subtotal * 0.15;
+          const total = subtotal + iva;
+          
+          document.getElementById('detalleServicios').innerHTML = detallesHtml;
+          document.getElementById('facturaSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+          document.getElementById('facturaIva').textContent = `$${iva.toFixed(2)}`;
+          document.getElementById('facturaTotal').textContent = `$${total.toFixed(2)}`;
+          
+          // Mostrar el modal
+          const modal = document.getElementById('modalDetalleFactura');
+          if (modal && modal.showModal) modal.showModal();
+        } else {
+          alert('Error al cargar los detalles de la factura');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar los detalles de la factura');
+      }
+    }
+
+    function generarPdfFactura(facturaId) {
+      try {
+        const token = localStorage.getItem('token');
+        const url = `/api/facturas/pdf/${facturaId}`;
+        
+        // Abrir el PDF en una nueva ventana
+        const ventanaPdf = window.open('', '_blank');
+        if (ventanaPdf) {
+          ventanaPdf.document.write('<div style="text-align: center; padding: 50px;">Generando PDF...</div>');
+          
+          fetch(url, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          .then(response => {
+            if (response.ok) {
+              return response.text();
+            }
+            throw new Error('Error al generar PDF');
+          })
+          .then(html => {
+            ventanaPdf.document.open();
+            ventanaPdf.document.write(html);
+            ventanaPdf.document.close();
+            
+            // Agregar función de impresión automática
+            ventanaPdf.onload = () => {
+              setTimeout(() => {
+                ventanaPdf.print();
+              }, 500);
+            };
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            ventanaPdf.document.write('<div style="text-align: center; padding: 50px; color: red;">Error al generar el PDF</div>');
+          });
+        } else {
+          alert('No se pudo abrir la ventana del PDF. Verifique que no esté bloqueada por el navegador.');
+        }
+      } catch (error) {
+        console.error('Error al generar PDF:', error);
+        alert('Error al generar el PDF');
+      }
     }
 
     // Confirmar facturación
@@ -982,6 +1123,72 @@ import Layout from '../../layouts/Layout.astro';
       
       .kpi-card {
         padding: 1rem;
+      }
+    }
+
+    /* Estilos para el modal de detalle de factura */
+    .detalle-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .info-section, .servicios-section {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .info-section h4, .servicios-section h4 {
+      margin: 0 0 1rem 0;
+      color: #1e3a8a;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-bottom: 2px solid #3b82f6;
+      padding-bottom: 0.5rem;
+    }
+
+    .info-section p {
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    .info-section strong {
+      color: #374151;
+      margin-right: 0.5rem;
+    }
+
+    .totales-section {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 2px solid #e5e7eb;
+    }
+
+    .totales-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      font-size: 1rem;
+    }
+
+    .totales-row.total-final {
+      background: #1e3a8a;
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      margin-top: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .modal.large {
+      max-width: 800px;
+      width: 90vw;
+    }
+
+    @media (min-width: 768px) {
+      .detalle-grid {
+        grid-template-columns: 1fr 2fr;
       }
     }
   </style>

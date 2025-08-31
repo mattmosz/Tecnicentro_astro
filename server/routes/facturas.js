@@ -282,4 +282,358 @@ router.get('/ordenes-pendientes', verifyToken, requireAdmin, async (req, res) =>
   }
 });
 
+// Obtener detalle de una factura específica
+router.get('/detalle/:id', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const facturaId = req.params.id;
+    
+    // Obtener información de la factura
+    const [facturaResult] = await db.execute(`
+      SELECT f.*, o.fecha_ingreso as fecha_orden,
+             CASE 
+               WHEN c.tipo = 'particular' THEN CONCAT(c.nombres, ' ', c.apellidos)
+               ELSE c.razon_social
+             END as cliente_nombre,
+             c.identificacion, c.telefono, c.correo as email, c.direccion,
+             v.marca, v.placa, v.kilometraje
+      FROM facturas f
+      JOIN ordenes_servicio o ON f.id_orden = o.id
+      JOIN vehiculos v ON o.id_vehiculo = v.id
+      JOIN clientes c ON v.id_cliente = c.id
+      WHERE f.id = ?
+    `, [facturaId]);
+
+    if (facturaResult.length === 0) {
+      return res.status(404).json({ success: false, message: 'Factura no encontrada' });
+    }
+
+    // Obtener detalles de servicios
+    const [detallesResult] = await db.execute(`
+      SELECT df.*, df.descripcion as servicio_nombre
+      FROM detalle_facturas df
+      WHERE df.id_factura = ?
+    `, [facturaId]);
+
+    const factura = facturaResult[0];
+    factura.detalles = detallesResult;
+
+    res.json({ success: true, data: factura });
+  } catch (error) {
+    console.error('Error al obtener detalle de factura:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+// Generar PDF de factura
+router.get('/pdf/:id', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const facturaId = req.params.id;
+    
+    // Obtener información completa de la factura
+    const [facturaResult] = await db.execute(`
+      SELECT f.*, o.fecha_ingreso as fecha_orden,
+             CASE 
+               WHEN c.tipo = 'particular' THEN CONCAT(c.nombres, ' ', c.apellidos)
+               ELSE c.razon_social
+             END as cliente_nombre,
+             c.identificacion, c.telefono, c.correo as email, c.direccion,
+             v.marca, v.placa, v.kilometraje
+      FROM facturas f
+      JOIN ordenes_servicio o ON f.id_orden = o.id
+      JOIN vehiculos v ON o.id_vehiculo = v.id
+      JOIN clientes c ON v.id_cliente = c.id
+      WHERE f.id = ?
+    `, [facturaId]);
+
+    if (facturaResult.length === 0) {
+      return res.status(404).json({ success: false, message: 'Factura no encontrada' });
+    }
+
+    // Obtener detalles de servicios
+    const [detallesResult] = await db.execute(`
+      SELECT df.*, df.descripcion as servicio_nombre
+      FROM detalle_facturas df
+      WHERE df.id_factura = ?
+    `, [facturaId]);
+
+    const factura = facturaResult[0];
+    factura.detalles = detallesResult;
+
+    // Generar HTML del PDF con diseño corporativo
+    const pdfHtml = generarHtmlFactura(factura);
+    
+    // Configurar headers para PDF
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Content-Disposition', `inline; filename="Factura_${factura.numero_factura}.pdf"`);
+    
+    res.send(pdfHtml);
+  } catch (error) {
+    console.error('Error al generar PDF:', error);
+    res.status(500).json({ success: false, message: 'Error al generar PDF' });
+  }
+});
+
+// Función para generar HTML del PDF
+function generarHtmlFactura(factura) {
+  const fechaEmision = new Date(factura.fecha_emision).toLocaleDateString('es-EC');
+  const fechaOrden = new Date(factura.fecha_orden).toLocaleDateString('es-EC');
+  
+  let detallesHtml = '';
+  let subtotal = 0;
+  
+  factura.detalles.forEach(detalle => {
+    const cantidad = parseInt(detalle.cantidad) || 0;
+    const precioUnitario = parseFloat(detalle.precio_unitario) || 0;
+    const total = cantidad * precioUnitario;
+    subtotal += total;
+    detallesHtml += `
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${detalle.servicio_nombre}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${cantidad}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${precioUnitario.toFixed(2)}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; font-weight: bold;">$${total.toFixed(2)}</td>
+      </tr>
+    `;
+  });
+
+  const iva = subtotal * 0.15;
+  const total = subtotal + iva;
+
+  return `
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <title>Factura ${factura.numero_factura}</title>
+      <style>
+        body { 
+          font-family: 'Segoe UI', Arial, sans-serif; 
+          margin: 0; 
+          padding: 20px; 
+          color: #333;
+          line-height: 1.4;
+        }
+        .container { 
+          max-width: 800px; 
+          margin: 0 auto; 
+          background: white;
+          box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header { 
+          background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); 
+          color: white; 
+          padding: 30px; 
+          text-align: center;
+        }
+        .logo { 
+          font-size: 2.5em; 
+          margin-bottom: 10px; 
+        }
+        .company-name { 
+          font-size: 1.8em; 
+          font-weight: bold; 
+          margin-bottom: 5px;
+        }
+        .company-subtitle { 
+          font-size: 1.1em; 
+          opacity: 0.9;
+        }
+        .content { 
+          padding: 30px; 
+        }
+        .invoice-info { 
+          display: flex; 
+          justify-content: space-between; 
+          margin-bottom: 30px;
+          flex-wrap: wrap;
+        }
+        .invoice-number { 
+          background: #f8fafc; 
+          padding: 15px; 
+          border-left: 4px solid #3b82f6; 
+          border-radius: 4px;
+        }
+        .invoice-number h2 { 
+          margin: 0; 
+          color: #1e3a8a; 
+          font-size: 1.5em;
+        }
+        .dates { 
+          text-align: right; 
+        }
+        .dates div { 
+          margin-bottom: 8px; 
+        }
+        .section { 
+          margin-bottom: 25px; 
+        }
+        .section-title { 
+          background: #e3f2fd; 
+          padding: 10px 15px; 
+          margin-bottom: 15px; 
+          font-weight: bold; 
+          color: #1e3a8a;
+          border-radius: 4px;
+        }
+        .info-grid { 
+          display: grid; 
+          grid-template-columns: 1fr 1fr; 
+          gap: 20px; 
+          margin-bottom: 20px;
+        }
+        .info-block p { 
+          margin: 5px 0; 
+        }
+        .info-block strong { 
+          color: #1e3a8a; 
+        }
+        table { 
+          width: 100%; 
+          border-collapse: collapse; 
+          margin-top: 10px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        th { 
+          background: #1e3a8a; 
+          color: white; 
+          padding: 12px; 
+          text-align: left; 
+        }
+        th:last-child, td:last-child { 
+          text-align: right; 
+        }
+        th:nth-child(2), td:nth-child(2) { 
+          text-align: center; 
+        }
+        .totals { 
+          margin-top: 20px; 
+          text-align: right; 
+        }
+        .totals table { 
+          margin-left: auto; 
+          width: 300px; 
+          box-shadow: none;
+        }
+        .totals th { 
+          background: #f8fafc; 
+          color: #333; 
+          border: 1px solid #e5e7eb;
+        }
+        .totals td { 
+          border: 1px solid #e5e7eb; 
+          padding: 8px 12px; 
+        }
+        .total-final { 
+          background: #1e3a8a !important; 
+          color: white !important; 
+          font-weight: bold;
+          font-size: 1.1em;
+        }
+        .footer { 
+          margin-top: 40px; 
+          padding-top: 20px; 
+          border-top: 2px solid #e5e7eb; 
+          text-align: center; 
+          color: #666;
+        }
+        @media print {
+          body { padding: 0; }
+          .container { box-shadow: none; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <div class="logo">🔧</div>
+          <div class="company-name">TecniCentro Ibarra Express</div>
+          <div class="company-subtitle">Servicios Automotrices Especializados</div>
+        </div>
+        
+        <div class="content">
+          <div class="invoice-info">
+            <div class="invoice-number">
+              <h2>FACTURA</h2>
+              <p><strong>N° ${factura.numero_factura}</strong></p>
+            </div>
+            <div class="dates">
+              <div><strong>Fecha de Emisión:</strong> ${fechaEmision}</div>
+              <div><strong>Fecha de Orden:</strong> ${fechaOrden}</div>
+              <div><strong>Tipo:</strong> ${factura.tipo_factura.toUpperCase()}</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">INFORMACIÓN DEL CLIENTE</div>
+            <div class="info-grid">
+              <div class="info-block">
+                <p><strong>Cliente:</strong> ${factura.cliente_nombre}</p>
+                <p><strong>Identificación:</strong> ${factura.identificacion}</p>
+                <p><strong>Teléfono:</strong> ${factura.telefono || 'N/A'}</p>
+              </div>
+              <div class="info-block">
+                <p><strong>Email:</strong> ${factura.email || 'N/A'}</p>
+                <p><strong>Dirección:</strong> ${factura.direccion || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">INFORMACIÓN DEL VEHÍCULO</div>
+            <div class="info-grid">
+              <div class="info-block">
+                <p><strong>Marca:</strong> ${factura.marca}</p>
+                <p><strong>Placa:</strong> ${factura.placa}</p>
+              </div>
+              <div class="info-block">
+                <p><strong>Kilometraje:</strong> ${factura.kilometraje || 'N/A'}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">DETALLE DE SERVICIOS</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Servicio</th>
+                  <th>Cantidad</th>
+                  <th>Precio Unit.</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${detallesHtml}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="totals">
+            <table>
+              <tr>
+                <th>Subtotal:</th>
+                <td>$${subtotal.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <th>IVA (15%):</th>
+                <td>$${iva.toFixed(2)}</td>
+              </tr>
+              <tr class="total-final">
+                <th>TOTAL:</th>
+                <td>$${total.toFixed(2)}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="footer">
+            <p>Gracias por confiar en TecniCentro Ibarra Express</p>
+            <p><strong>¡Su satisfacción es nuestro compromiso!</strong></p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
 export default router;
