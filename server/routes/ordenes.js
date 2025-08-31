@@ -218,10 +218,21 @@ router.get('/:id', verifyToken, async (req, res) => {
       FROM detalle_ordenes do
       JOIN servicios s ON do.id_servicio = s.id
       WHERE do.id_orden = ?
-      ORDER BY s.tipo, s.descripcion
     `, [id]);
 
-    const orden = { ...ordenes[0], detalle_servicios: detalle };
+    // Calcular totales basados en los servicios
+    const subtotal = detalle.reduce((sum, item) => sum + parseFloat(item.subtotal || 0), 0);
+    const iva = subtotal * 0.15; // 15% IVA
+    const total = subtotal + iva;
+
+    const orden = ordenes[0];
+    orden.vehiculo_marca = orden.marca;
+    orden.vehiculo_placa = orden.placa;
+    orden.subtotal = subtotal;
+    orden.iva = iva;
+    orden.total = total;
+    orden.servicios = detalle;
+
     res.json({ success: true, data: orden });
   } catch (error) {
     console.error('Error al obtener orden:', error);

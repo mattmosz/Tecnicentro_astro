@@ -2,133 +2,987 @@
 import Layout from '../../layouts/Layout.astro';
 ---
 <Layout title="Facturación - TecniCentro Ibarra Express">
-  <header class="navbar"><div class="container">
-    <a href="/admin/dashboard" class="brand"><span class="logo-circle">🔧</span><span class="brand-text">TecniCentro Ibarra Express</span></a>
-    <div class="user-menu"><span id="userWelcome" class="user-chip">Cargando…</span><button id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">Cerrar Sesión</button></div>
-  </div></header>
+  <header class="navbar" role="banner">
+    <div class="container">
+      <a href="/admin/dashboard" class="brand">
+        <span class="logo-circle">🔧</span>
+        <span class="brand-text">TecniCentro Ibarra Express</span>
+      </a>
+      <div class="user-menu">
+        <span id="userWelcome" class="user-chip">Cargando…</span>
+        <button type="button" id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </header>
 
   <main class="page">
     <div class="container">
       <div class="header-row">
-        <div><h1>Facturación</h1><p class="muted">Emite y controla comprobantes</p></div>
-        <div class="actions">
-          <input id="q" class="input" placeholder="Buscar por #, cliente, CI" />
-          <input id="fDesde" type="date" class="input" />
-          <input id="fHasta" type="date" class="input" />
-          <button class="btn btn-outline" id="btnBuscar">Filtrar</button>
-          <button class="btn btn-orange" id="btnNueva">Nueva Factura</button>
+        <div>
+          <h1>Facturación</h1>
+          <p class="muted">Emite facturas desde las órdenes completadas</p>
         </div>
       </div>
 
-      <div class="stats-grid">
-        <article class="kpi-card kpi-orange"><div class="kpi-icon">💵</div><div><h3 id="kpiHoy" class="kpi-value">$0</h3><p class="kpi-label">Hoy</p></div></article>
-        <article class="kpi-card kpi-amber"><div class="kpi-icon">📅</div><div><h3 id="kpiMes" class="kpi-value">$0</h3><p class="kpi-label">Este mes</p></div></article>
-        <article class="kpi-card kpi-green"><div class="kpi-icon">🧾</div><div><h3 id="kpiNum" class="kpi-value">0</h3><p class="kpi-label"># facturas</p></div></article>
+      <!-- KPIs de facturación -->
+      <div class="section">
+        <h2 class="section-title">Indicadores de facturación</h2>
+        <div class="stats-grid">
+          <article class="kpi-card kpi-orange">
+            <div class="kpi-icon">💵</div>
+            <div>
+              <h3 id="kpiHoy" class="kpi-value">$0</h3>
+              <p class="kpi-label">Ventas Hoy</p>
+            </div>
+          </article>
+          <article class="kpi-card kpi-amber">
+            <div class="kpi-icon">📅</div>
+            <div>
+              <h3 id="kpiMes" class="kpi-value">$0</h3>
+              <p class="kpi-label">Ventas del Mes</p>
+            </div>
+          </article>
+          <article class="kpi-card kpi-green">
+            <div class="kpi-icon">🧾</div>
+            <div>
+              <h3 id="kpiNum" class="kpi-value">0</h3>
+              <p class="kpi-label">Facturas del Mes</p>
+            </div>
+          </article>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-head"><h3>Listado</h3></div>
-        <div class="card-body">
-          <div id="wrapTable" class="table-wrap"><div class="skeleton"></div></div>
+      <!-- Pestañas -->
+      <div class="tabs-wrapper">
+        <div class="tabs">
+          <button class="tab active" data-tab="pendientes">Órdenes Pendientes</button>
+          <button class="tab" data-tab="facturas">Facturas Emitidas</button>
+        </div>
+      </div>
+
+      <!-- Contenido de órdenes pendientes -->
+      <div id="tab-pendientes" class="tab-content active">
+        <div class="card">
+          <div class="card-head">
+            <h3>Órdenes Listas para Facturar</h3>
+            <span id="contadorPendientes" class="badge">0</span>
+          </div>
+          <div class="card-body">
+            <div id="wrapOrdenes" class="table-wrap">
+              <div class="skeleton"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido de facturas emitidas -->
+      <div id="tab-facturas" class="tab-content">
+        <div class="card">
+          <div class="card-head">
+            <h3>Facturas Emitidas</h3>
+            <div class="card-actions">
+              <input id="qFacturas" class="input" placeholder="Buscar por número o cliente" />
+              <button class="btn btn-outline" id="btnBuscarFacturas">Buscar</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="wrapFacturas" class="table-wrap">
+              <div class="skeleton"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- Modal rápida de factura (simple demo) -->
-  <dialog id="modalFAC">
-    <form id="frmFAC" method="dialog" class="modal">
-      <div class="modal-head"><h3>Nueva Factura</h3><button class="icon" type="button" id="closeFAC">✖</button></div>
-      <div class="modal-body grid2">
-        <label>Cliente (ID)<input name="id_cliente" required class="input"/></label>
-        <label>Orden (ID)<input name="id_orden" class="input"/></label>
-        <label>Fecha<input name="fecha" type="date" required class="input"/></label>
-        <label>Total (USD)<input name="total" type="number" step="0.01" required class="input"/></label>
-        <label>Detalle<textarea name="detalle" class="input" rows="3"></textarea></label>
+  <!-- Modal para confirmar facturación -->
+  <dialog id="modalFacturar">
+    <form id="frmFacturar" method="dialog" class="modal">
+      <div class="modal-head">
+        <h3>Confirmar Facturación</h3>
+        <button class="icon" type="button" id="closeFacturar">✖</button>
       </div>
-      <div class="modal-foot"><button class="btn btn-outline" value="cancel">Cancelar</button><button class="btn btn-orange" id="btnGuardar" value="default">Emitir</button></div>
+      <div class="modal-body">
+        <div id="resumenOrden"></div>
+        <div class="form-group">
+          <label>Tipo de Factura</label>
+          <select name="tipo_factura" class="input" required>
+            <option value="general">General</option>
+            <option value="consumidor_final">Consumidor Final</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" value="cancel">Cancelar</button>
+        <button class="btn btn-orange" id="btnConfirmarFactura" value="default">Generar Factura</button>
+      </div>
     </form>
   </dialog>
 
+  <!-- Modal para ver detalle de factura -->
+  <dialog id="modalDetalleFactura">
+    <div class="modal large">
+      <div class="modal-head">
+        <h3>Detalle de Factura</h3>
+        <button class="icon" type="button" id="closeDetalle">✖</button>
+      </div>
+      <div class="modal-body">
+        <div id="detalleFacturaContent"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" id="btnCerrarDetalle">Cerrar</button>
+      </div>
+    </div>
+  </dialog>
+
   <style>
-    /* Reusa tokens + kpi-card de tu dashboard */
+    /* Variables globales heredadas del Layout */
+    .tabs-wrapper {
+      margin-bottom: 32px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      color: var(--text-muted, #6B7280);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .tab:hover {
+      color: var(--text-dark, #1A1A1A);
+      background: var(--background-light, #F8F9FA);
+    }
+
+    .tab.active {
+      color: var(--primary-orange, #FF4500);
+      border-bottom-color: var(--primary-orange, #FF4500);
+      background: var(--text-light, white);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color, #E0E0E0);
+    }
+
+    .card-head h3 {
+      margin: 0;
+      color: var(--text-dark, #1A1A1A);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .badge {
+      background: var(--primary-orange, #FF4500);
+      color: var(--text-light, white);
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-pendiente {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .btn-facturar {
+      background: var(--success-green, #28A745);
+      color: var(--text-light, white);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-facturar:hover {
+      background: #1E7E34;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .modal.large {
+      width: 800px;
+      max-width: 90vw;
+    }
+
+    .resumen-orden {
+      background: var(--background-light, #F8F9FA);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color, #E0E0E0);
+    }
+
+    .resumen-orden h4 {
+      margin: 0 0 16px 0;
+      color: var(--primary-blue, #1E4D8B);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .resumen-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 4px 0;
+    }
+
+    .resumen-row:last-child {
+      margin-bottom: 0;
+      font-weight: 600;
+      border-top: 2px solid var(--border-color, #E0E0E0);
+      padding-top: 12px;
+      margin-top: 12px;
+      color: var(--primary-blue, #1E4D8B);
+    }
+
+    .resumen-row span:first-child {
+      color: var(--text-muted, #6B7280);
+      font-weight: 500;
+    }
+
+    .resumen-row span:last-child {
+      font-weight: 600;
+      color: var(--text-dark, #1A1A1A);
+    }
+
+    /* KPIs consistentes con dashboard */
+    .section {
+      margin-bottom: 32px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: var(--text-light, white);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(30, 77, 139, 0.1);
+      border: 1px solid var(--border-color, #E0E0E0);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(30, 77, 139, 0.15);
+    }
+
+    .kpi-card.kpi-orange {
+      border-left: 4px solid var(--primary-orange, #FF4500);
+    }
+
+    .kpi-card.kpi-amber {
+      border-left: 4px solid #F59E0B;
+    }
+
+    .kpi-card.kpi-green {
+      border-left: 4px solid var(--success-green, #28A745);
+    }
+
+    .kpi-icon {
+      font-size: 32px;
+      opacity: 0.8;
+    }
+
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-dark, #1A1A1A);
+      line-height: 1.2;
+    }
+
+    .kpi-label {
+      font-size: 14px;
+      color: var(--text-muted, #6B7280);
+      margin: 4px 0 0 0;
+      font-weight: 500;
+    }
+
+    /* Tabla responsiva */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--border-color, #E0E0E0);
+    }
+
+    .table-wrap table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--text-light, white);
+    }
+
+    .table-wrap th {
+      background: var(--background-light, #F8F9FA);
+      color: var(--text-dark, #1A1A1A);
+      font-weight: 600;
+      padding: 16px 12px;
+      text-align: left;
+      border-bottom: 2px solid var(--border-color, #E0E0E0);
+      font-size: 14px;
+    }
+
+    .table-wrap td {
+      padding: 16px 12px;
+      border-bottom: 1px solid var(--border-color, #E0E0E0);
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    .table-wrap tr:hover {
+      background: var(--background-light, #F8F9FA);
+    }
+
+    .table-wrap tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Skeleton loader */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      height: 200px;
+      border-radius: 8px;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Estados de texto */
+    .muted {
+      color: var(--text-muted, #6B7280);
+      font-size: 14px;
+      padding: 40px;
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* Acciones en filas */
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .icon-btn {
+      background: none;
+      border: 1px solid var(--border-color, #E0E0E0);
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-dark, #1A1A1A);
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: var(--background-light, #F8F9FA);
+      border-color: var(--primary-blue, #1E4D8B);
+      color: var(--primary-blue, #1E4D8B);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .card-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .card-actions {
+        width: 100%;
+      }
+
+      .card-actions input {
+        flex: 1;
+      }
+
+      .tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .tab {
+        white-space: nowrap;
+        min-width: 140px;
+      }
+    }
   </style>
 
   <script>
-    function _hardLogout(){ try{localStorage.removeItem('token');localStorage.removeItem('user')}finally{location.replace('/')} }
-    window.logout=_hardLogout;
-    document.addEventListener('click',(e)=>{const b=e.target.closest('#btnLogout');if(!b)return;e.preventDefault();_hardLogout();});
-    (async()=>{
-      const t=localStorage.getItem('token');const u=localStorage.getItem('user'); if(!t||!u) return _hardLogout();
-      try{const r=await fetch('/api/auth/verify',{headers:{Authorization:`Bearer ${t}`}});const j=await r.json().catch(()=>({}));if(!r.ok||!j?.success)return _hardLogout();}catch{return _hardLogout();}
-      const user=JSON.parse(u); if(user.rol!=='admin') return _hardLogout();
-      document.getElementById('userWelcome').textContent=`Bienvenido, ${user.nombre}`;
-      await loadKPIs(); loadPage();
+    // Función de logout
+    function _hardLogout() {
+      try {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } finally {
+        location.replace('/');
+      }
+    }
+    window.logout = _hardLogout;
+
+    // Verificación de autenticación
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('#btnLogout');
+      if (!b) return;
+      e.preventDefault();
+      _hardLogout();
+    });
+
+    // Inicialización
+    (async () => {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      if (!token || !user) return _hardLogout();
+
+      try {
+        const response = await fetch('/api/auth/verify', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result?.success) return _hardLogout();
+      } catch {
+        return _hardLogout();
+      }
+
+      const userData = JSON.parse(user);
+      if (userData.rol !== 'admin') return _hardLogout();
+      
+      const welcomeEl = document.getElementById('userWelcome');
+      if (welcomeEl) welcomeEl.textContent = `Bienvenido, ${userData.nombre}`;
+      
+      await loadKPIs();
+      await loadOrdenesPendientes();
+      setupTabs();
     })();
 
-    const money=new Intl.NumberFormat('es-EC',{style:'currency',currency:'USD'});
-    async function loadKPIs(){
-      const t=localStorage.getItem('token');
-      const r=await fetch('/api/facturas/kpis',{headers:{Authorization:`Bearer ${t}`}});
-      const k=await r.json().catch(()=>({hoy:0,mes:0,num:0}));
-      document.getElementById('kpiHoy').textContent=money.format(k.hoy||0);
-      document.getElementById('kpiMes').textContent=money.format(k.mes||0);
-      document.getElementById('kpiNum').textContent=(k.num||0);
+    // Formateo de moneda
+    const money = new Intl.NumberFormat('es-EC', {
+      style: 'currency',
+      currency: 'USD'
+    });
+
+    // Cargar KPIs
+    async function loadKPIs() {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('/api/facturas/kpis', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+          const { hoy, mes, num } = result.data;
+          const kpiHoy = document.getElementById('kpiHoy');
+          const kpiMes = document.getElementById('kpiMes');
+          const kpiNum = document.getElementById('kpiNum');
+          
+          if (kpiHoy) kpiHoy.textContent = money.format(hoy || 0);
+          if (kpiMes) kpiMes.textContent = money.format(mes || 0);
+          if (kpiNum) kpiNum.textContent = String(num || 0);
+        }
+      } catch (error) {
+        console.error('Error al cargar KPIs:', error);
+      }
     }
 
-    let q='', desde='', hasta='';
-    async function loadPage(){
-      const t=localStorage.getItem('token');
-      const url=new URL('/api/facturas', location.origin);
-      if(q) url.searchParams.set('q', q);
-      if(desde) url.searchParams.set('desde', desde);
-      if(hasta) url.searchParams.set('hasta', hasta);
-      const r=await fetch(url,{headers:{Authorization:`Bearer ${t}`}});
-      const items=await r.json().catch(()=>[]);
-      const wrap=document.getElementById('wrapTable');
-      if(!items.length){ wrap.innerHTML='<div class="muted">Sin resultados</div>'; return; }
-      wrap.innerHTML=`
-        <table>
-          <thead><tr><th>Número</th><th>Cliente</th><th>Total</th><th>Fecha</th><th>Estado</th><th></th></tr></thead>
-          <tbody>
-            ${items.map(f=>`
+    // Cargar órdenes pendientes
+    async function loadOrdenesPendientes() {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('/api/facturas/ordenes-pendientes', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = await response.json();
+        
+        const wrap = document.getElementById('wrapOrdenes');
+        const contador = document.getElementById('contadorPendientes');
+        
+        if (!wrap) return;
+        
+        if (!result.success || !result.data.length) {
+          wrap.innerHTML = '<div class="muted">No hay órdenes pendientes de facturación</div>';
+          if (contador) contador.textContent = '0';
+          return;
+        }
+
+        const ordenes = result.data;
+        if (contador) contador.textContent = String(ordenes.length);
+
+        wrap.innerHTML = `
+          <table>
+            <thead>
               <tr>
-                <td>${f.numero||''}</td>
-                <td>${f.cliente_nombre||''}</td>
-                <td>${money.format(+f.total||0)}</td>
-                <td>${f.fecha? new Date(f.fecha).toLocaleDateString():'—'}</td>
-                <td>${f.estado||'—'}</td>
-                <td>
-                  <div class="row-actions">
-                    <a class="icon-btn" href="/api/facturas/${f.id}/pdf" target="_blank">⬇ PDF</a>
-                    <button class="icon-btn" data-del="${f.id}">🗑</button>
-                  </div>
-                </td>
-              </tr>`).join('')}
-          </tbody>
-        </table>`;
+                <th>Orden #</th>
+                <th>Cliente</th>
+                <th>Vehículo</th>
+                <th>Servicios</th>
+                <th>Total</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${ordenes.map(orden => `
+                <tr>
+                  <td>#${orden.id}</td>
+                  <td>
+                    <strong>${orden.cliente_nombre}</strong><br>
+                    <small class="muted">${orden.identificacion}</small>
+                  </td>
+                  <td>
+                    ${orden.marca}<br>
+                    <small class="muted">${orden.placa}</small>
+                  </td>
+                  <td>${orden.num_servicios} servicio(s)</td>
+                  <td><strong>${money.format(orden.total)}</strong></td>
+                  <td>${new Date(orden.fecha_ingreso).toLocaleDateString('es-EC')}</td>
+                  <td>
+                    <button class="btn-facturar" data-orden="${orden.id}">
+                      Facturar
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (error) {
+        console.error('Error al cargar órdenes pendientes:', error);
+        const wrap = document.getElementById('wrapOrdenes');
+        if (wrap) wrap.innerHTML = '<div class="muted">Error al cargar órdenes</div>';
+      }
     }
 
-    document.getElementById('btnBuscar').addEventListener('click',()=>{
-      q=document.getElementById('q').value.trim(); desde=document.getElementById('fDesde').value; hasta=document.getElementById('fHasta').value; loadPage();
+    // Cargar facturas emitidas
+    async function loadFacturas() {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('/api/facturas', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = await response.json();
+        
+        const wrap = document.getElementById('wrapFacturas');
+        if (!wrap) return;
+        
+        if (!result.success || !result.data.length) {
+          wrap.innerHTML = '<div class="muted">No hay facturas emitidas</div>';
+          return;
+        }
+
+        const facturas = result.data;
+
+        wrap.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Número</th>
+                <th>Cliente</th>
+                <th>Vehículo</th>
+                <th>Total</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${facturas.map(factura => `
+                <tr>
+                  <td><strong>${factura.numero_factura}</strong></td>
+                  <td>
+                    ${factura.cliente_nombre}<br>
+                    <small class="muted">${factura.identificacion}</small>
+                  </td>
+                  <td>
+                    ${factura.marca}<br>
+                    <small class="muted">${factura.placa}</small>
+                  </td>
+                  <td><strong>${money.format(factura.total)}</strong></td>
+                  <td>${new Date(factura.fecha_emision).toLocaleDateString('es-EC')}</td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="icon-btn" data-detalle="${factura.id}">👁️ Ver</button>
+                      <button class="icon-btn" data-pdf="${factura.id}">📄 PDF</button>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (error) {
+        console.error('Error al cargar facturas:', error);
+        const wrap = document.getElementById('wrapFacturas');
+        if (wrap) wrap.innerHTML = '<div class="muted">Error al cargar facturas</div>';
+      }
+    }
+
+    // Setup de pestañas
+    function setupTabs() {
+      const tabs = document.querySelectorAll('.tab');
+      const contents = document.querySelectorAll('.tab-content');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const targetTab = tab.dataset.tab;
+          
+          // Remover clase active de todas las pestañas y contenidos
+          tabs.forEach(t => t.classList.remove('active'));
+          contents.forEach(c => c.classList.remove('active'));
+          
+          // Agregar clase active a la pestaña clickeada y su contenido
+          tab.classList.add('active');
+          const targetContent = document.getElementById(`tab-${targetTab}`);
+          if (targetContent) targetContent.classList.add('active');
+          
+          // Cargar contenido si es necesario
+          if (targetTab === 'facturas') {
+            loadFacturas();
+          }
+        });
+      });
+    }
+
+    // Event listeners para facturación
+    document.addEventListener('click', async (e) => {
+      const btnFacturar = e.target.closest('[data-orden]');
+      if (btnFacturar) {
+        const ordenId = btnFacturar.dataset.orden;
+        if (ordenId) await mostrarModalFacturar(ordenId);
+        return;
+      }
+
+      const btnDetalle = e.target.closest('[data-detalle]');
+      if (btnDetalle) {
+        const facturaId = btnDetalle.dataset.detalle;
+        if (facturaId) await mostrarDetalleFactura(facturaId);
+        return;
+      }
     });
 
-    // modal
-    const modal=document.getElementById('modalFAC');
-    document.getElementById('btnNueva').addEventListener('click',()=>modal.showModal());
-    document.getElementById('closeFAC').addEventListener('click',()=>modal.close());
-    document.getElementById('frmFAC').addEventListener('submit', async (e)=>{
-      e.preventDefault(); const f=e.target; const t=localStorage.getItem('token');
-      const payload=Object.fromEntries(new FormData(f).entries());
-      const r=await fetch('/api/facturas',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${t}`},body:JSON.stringify(payload)});
-      if(r.ok){ modal.close(); await loadKPIs(); loadPage(); } else alert('No se pudo emitir');
-    });
+    // Modal de facturación
+    let ordenActual = null;
 
-    document.addEventListener('click', async (e)=>{
-      const bd=e.target.closest('button[data-del]'); if(!bd) return;
-      if(!confirm('¿Eliminar factura?')) return;
-      const t=localStorage.getItem('token'); const r=await fetch(`/api/facturas/${bd.dataset.del}`,{method:'DELETE',headers:{Authorization:`Bearer ${t}`}});
-      if(r.ok){ await loadKPIs(); loadPage(); } else alert('No se pudo eliminar');
-    });
+    async function mostrarModalFacturar(ordenId) {
+      const token = localStorage.getItem('token');
+      try {
+        // Obtener detalles de la orden
+        const response = await fetch(`/api/ordenes/${ordenId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = await response.json();
+        
+        if (!result.success) {
+          alert('Error al cargar detalles de la orden');
+          return;
+        }
+
+        ordenActual = result.data;
+        
+        // Debug: ver qué datos estamos recibiendo
+        console.log('Datos de la orden:', ordenActual);
+        
+        // Mostrar resumen en el modal
+        const resumenEl = document.getElementById('resumenOrden');
+        if (resumenEl) {
+          resumenEl.innerHTML = `
+            <div class="resumen-orden">
+              <h4>Orden #${ordenActual.id}</h4>
+              <div class="resumen-row">
+                <span>Cliente:</span>
+                <span>${ordenActual.cliente_nombre || 'No disponible'}</span>
+              </div>
+              <div class="resumen-row">
+                <span>Vehículo:</span>
+                <span>${ordenActual.marca || 'No disponible'} (${ordenActual.placa || 'No disponible'})</span>
+              </div>
+              <div class="resumen-row">
+                <span>Subtotal:</span>
+                <span>${money.format(ordenActual.subtotal || 0)}</span>
+              </div>
+              <div class="resumen-row">
+                <span>IVA (15%):</span>
+                <span>${money.format(ordenActual.iva || 0)}</span>
+              </div>
+              <div class="resumen-row">
+                <span>Total:</span>
+                <span>${money.format(ordenActual.total || 0)}</span>
+              </div>
+            </div>
+          `;
+        }
+        
+        const modal = document.getElementById('modalFacturar');
+        if (modal && modal.showModal) modal.showModal();
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error al cargar detalles de la orden');
+      }
+    }
+
+    async function mostrarDetalleFactura(facturaId) {
+      // Implementar si es necesario
+      console.log('Ver detalle de factura:', facturaId);
+    }
+
+    // Confirmar facturación
+    const btnConfirmar = document.getElementById('btnConfirmarFactura');
+    if (btnConfirmar) {
+      btnConfirmar.addEventListener('click', async () => {
+        if (!ordenActual) return;
+        
+        const token = localStorage.getItem('token');
+        const tipoSelect = document.querySelector('[name="tipo_factura"]');
+        const tipoFactura = tipoSelect ? tipoSelect.value : 'general';
+        
+        try {
+          const response = await fetch(`/api/facturas/desde-orden/${ordenActual.id}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ tipo_factura: tipoFactura })
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            alert(`Factura ${result.numero_factura} generada exitosamente`);
+            const modal = document.getElementById('modalFacturar');
+            if (modal && modal.close) modal.close();
+            await loadKPIs();
+            await loadOrdenesPendientes();
+          } else {
+            alert(result.message || 'Error al generar factura');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error al generar factura');
+        }
+      });
+    }
+
+    // Cerrar modales
+    const closeFacturar = document.getElementById('closeFacturar');
+    if (closeFacturar) {
+      closeFacturar.addEventListener('click', () => {
+        const modal = document.getElementById('modalFacturar');
+        if (modal && modal.close) modal.close();
+      });
+    }
+
+    const closeDetalle = document.getElementById('closeDetalle');
+    if (closeDetalle) {
+      closeDetalle.addEventListener('click', () => {
+        const modal = document.getElementById('modalDetalleFactura');
+        if (modal && modal.close) modal.close();
+      });
+    }
+
+    const btnCerrarDetalle = document.getElementById('btnCerrarDetalle');
+    if (btnCerrarDetalle) {
+      btnCerrarDetalle.addEventListener('click', () => {
+        const modal = document.getElementById('modalDetalleFactura');
+        if (modal && modal.close) modal.close();
+      });
+    }
   </script>
+
+  <style>
+    /* Estilos del header - copiados de la página de órdenes */
+    .navbar {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .logo-circle {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .user-chip {
+      background: rgba(255,255,255,0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 1rem;
+      font-size: 0.9rem;
+    }
+    .page {
+      padding: 2rem 0;
+      min-height: calc(100vh - 80px);
+      background: #f8fafc;
+    }
+
+    /* Estilos de la sección de KPIs */
+    .section {
+      margin: 2rem 0;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title::before {
+      content: "📊";
+      font-size: 1.5rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .kpi-icon {
+      font-size: 2.5rem;
+      line-height: 1;
+      opacity: 0.8;
+    }
+
+    .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.25rem 0;
+      color: var(--color-text);
+    }
+
+    .kpi-label {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .kpi-orange {
+      border-left: 4px solid var(--color-orange);
+    }
+
+    .kpi-amber {
+      border-left: 4px solid #f59e0b;
+    }
+
+    .kpi-green {
+      border-left: 4px solid #10b981;
+    }
+
+    .tabs-wrapper {
+      margin-top: 2rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .kpi-card {
+        padding: 1rem;
+      }
+    }
+  </style>
 </Layout>

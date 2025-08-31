@@ -38,13 +38,30 @@ router.get('/stats', authenticateToken, async (req, res) => {
 
     // Facturación de hoy (si existe la tabla facturas)
     let facturacionHoy = 0;
+    let ultimasFacturas = [];
     try {
       const [facturacionResult] = await db.execute(`
         SELECT COALESCE(SUM(total), 0) as total 
         FROM facturas 
-        WHERE DATE(fecha) = CURDATE()
+        WHERE DATE(fecha_emision) = CURDATE()
       `);
       facturacionHoy = facturacionResult[0].total || 0;
+
+      // Obtener últimas 5 facturas
+      const [ultimasFacturasResult] = await db.execute(`
+        SELECT f.numero_factura, f.total, f.fecha_emision,
+               CASE 
+                 WHEN c.tipo = 'particular' THEN CONCAT(c.nombres, ' ', c.apellidos)
+                 ELSE c.razon_social
+               END as cliente_nombre
+        FROM facturas f
+        JOIN ordenes_servicio o ON f.id_orden = o.id
+        JOIN vehiculos v ON o.id_vehiculo = v.id
+        JOIN clientes c ON v.id_cliente = c.id
+        ORDER BY f.fecha_emision DESC
+        LIMIT 5
+      `);
+      ultimasFacturas = ultimasFacturasResult;
     } catch (error) {
       console.log('Tabla facturas no existe aún, facturación = 0');
     }
@@ -53,7 +70,8 @@ router.get('/stats', authenticateToken, async (req, res) => {
       clientes: clientesResult[0].total,
       vehiculos: vehiculosResult[0].total,
       ordenesActivas: ordenesResult[0].total,
-      facturacionHoy: facturacionHoy
+      facturacionHoy: facturacionHoy,
+      ultimasFacturas: ultimasFacturas
     };
 
     res.json(stats);

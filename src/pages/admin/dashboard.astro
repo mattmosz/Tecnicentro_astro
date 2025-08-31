@@ -276,6 +276,9 @@ import Layout from '../../layouts/Layout.astro';
           document.getElementById('totalVehiculos').textContent = fmtNum.format(s.vehiculos||0);
           document.getElementById('ordenesActivas').textContent = fmtNum.format(s.ordenesActivas||0);
           document.getElementById('facturasHoy').textContent    = fmtMoney.format(s.facturacionHoy||0);
+          
+          // Renderizar las últimas facturas que ya vienen en las estadísticas
+          renderFacturas(s.ultimasFacturas || []);
         } else {
           console.error('Error en respuesta:', await statsRes.text());
         }
@@ -288,26 +291,28 @@ import Layout from '../../layouts/Layout.astro';
     async function loadRecentActivity(){
       try{
         const token = localStorage.getItem('token');
-        const [ordenesRes, facturasRes] = await Promise.all([
-          fetch('/api/ordenes?limit=5',  { headers:{ Authorization:`Bearer ${token}` }}),
-          fetch('/api/facturas?limit=5', { headers:{ Authorization:`Bearer ${token}` }})
-        ]);
+        // Solo cargar órdenes recientes, las facturas ya vienen del endpoint de stats
+        const ordenesRes = await fetch('/api/ordenes?limit=5',  { headers:{ Authorization:`Bearer ${token}` }});
 
         if (ordenesRes.ok){
           const response = await ordenesRes.json();
           const list = response.success ? response.data : [];
           renderOrdenes(list);
         }
-        if (facturasRes.ok){
-          const list = await facturasRes.json();
-          renderFacturas(list);
-        }
       }catch(err){ console.error(err); }
     }
 
     function renderOrdenes(ordenes=[]){
+      console.log('Renderizando órdenes:', ordenes);
       const el = document.getElementById('recentOrders');
-      if (!ordenes.length){ el.innerHTML = '<div class="muted">No hay órdenes registradas</div>'; return; }
+      if (!el) {
+        console.error('Elemento recentOrders no encontrado');
+        return;
+      }
+      if (!ordenes.length){ 
+        el.innerHTML = '<div class="muted">No hay órdenes registradas</div>'; 
+        return; 
+      }
       el.innerHTML = `
         <div class="table-wrap">
           <table>
@@ -318,7 +323,7 @@ import Layout from '../../layouts/Layout.astro';
                   <td>#${o.id}</td>
                   <td>${o.cliente_nombre||'N/A'}</td>
                   <td><span class="badge ${badge(o.estado)}">${o.estado}</span></td>
-                  <td>${new Date(o.fecha_ingreso).toLocaleDateString()}</td>
+                  <td>${new Date(o.fecha_creacion||o.fecha_ingreso).toLocaleDateString()}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -327,8 +332,16 @@ import Layout from '../../layouts/Layout.astro';
     }
 
     function renderFacturas(facturas=[]){
+      console.log('Renderizando facturas:', facturas);
       const el = document.getElementById('recentFacturas');
-      if (!facturas.length){ el.innerHTML = '<div class="muted">No hay facturas registradas</div>'; return; }
+      if (!el) {
+        console.error('Elemento recentFacturas no encontrado');
+        return;
+      }
+      if (!facturas.length){ 
+        el.innerHTML = '<div class="muted">No hay facturas registradas</div>'; 
+        return; 
+      }
       el.innerHTML = `
         <div class="table-wrap">
           <table>
@@ -336,10 +349,10 @@ import Layout from '../../layouts/Layout.astro';
             <tbody>
               ${facturas.map(f=>`
                 <tr>
-                  <td>#${f.numero}</td>
+                  <td>#${f.numero_factura||'N/A'}</td>
                   <td>${f.cliente_nombre||'N/A'}</td>
                   <td>${fmtMoney.format(f.total||0)}</td>
-                  <td>${new Date(f.fecha).toLocaleDateString()}</td>
+                  <td>${new Date(f.fecha_emision).toLocaleDateString()}</td>
                 </tr>
               `).join('')}
             </tbody>

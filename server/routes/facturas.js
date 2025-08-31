@@ -86,7 +86,7 @@ router.post('/desde-orden/:ordenId', verifyToken, requireAdmin, async (req, res)
 
     // Calcular totales
     const subtotal = detalles.reduce((sum, item) => sum + parseFloat(item.subtotal), 0);
-    const iva = subtotal * 0.12; // 12% IVA
+    const iva = subtotal * 0.15; // 15% IVA
     const total = subtotal + iva;
 
     // Generar número de factura
@@ -138,7 +138,7 @@ router.get('/', verifyToken, requireAdmin, async (req, res) => {
   try {
     const [facturas] = await db.execute(`
       SELECT f.*, 
-             v.marca, v.modelo, v.placa,
+             v.marca, v.placa,
              CASE 
                WHEN c.tipo = 'particular' THEN CONCAT(c.nombres, ' ', c.apellidos)
                ELSE c.razon_social
@@ -173,6 +173,111 @@ router.get('/:id/detalle', verifyToken, requireAdmin, async (req, res) => {
     res.json({ success: true, data: detalle });
   } catch (error) {
     console.error('Error al obtener detalle de factura:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+// Obtener KPIs de facturación
+router.get('/kpis', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    // Verificar si la tabla facturas existe y crearla si no existe
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS facturas (
+        id int(11) NOT NULL AUTO_INCREMENT,
+        numero_factura varchar(25) NOT NULL,
+        id_orden int(11) NOT NULL,
+        tipo_cliente enum('particular','institucion') NOT NULL,
+        tipo_factura enum('general','mano_obra','repuestos','lubricantes') DEFAULT 'general',
+        fecha_emision datetime DEFAULT current_timestamp(),
+        subtotal decimal(10,2) NOT NULL,
+        iva decimal(10,2) NOT NULL,
+        total decimal(10,2) NOT NULL,
+        archivo_xml text DEFAULT NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY numero_factura (numero_factura),
+        KEY id_orden (id_orden),
+        CONSTRAINT facturas_ibfk_1 FOREIGN KEY (id_orden) REFERENCES ordenes_servicio (id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+    `);
+
+    // Crear tabla detalle_facturas si no existe
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS detalle_facturas (
+        id int(11) NOT NULL AUTO_INCREMENT,
+        id_factura int(11) NOT NULL,
+        descripcion varchar(255) NOT NULL,
+        cantidad int(11) NOT NULL,
+        precio_unitario decimal(10,2) NOT NULL,
+        PRIMARY KEY (id),
+        KEY id_factura (id_factura),
+        CONSTRAINT detalle_facturas_ibfk_1 FOREIGN KEY (id_factura) REFERENCES facturas (id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+    `);
+
+    // Ventas de hoy
+    const [hoy] = await db.execute(`
+      SELECT COALESCE(SUM(total), 0) as total
+      FROM facturas 
+      WHERE DATE(fecha_emision) = CURDATE()
+    `);
+
+    // Ventas del mes actual
+    const [mes] = await db.execute(`
+      SELECT COALESCE(SUM(total), 0) as total
+      FROM facturas 
+      WHERE YEAR(fecha_emision) = YEAR(CURDATE()) 
+      AND MONTH(fecha_emision) = MONTH(CURDATE())
+    `);
+
+    // Número total de facturas del mes
+    const [num] = await db.execute(`
+      SELECT COUNT(*) as count
+      FROM facturas 
+      WHERE YEAR(fecha_emision) = YEAR(CURDATE()) 
+      AND MONTH(fecha_emision) = MONTH(CURDATE())
+    `);
+
+    res.json({ 
+      success: true, 
+      data: {
+        hoy: parseFloat(hoy[0].total),
+        mes: parseFloat(mes[0].total),
+        num: parseInt(num[0].count)
+      }
+    });
+  } catch (error) {
+    console.error('Error al obtener KPIs:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+// Obtener órdenes pendientes de facturación
+router.get('/ordenes-pendientes', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const [ordenes] = await db.execute(`
+      SELECT o.id, o.fecha_ingreso, 
+             COALESCE(SUM(do.subtotal), 0) as subtotal,
+             COALESCE(SUM(do.subtotal), 0) * 0.15 as iva,
+             COALESCE(SUM(do.subtotal), 0) * 1.15 as total,
+             v.marca, v.placa,
+             CASE 
+               WHEN c.tipo = 'particular' THEN CONCAT(c.nombres, ' ', c.apellidos)
+               ELSE c.razon_social
+             END as cliente_nombre,
+             c.identificacion,
+             COUNT(do.id) as num_servicios
+      FROM ordenes_servicio o
+      JOIN vehiculos v ON o.id_vehiculo = v.id
+      JOIN clientes c ON v.id_cliente = c.id
+      LEFT JOIN detalle_ordenes do ON o.id = do.id_orden
+      WHERE o.estado = 'pendiente'
+      GROUP BY o.id, o.fecha_ingreso, v.marca, v.placa, c.tipo, c.nombres, c.apellidos, c.razon_social, c.identificacion
+      ORDER BY o.fecha_ingreso DESC
+    `);
+
+    res.json({ success: true, data: ordenes });
+  } catch (error) {
+    console.error('Error al obtener órdenes pendientes:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
