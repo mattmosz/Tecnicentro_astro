@@ -392,6 +392,94 @@ import Layout from '../../layouts/Layout.astro';
       padding-top: 0.5rem;
       margin-top: 0.5rem;
     }
+    /* ====== TOPBAR ACOMODADA Y MÁS ESTÉTICA ====== */
+
+/* La barra ocupa todo el ancho y queda fija/pegajosa arriba */
+.navbar{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  color: #fff;
+  border: 0;
+  box-shadow: 0 4px 16px rgba(2, 6, 23, .10);
+}
+
+/* Contenedor interno con layout flexible */
+.navbar .container{
+  max-width: var(--container, 1200px);
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Marca (logo + texto) a la izquierda */
+.brand{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Empuja el user menu completamente a la derecha */
+.navbar .user-menu{
+  margin-left: auto;     /* <-- clave para enviarlo a la derecha */
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Chip de bienvenida más limpio */
+.user-chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.25);
+  font-weight: 600;
+  font-size: .875rem;
+  backdrop-filter: saturate(140%) blur(2px);
+}
+
+/* Botón “Cerrar Sesión” como CTA */
+#btnLogout.btn{
+  background: #ef4444;             /* rojo suave */
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  box-shadow: 0 6px 14px rgba(239,68,68,.22);
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+}
+#btnLogout.btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(239,68,68,.28);
+}
+#btnLogout.btn:active{
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(239,68,68,.22);
+}
+
+/* Ícono/emoji del logo con mejor contraste */
+.logo-circle{
+  width: 36px; height: 36px;
+  display:grid; place-items:center;
+  border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  color:#fff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
+}
+.brand-text{ color:#fff; }
+
   </style>
 
   <script>

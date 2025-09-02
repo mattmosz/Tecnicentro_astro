@@ -425,6 +425,123 @@ import Layout from '../../layouts/Layout.astro';
       }
     }
   </style>
+  <style is:global>
+/* ===== VEHÍCULOS – fuerzas globales sobre la tabla del listado ===== */
+
+/* Layout básico + separación entre filas */
+main.page .card .card-body #wrapTable table{
+  width:100% !important;
+  table-layout:fixed !important;
+  border-collapse:separate !important;
+  border-spacing:0 10px !important;        /* aire entre filas */
+}
+
+/* Encabezado fijo y limpio */
+main.page .card .card-body #wrapTable thead th{
+  background:#fff !important;
+  position:sticky; top:-1px; z-index:1;
+  padding:10px !important;
+  border-bottom:1px solid #eef2f7 !important;
+  font-size:12px !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  color:#64748b !important;
+}
+
+/* Fila tipo “tarjeta” */
+main.page .card .card-body #wrapTable tbody tr{
+  background:transparent !important;       /* transparente: damos fondo a celdas */
+}
+main.page .card .card-body #wrapTable tbody td{
+  background:#fff !important;
+  border-top:none !important;
+  padding:14px 12px !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 10px 20px rgba(2,6,23,.06) !important;
+}
+main.page .card .card-body #wrapTable tbody tr:hover td{
+  background:#fcfcff !important;
+}
+
+/* Bordes redondeados a la tarjeta (primera/última celda) */
+main.page .card .card-body #wrapTable tbody td:first-child{
+  border-top-left-radius:12px !important;
+  border-bottom-left-radius:12px !important;
+}
+main.page .card .card-body #wrapTable tbody td:last-child{
+  border-top-right-radius:12px !important;
+  border-bottom-right-radius:12px !important;
+  text-align:right !important;
+  white-space:nowrap !important;
+}
+
+/* Anchos de columnas (ajusta si quieres) */
+main.page .card .card-body #wrapTable thead th:nth-child(1){ width:130px !important; } /* Placa */
+main.page .card .card-body #wrapTable thead th:nth-child(2){ width:160px !important; } /* Marca */
+main.page .card .card-body #wrapTable thead th:nth-child(3){ width:280px !important; } /* Cliente */
+main.page .card .card-body #wrapTable thead th:nth-child(4){ width:160px !important; } /* Kilometraje */
+main.page .card .card-body #wrapTable thead th:nth-child(5){ width:120px !important; } /* Acciones */
+
+main.page .card .card-body #wrapTable tbody td:nth-child(3){
+  overflow:hidden !important; text-overflow:ellipsis !important; white-space:nowrap !important;
+}
+main.page .card .card-body #wrapTable tbody td:nth-child(4){
+  white-space:nowrap !important; font-variant-numeric:tabular-nums !important; font-weight:600 !important;
+}
+
+/* Chip azul para la PLACA (texto que envuelves en <strong>) */
+main.page .card .card-body #wrapTable tbody td:nth-child(1) strong{
+  display:inline-block !important;
+  padding:6px 10px !important;
+  border-radius:999px !important;
+  background:#eef2ff !important;
+  color:#1e3a8a !important;
+  letter-spacing:.04em !important;
+  font-weight:800 !important;
+  font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace !important;
+}
+
+/* Acciones colorizadas por posición (sin tocar HTML) */
+main.page .card .card-body #wrapTable .row-actions{ display:inline-flex !important; gap:8px !important; }
+main.page .card .card-body #wrapTable .row-actions button{
+  width:36px !important; height:36px !important; padding:0 !important;
+  border-radius:10px !important; border:1px solid #e5e7eb !important;
+  background:#fff !important; color:#334155 !important;
+  display:inline-grid !important; place-items:center !important;
+  transition:background .15s,border-color .15s,transform .15s,box-shadow .15s !important;
+  font-size:16px !important; line-height:1 !important; cursor:pointer !important;
+}
+main.page .card .card-body #wrapTable .row-actions button:hover{
+  transform:translateY(-1px) !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 20px rgba(2,6,23,.08) !important;
+}
+
+/* 1º botón = Editar (azul) */
+main.page .card .card-body #wrapTable .row-actions button:first-child{
+  background:#dbeafe !important; border-color:#bfdbfe !important; color:#1d4ed8 !important;
+}
+main.page .card .card-body #wrapTable .row-actions button:first-child:hover{
+  background:#bfdbfe !important; border-color:#93c5fd !important; color:#1e40af !important;
+}
+
+/* 2º botón = Eliminar (rojo) */
+main.page .card .card-body #wrapTable .row-actions button:last-child{
+  background:#fee2e2 !important; border-color:#fecaca !important; color:#b91c1c !important;
+}
+main.page .card .card-body #wrapTable .row-actions button:last-child:hover{
+  background:#fecaca !important; border-color:#fca5a5 !important; color:#7f1d1d !important;
+}
+
+/* Responsivo: estrecha cliente/km */
+@media (max-width:1100px){
+  main.page .card .card-body #wrapTable thead th:nth-child(3){ width:240px !important; }
+  main.page .card .card-body #wrapTable thead th:nth-child(4){ width:140px !important; }
+}
+@media (max-width:900px){
+  main.page .card .card-body #wrapTable thead th:nth-child(2){ width:140px !important; }
+  main.page .card .card-body #wrapTable thead th:nth-child(3){ width:200px !important; }
+}
+</style>
+
 
   <script>
     // -------- logout & guard ----------

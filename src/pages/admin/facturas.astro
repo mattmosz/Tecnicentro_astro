@@ -1,6 +1,7 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from "../../layouts/Layout.astro";
 ---
+
 <Layout title="Facturación - TecniCentro Ibarra Express">
   <header class="navbar" role="banner">
     <div class="container">
@@ -10,7 +11,12 @@ import Layout from '../../layouts/Layout.astro';
       </a>
       <div class="user-menu">
         <span id="userWelcome" class="user-chip">Cargando…</span>
-        <button type="button" id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">
+        <button
+          type="button"
+          id="btnLogout"
+          class="btn btn-orange"
+          onclick="window.logout?.()"
+        >
           Cerrar Sesión
         </button>
       </div>
@@ -57,7 +63,9 @@ import Layout from '../../layouts/Layout.astro';
       <!-- Pestañas -->
       <div class="tabs-wrapper">
         <div class="tabs">
-          <button class="tab active" data-tab="pendientes">Órdenes Pendientes</button>
+          <button class="tab active" data-tab="pendientes"
+            >Órdenes Pendientes</button
+          >
           <button class="tab" data-tab="facturas">Facturas Emitidas</button>
         </div>
       </div>
@@ -83,8 +91,14 @@ import Layout from '../../layouts/Layout.astro';
           <div class="card-head">
             <h3>Facturas Emitidas</h3>
             <div class="card-actions">
-              <input id="qFacturas" class="input" placeholder="Buscar por número o cliente" />
-              <button class="btn btn-outline" id="btnBuscarFacturas">Buscar</button>
+              <input
+                id="qFacturas"
+                class="input"
+                placeholder="Buscar por número o cliente"
+              />
+              <button class="btn btn-outline" id="btnBuscarFacturas"
+                >Buscar</button
+              >
             </div>
           </div>
           <div class="card-body">
@@ -116,7 +130,9 @@ import Layout from '../../layouts/Layout.astro';
       </div>
       <div class="modal-foot">
         <button class="btn btn-outline" value="cancel">Cancelar</button>
-        <button class="btn btn-orange" id="btnConfirmarFactura" value="default">Generar Factura</button>
+        <button class="btn btn-orange" id="btnConfirmarFactura" value="default"
+          >Generar Factura</button
+        >
       </div>
     </form>
   </dialog>
@@ -135,9 +151,12 @@ import Layout from '../../layouts/Layout.astro';
             <p><strong>Número:</strong> <span id="facturaNumero">-</span></p>
             <p><strong>Fecha:</strong> <span id="facturaFecha">-</span></p>
             <p><strong>Cliente:</strong> <span id="facturaCliente">-</span></p>
-            <p><strong>Vehículo:</strong> <span id="facturaVehiculo">-</span></p>
+            <p>
+              <strong>Vehículo:</strong>
+              <span id="facturaVehiculo">-</span>
+            </p>
           </div>
-          
+
           <div class="servicios-section">
             <h4>Servicios Realizados</h4>
             <div class="table-wrap">
@@ -155,10 +174,12 @@ import Layout from '../../layouts/Layout.astro';
                 </tbody>
               </table>
             </div>
-            
+
             <div class="totales-section">
               <div class="totales-row">
-                <strong>Subtotal: <span id="facturaSubtotal">$0.00</span></strong>
+                <strong
+                  >Subtotal: <span id="facturaSubtotal">$0.00</span></strong
+                >
               </div>
               <div class="totales-row">
                 <strong>IVA (15%): <span id="facturaIva">$0.00</span></strong>
@@ -175,355 +196,161 @@ import Layout from '../../layouts/Layout.astro';
       </div>
     </div>
   </dialog>
+  <style is:global>
+/* ===== Facturación – estilos globales sin depender de body.facturacion ===== */
 
-  <style>
-    /* Variables globales heredadas del Layout */
-    .tabs-wrapper {
-      margin-bottom: 32px;
-    }
+/* Vars */
+:root{
+  --container: 1200px;
+  --bg: #f8fafc;
+  --card: #fff;
+  --text: #1a1a1a;
+  --muted: #6b7280;
+  --border: #e6eaf1;
+  --border-2: #edf1f6;
+  --blue-700: #1e3a8a;
+  --blue-500: #3b82f6;
+  --orange: #ff4500;
+  --green: #22c55e;
+  --red: #ef4444;
+}
 
-    .tabs {
-      display: flex;
-      gap: 8px;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 0;
-    }
+/* Página base */
+.page{ padding:24px 0 40px; background:var(--bg); }
+.container{ max-width:var(--container); margin:0 auto; padding:0 20px; }
+.muted{ color:var(--muted); }
 
-    .tab {
-      padding: 12px 24px;
-      background: none;
-      border: none;
-      color: var(--text-muted, #6B7280);
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: all 0.3s ease;
-      font-weight: 500;
-      border-radius: 8px 8px 0 0;
-    }
+/* Navbar */
+.navbar{
+  position: sticky; top:0; z-index:50;
+  background: linear-gradient(135deg,var(--blue-700) 0%,var(--blue-500) 100%);
+  color:#fff; box-shadow:0 6px 18px rgba(2,6,23,.12);
+}
+.navbar .container{ display:flex; align-items:center; gap:16px; padding:10px 20px; }
+.brand{ display:inline-flex; align-items:center; gap:10px; color:#fff; text-decoration:none; font-weight:700; }
+.logo-circle{
+  width:36px; height:36px; display:grid; place-items:center;
+  border-radius:50%; background:rgba(255,255,255,.15);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
+}
+.brand-text{ color:#fff; }
+.user-menu{ margin-left:auto; display:inline-flex; gap:12px; align-items:center; }
+.user-chip{
+  padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.25); color:#fff; font-weight:600; font-size:.875rem;
+  backdrop-filter:saturate(140%) blur(2px);
+}
+#btnLogout{ background:var(--red); color:#fff; border:0; border-radius:999px; padding:8px 14px; font-weight:700;
+  box-shadow:0 6px 14px rgba(239,68,68,.22); cursor:pointer; transition:transform .12s,box-shadow .12s; }
+#btnLogout:hover{ transform:translateY(-1px); box-shadow:0 10px 22px rgba(239,68,68,.28); }
 
-    .tab:hover {
-      color: var(--text-dark, #1A1A1A);
-      background: var(--background-light, #F8F9FA);
-    }
+/* Header de página */
+.header-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin:8px 0 14px; }
+.header-row h1{ margin:0 0 6px; font-size:2rem; font-weight:800; color:#0f172a; }
 
-    .tab.active {
-      color: var(--primary-orange, #FF4500);
-      border-bottom-color: var(--primary-orange, #FF4500);
-      background: var(--text-light, white);
-    }
+/* Botones/inputs */
+.btn{ border:0; border-radius:10px; padding:10px 14px; font-weight:600; cursor:pointer; font-size:.9rem; }
+.btn-orange{ background:var(--orange); color:#fff; }
+.btn-outline{ background:#fff; border:1px solid var(--border); color:var(--text); }
+.input{
+  border:1px solid var(--border); border-radius:10px; padding:10px 12px;
+  min-width:220px; font-size:.9rem; background:#fff; color:var(--text);
+}
+.input:focus{ outline:none; border-color:var(--blue-500); box-shadow:0 0 0 3px rgba(59,130,246,.15); }
 
-    .tab-content {
-      display: none;
-    }
+/* Cards */
+.card{ background:var(--card); border:1px solid var(--border); border-radius:14px; box-shadow:0 8px 22px rgba(2,6,23,.06); overflow:hidden; }
+.card-head{ display:flex; align-items:center; justify-content:space-between; padding:16px 18px; background:#fafbfc; border-bottom:1px solid var(--border-2); }
+.card-head h3{ margin:0; font-size:1.125rem; font-weight:700; color:#0f172a; }
+.card-body{ padding:16px 18px 18px; }
+.card-actions{ display:flex; gap:12px; align-items:center; }
+.badge{ display:inline-block; min-width:24px; text-align:center; background:var(--orange); color:#fff; padding:4px 10px; border-radius:16px; font-size:.75rem; font-weight:700; }
 
-    .tab-content.active {
-      display: block;
-    }
+/* Tabs */
+.tabs-wrapper{ margin:24px 0 16px; }
+.tabs{ display:flex; gap:8px; border-bottom:1px solid var(--border-2); }
+.tab{ padding:12px 18px; border:0; background:transparent; cursor:pointer; color:var(--muted);
+  border-bottom:3px solid transparent; border-radius:10px 10px 0 0; font-weight:700; transition:color .15s,background .15s,border-color .15s; }
+.tab:hover{ color:#0f172a; background:#f3f4f6; }
+.tab.active{ color:var(--blue-700); background:#fff; border-bottom-color:var(--blue-700); }
+.tab-content{ display:none; }
+.tab-content.active{ display:block; }
 
-    .card-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border-color, #E0E0E0);
-    }
+/* KPIs */
+.section{ margin:14px 0 24px; }
+.section-title{ font-size:1.05rem; font-weight:800; color:#0f172a; margin:0 0 10px; display:flex; align-items:center; gap:8px; }
+.section-title::before{ content:'📊'; font-size:1.3rem; }
+.stats-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; }
+.kpi-card{ background:#fff; border:1px solid var(--border); border-radius:14px; padding:18px; display:flex; align-items:center; gap:14px;
+  box-shadow:0 8px 22px rgba(2,6,23,.06); transition:transform .12s, box-shadow .12s; }
+.kpi-card:hover{ transform:translateY(-2px); box-shadow:0 12px 28px rgba(2,6,23,.1); }
+.kpi-card.kpi-orange{ border-left:4px solid var(--orange); }
+.kpi-card.kpi-amber{ border-left:4px solid #f59e0b; }
+.kpi-card.kpi-green{ border-left:4px solid #10b981; }
+.kpi-icon{ font-size:28px; opacity:.85; }
+.kpi-value{ margin:0; font-size:1.5rem; font-weight:800; color:#0f172a; }
+.kpi-label{ margin:2px 0 0; color:var(--muted); font-weight:600; font-size:.85rem; }
 
-    .card-head h3 {
-      margin: 0;
-      color: var(--text-dark, #1A1A1A);
-      font-size: 18px;
-      font-weight: 600;
-    }
+/* Tabla */
+.table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:10px; }
+.table-wrap table{ width:100%; border-collapse:collapse; background:#fff; }
+.table-wrap thead th{ background:#f8fafc; color:#0f172a; font-weight:700; font-size:.82rem; letter-spacing:.02em; text-transform:uppercase;
+  text-align:left; padding:14px 12px; border-bottom:2px solid var(--border); }
+.table-wrap tbody td{ padding:14px 12px; border-bottom:1px solid var(--border-2); font-size:.95rem; vertical-align:top; }
+.table-wrap tbody tr:hover{ background:#f6f9ff; }
+.row-actions{ display:flex; gap:10px; align-items:center; }
+.icon-btn{ background:#fff; border:1px solid var(--border); border-radius:10px; padding:8px 12px; font-size:.85rem; font-weight:600; cursor:pointer;
+  transition:transform .12s, box-shadow .12s, border-color .12s, color .12s; }
+.icon-btn:hover{ transform:translateY(-1px); border-color:#c7d2fe; box-shadow:0 8px 18px rgba(2,6,23,.06); color:#1e40af; }
+.btn-facturar{ background:var(--green); color:#fff; border:0; border-radius:10px; padding:8px 14px; font-weight:800;
+  box-shadow:0 8px 18px rgba(34,197,94,.22); }
+.btn-facturar:hover{ transform:translateY(-1px); background:#16a34a; }
 
-    .card-actions {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
+/* Skeleton */
+.skeleton{ height:160px; border-radius:10px;
+  background:linear-gradient(90deg,#f2f4f8 25%, #e6eaf1 37%, #f2f4f8 63%); background-size:400% 100%; animation:sk 1.2s infinite; }
+@keyframes sk{ 0%{background-position:100% 0} 100%{background-position:0 0} }
 
-    .badge {
-      background: var(--primary-orange, #FF4500);
-      color: var(--text-light, white);
-      padding: 4px 12px;
-      border-radius: 16px;
-      font-size: 12px;
-      font-weight: 600;
-      min-width: 24px;
-      text-align: center;
-    }
-
-    .status-badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .status-pendiente {
-      background: #FEF3C7;
-      color: #92400E;
-    }
-
-    .btn-facturar {
-      background: var(--success-green, #28A745);
-      color: var(--text-light, white);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    .btn-facturar:hover {
-      background: #1E7E34;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-    }
-
-    .modal.large {
-      width: 800px;
-      max-width: 90vw;
-    }
-
-    .resumen-orden {
-      background: var(--background-light, #F8F9FA);
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      border: 1px solid var(--border-color, #E0E0E0);
-    }
-
-    .resumen-orden h4 {
-      margin: 0 0 16px 0;
-      color: var(--primary-blue, #1E4D8B);
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    .resumen-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      padding: 4px 0;
-    }
-
-    .resumen-row:last-child {
-      margin-bottom: 0;
-      font-weight: 600;
-      border-top: 2px solid var(--border-color, #E0E0E0);
-      padding-top: 12px;
-      margin-top: 12px;
-      color: var(--primary-blue, #1E4D8B);
-    }
-
-    .resumen-row span:first-child {
-      color: var(--text-muted, #6B7280);
-      font-weight: 500;
-    }
-
-    .resumen-row span:last-child {
-      font-weight: 600;
-      color: var(--text-dark, #1A1A1A);
-    }
-
-    /* KPIs consistentes con dashboard */
-    .section {
-      margin-bottom: 32px;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 24px;
-      margin-bottom: 32px;
-    }
-
-    .kpi-card {
-      background: var(--text-light, white);
-      border-radius: 12px;
-      padding: 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      box-shadow: 0 4px 20px rgba(30, 77, 139, 0.1);
-      border: 1px solid var(--border-color, #E0E0E0);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .kpi-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(30, 77, 139, 0.15);
-    }
-
-    .kpi-card.kpi-orange {
-      border-left: 4px solid var(--primary-orange, #FF4500);
-    }
-
-    .kpi-card.kpi-amber {
-      border-left: 4px solid #F59E0B;
-    }
-
-    .kpi-card.kpi-green {
-      border-left: 4px solid var(--success-green, #28A745);
-    }
-
-    .kpi-icon {
-      font-size: 32px;
-      opacity: 0.8;
-    }
-
-    .kpi-value {
-      font-size: 24px;
-      font-weight: 700;
-      margin: 0;
-      color: var(--text-dark, #1A1A1A);
-      line-height: 1.2;
-    }
-
-    .kpi-label {
-      font-size: 14px;
-      color: var(--text-muted, #6B7280);
-      margin: 4px 0 0 0;
-      font-weight: 500;
-    }
-
-    /* Tabla responsiva */
-    .table-wrap {
-      overflow-x: auto;
-      border-radius: 8px;
-      border: 1px solid var(--border-color, #E0E0E0);
-    }
-
-    .table-wrap table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--text-light, white);
-    }
-
-    .table-wrap th {
-      background: var(--background-light, #F8F9FA);
-      color: var(--text-dark, #1A1A1A);
-      font-weight: 600;
-      padding: 16px 12px;
-      text-align: left;
-      border-bottom: 2px solid var(--border-color, #E0E0E0);
-      font-size: 14px;
-    }
-
-    .table-wrap td {
-      padding: 16px 12px;
-      border-bottom: 1px solid var(--border-color, #E0E0E0);
-      font-size: 14px;
-      vertical-align: top;
-    }
-
-    .table-wrap tr:hover {
-      background: var(--background-light, #F8F9FA);
-    }
-
-    .table-wrap tr:last-child td {
-      border-bottom: none;
-    }
-
-    /* Skeleton loader */
-    .skeleton {
-      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s infinite;
-      height: 200px;
-      border-radius: 8px;
-    }
-
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
-    /* Estados de texto */
-    .muted {
-      color: var(--text-muted, #6B7280);
-      font-size: 14px;
-      padding: 40px;
-      text-align: center;
-      font-style: italic;
-    }
-
-    /* Acciones en filas */
-    .row-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .icon-btn {
-      background: none;
-      border: 1px solid var(--border-color, #E0E0E0);
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 12px;
-      color: var(--text-dark, #1A1A1A);
-      transition: all 0.2s ease;
-    }
-
-    .icon-btn:hover {
-      background: var(--background-light, #F8F9FA);
-      border-color: var(--primary-blue, #1E4D8B);
-      color: var(--primary-blue, #1E4D8B);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      .card-head {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-
-      .card-actions {
-        width: 100%;
-      }
-
-      .card-actions input {
-        flex: 1;
-      }
-
-      .tabs {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .tab {
-        white-space: nowrap;
-        min-width: 140px;
-      }
-    }
-  </style>
+/* Modales */
+dialog::backdrop{ background:rgba(0,0,0,.32); }
+dialog{ border:0; border-radius:14px; padding:0; box-shadow:0 24px 50px rgba(2,6,23,.3); }
+.modal{ background:#fff; border-radius:14px; overflow:hidden; }
+.modal.large{ max-width:800px; width:92vw; }
+.modal-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:#fafbfc; border-bottom:1px solid var(--border-2); }
+.modal-head h3{ margin:0; font-size:1.1rem; font-weight:800; color:#0f172a; }
+.icon{ background:none; border:0; font-size:1.2rem; cursor:pointer; color:var(--muted); padding:6px; border-radius:6px; }
+.icon:hover{ background:#f1f5f9; color:#0f172a; }
+.modal-body{ padding:16px; }
+.modal-foot{ display:flex; justify-content:flex-end; gap:10px; padding:14px 16px; border-top:1px solid var(--border-2); }
+.resumen-orden{ background:#f8fafc; border:1px solid var(--border-2); border-radius:10px; padding:16px; margin-bottom:16px; }
+.resumen-orden h4{ margin:0 0 12px; color:var(--blue-700); font-size:1rem; font-weight:800; }
+.resumen-row{ display:flex; justify-content:space-between; padding:6px 0; }
+.resumen-row span:first-child{ color:var(--muted); font-weight:600; }
+.resumen-row:last-child{ border-top:2px solid var(--border-2); margin-top:10px; padding-top:10px; color:var(--blue-700); font-weight:800; }
+.detalle-grid{ display:grid; grid-template-columns:1fr; gap:18px; }
+@media (min-width:820px){ .detalle-grid{ grid-template-columns:1fr 2fr; } }
+.info-section,.servicios-section{ background:#f8fafc; border:1px solid var(--border-2); border-radius:10px; padding:16px; }
+.info-section h4,.servicios-section h4{ margin:0 0 10px; color:var(--blue-700); font-size:1rem; font-weight:800; border-bottom:2px solid var(--blue-500); padding-bottom:6px; }
+.totales-section{ margin-top:10px; padding-top:10px; border-top:2px solid var(--border-2); }
+.totales-row{ display:flex; justify-content:space-between; padding:6px 0; }
+.totales-row.total-final{ background:var(--blue-700); color:#fff; border-radius:8px; padding:10px 12px; font-weight:900; }
+</style>
 
   <script>
     // Función de logout
     function _hardLogout() {
       try {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       } finally {
-        location.replace('/');
+        location.replace("/");
       }
     }
     window.logout = _hardLogout;
 
     // Verificación de autenticación
-    document.addEventListener('click', (e) => {
-      const b = e.target.closest('#btnLogout');
+    document.addEventListener("click", (e) => {
+      const b = e.target.closest("#btnLogout");
       if (!b) return;
       e.preventDefault();
       _hardLogout();
@@ -531,13 +358,13 @@ import Layout from '../../layouts/Layout.astro';
 
     // Inicialización
     (async () => {
-      const token = localStorage.getItem('token');
-      const user = localStorage.getItem('user');
+      const token = localStorage.getItem("token");
+      const user = localStorage.getItem("user");
       if (!token || !user) return _hardLogout();
 
       try {
-        const response = await fetch('/api/auth/verify', {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await fetch("/api/auth/verify", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         const result = await response.json().catch(() => ({}));
         if (!response.ok || !result?.success) return _hardLogout();
@@ -546,63 +373,64 @@ import Layout from '../../layouts/Layout.astro';
       }
 
       const userData = JSON.parse(user);
-      if (userData.rol !== 'admin') return _hardLogout();
-      
-      const welcomeEl = document.getElementById('userWelcome');
+      if (userData.rol !== "admin") return _hardLogout();
+
+      const welcomeEl = document.getElementById("userWelcome");
       if (welcomeEl) welcomeEl.textContent = `Bienvenido, ${userData.nombre}`;
-      
+
       await loadKPIs();
       await loadOrdenesPendientes();
       setupTabs();
     })();
 
     // Formateo de moneda
-    const money = new Intl.NumberFormat('es-EC', {
-      style: 'currency',
-      currency: 'USD'
+    const money = new Intl.NumberFormat("es-EC", {
+      style: "currency",
+      currency: "USD",
     });
 
     // Cargar KPIs
     async function loadKPIs() {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       try {
-        const response = await fetch('/api/facturas/kpis', {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await fetch("/api/facturas/kpis", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         const result = await response.json();
-        
+
         if (result.success) {
           const { hoy, mes, num } = result.data;
-          const kpiHoy = document.getElementById('kpiHoy');
-          const kpiMes = document.getElementById('kpiMes');
-          const kpiNum = document.getElementById('kpiNum');
-          
+          const kpiHoy = document.getElementById("kpiHoy");
+          const kpiMes = document.getElementById("kpiMes");
+          const kpiNum = document.getElementById("kpiNum");
+
           if (kpiHoy) kpiHoy.textContent = money.format(hoy || 0);
           if (kpiMes) kpiMes.textContent = money.format(mes || 0);
           if (kpiNum) kpiNum.textContent = String(num || 0);
         }
       } catch (error) {
-        console.error('Error al cargar KPIs:', error);
+        console.error("Error al cargar KPIs:", error);
       }
     }
 
     // Cargar órdenes pendientes
     async function loadOrdenesPendientes() {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       try {
-        const response = await fetch('/api/facturas/ordenes-pendientes', {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await fetch("/api/facturas/ordenes-pendientes", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         const result = await response.json();
-        
-        const wrap = document.getElementById('wrapOrdenes');
-        const contador = document.getElementById('contadorPendientes');
-        
+
+        const wrap = document.getElementById("wrapOrdenes");
+        const contador = document.getElementById("contadorPendientes");
+
         if (!wrap) return;
-        
+
         if (!result.success || !result.data.length) {
-          wrap.innerHTML = '<div class="muted">No hay órdenes pendientes de facturación</div>';
-          if (contador) contador.textContent = '0';
+          wrap.innerHTML =
+            '<div class="muted">No hay órdenes pendientes de facturación</div>';
+          if (contador) contador.textContent = "0";
           return;
         }
 
@@ -623,7 +451,9 @@ import Layout from '../../layouts/Layout.astro';
               </tr>
             </thead>
             <tbody>
-              ${ordenes.map(orden => `
+              ${ordenes
+                .map(
+                  (orden) => `
                 <tr>
                   <td>#${orden.id}</td>
                   <td>
@@ -636,36 +466,39 @@ import Layout from '../../layouts/Layout.astro';
                   </td>
                   <td>${orden.num_servicios} servicio(s)</td>
                   <td><strong>${money.format(orden.total)}</strong></td>
-                  <td>${new Date(orden.fecha_ingreso).toLocaleDateString('es-EC')}</td>
+                  <td>${new Date(orden.fecha_ingreso).toLocaleDateString("es-EC")}</td>
                   <td>
                     <button class="btn-facturar" data-orden="${orden.id}">
                       Facturar
                     </button>
                   </td>
                 </tr>
-              `).join('')}
+              `
+                )
+                .join("")}
             </tbody>
           </table>
         `;
       } catch (error) {
-        console.error('Error al cargar órdenes pendientes:', error);
-        const wrap = document.getElementById('wrapOrdenes');
-        if (wrap) wrap.innerHTML = '<div class="muted">Error al cargar órdenes</div>';
+        console.error("Error al cargar órdenes pendientes:", error);
+        const wrap = document.getElementById("wrapOrdenes");
+        if (wrap)
+          wrap.innerHTML = '<div class="muted">Error al cargar órdenes</div>';
       }
     }
 
     // Cargar facturas emitidas
     async function loadFacturas() {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       try {
-        const response = await fetch('/api/facturas', {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await fetch("/api/facturas", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         const result = await response.json();
-        
-        const wrap = document.getElementById('wrapFacturas');
+
+        const wrap = document.getElementById("wrapFacturas");
         if (!wrap) return;
-        
+
         if (!result.success || !result.data.length) {
           wrap.innerHTML = '<div class="muted">No hay facturas emitidas</div>';
           return;
@@ -686,7 +519,9 @@ import Layout from '../../layouts/Layout.astro';
               </tr>
             </thead>
             <tbody>
-              ${facturas.map(factura => `
+              ${facturas
+                .map(
+                  (factura) => `
                 <tr>
                   <td><strong>${factura.numero_factura}</strong></td>
                   <td>
@@ -698,7 +533,7 @@ import Layout from '../../layouts/Layout.astro';
                     <small class="muted">${factura.placa}</small>
                   </td>
                   <td><strong>${money.format(factura.total)}</strong></td>
-                  <td>${new Date(factura.fecha_emision).toLocaleDateString('es-EC')}</td>
+                  <td>${new Date(factura.fecha_emision).toLocaleDateString("es-EC")}</td>
                   <td>
                     <div class="row-actions">
                       <button class="icon-btn" data-detalle="${factura.id}">👁️ Ver</button>
@@ -706,37 +541,40 @@ import Layout from '../../layouts/Layout.astro';
                     </div>
                   </td>
                 </tr>
-              `).join('')}
+              `
+                )
+                .join("")}
             </tbody>
           </table>
         `;
       } catch (error) {
-        console.error('Error al cargar facturas:', error);
-        const wrap = document.getElementById('wrapFacturas');
-        if (wrap) wrap.innerHTML = '<div class="muted">Error al cargar facturas</div>';
+        console.error("Error al cargar facturas:", error);
+        const wrap = document.getElementById("wrapFacturas");
+        if (wrap)
+          wrap.innerHTML = '<div class="muted">Error al cargar facturas</div>';
       }
     }
 
     // Setup de pestañas
     function setupTabs() {
-      const tabs = document.querySelectorAll('.tab');
-      const contents = document.querySelectorAll('.tab-content');
+      const tabs = document.querySelectorAll(".tab");
+      const contents = document.querySelectorAll(".tab-content");
 
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
           const targetTab = tab.dataset.tab;
-          
+
           // Remover clase active de todas las pestañas y contenidos
-          tabs.forEach(t => t.classList.remove('active'));
-          contents.forEach(c => c.classList.remove('active'));
-          
+          tabs.forEach((t) => t.classList.remove("active"));
+          contents.forEach((c) => c.classList.remove("active"));
+
           // Agregar clase active a la pestaña clickeada y su contenido
-          tab.classList.add('active');
+          tab.classList.add("active");
           const targetContent = document.getElementById(`tab-${targetTab}`);
-          if (targetContent) targetContent.classList.add('active');
-          
+          if (targetContent) targetContent.classList.add("active");
+
           // Cargar contenido si es necesario
-          if (targetTab === 'facturas') {
+          if (targetTab === "facturas") {
             loadFacturas();
           }
         });
@@ -744,22 +582,22 @@ import Layout from '../../layouts/Layout.astro';
     }
 
     // Event listeners para facturación
-    document.addEventListener('click', async (e) => {
-      const btnFacturar = e.target.closest('[data-orden]');
+    document.addEventListener("click", async (e) => {
+      const btnFacturar = e.target.closest("[data-orden]");
       if (btnFacturar) {
         const ordenId = btnFacturar.dataset.orden;
         if (ordenId) await mostrarModalFacturar(ordenId);
         return;
       }
 
-      const btnDetalle = e.target.closest('[data-detalle]');
+      const btnDetalle = e.target.closest("[data-detalle]");
       if (btnDetalle) {
         const facturaId = btnDetalle.dataset.detalle;
         if (facturaId) await mostrarDetalleFactura(facturaId);
         return;
       }
 
-      const btnPdf = e.target.closest('[data-pdf]');
+      const btnPdf = e.target.closest("[data-pdf]");
       if (btnPdf) {
         const facturaId = btnPdf.dataset.pdf;
         if (facturaId) generarPdfFactura(facturaId);
@@ -771,37 +609,37 @@ import Layout from '../../layouts/Layout.astro';
     let ordenActual = null;
 
     async function mostrarModalFacturar(ordenId) {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       try {
         // Obtener detalles de la orden
         const response = await fetch(`/api/ordenes/${ordenId}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         const result = await response.json();
-        
+
         if (!result.success) {
-          alert('Error al cargar detalles de la orden');
+          alert("Error al cargar detalles de la orden");
           return;
         }
 
         ordenActual = result.data;
-        
+
         // Debug: ver qué datos estamos recibiendo
-        console.log('Datos de la orden:', ordenActual);
-        
+        console.log("Datos de la orden:", ordenActual);
+
         // Mostrar resumen en el modal
-        const resumenEl = document.getElementById('resumenOrden');
+        const resumenEl = document.getElementById("resumenOrden");
         if (resumenEl) {
           resumenEl.innerHTML = `
             <div class="resumen-orden">
               <h4>Orden #${ordenActual.id}</h4>
               <div class="resumen-row">
                 <span>Cliente:</span>
-                <span>${ordenActual.cliente_nombre || 'No disponible'}</span>
+                <span>${ordenActual.cliente_nombre || "No disponible"}</span>
               </div>
               <div class="resumen-row">
                 <span>Vehículo:</span>
-                <span>${ordenActual.marca || 'No disponible'} (${ordenActual.placa || 'No disponible'})</span>
+                <span>${ordenActual.marca || "No disponible"} (${ordenActual.placa || "No disponible"})</span>
               </div>
               <div class="resumen-row">
                 <span>Subtotal:</span>
@@ -818,37 +656,42 @@ import Layout from '../../layouts/Layout.astro';
             </div>
           `;
         }
-        
-        const modal = document.getElementById('modalFacturar');
+
+        const modal = document.getElementById("modalFacturar");
         if (modal && modal.showModal) modal.showModal();
       } catch (error) {
-        console.error('Error:', error);
-        alert('Error al cargar detalles de la orden');
+        console.error("Error:", error);
+        alert("Error al cargar detalles de la orden");
       }
     }
 
     async function mostrarDetalleFactura(facturaId) {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         const response = await fetch(`/api/facturas/detalle/${facturaId}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.ok) {
           const result = await response.json();
           const factura = result.data;
-          
+
           // Llenar el modal con los datos de la factura
-          document.getElementById('facturaNumero').textContent = factura.numero_factura;
-          document.getElementById('facturaFecha').textContent = new Date(factura.fecha_emision).toLocaleDateString();
-          document.getElementById('facturaCliente').textContent = factura.cliente_nombre;
-          document.getElementById('facturaVehiculo').textContent = `${factura.marca} (${factura.placa})`;
-          
+          document.getElementById("facturaNumero").textContent =
+            factura.numero_factura;
+          document.getElementById("facturaFecha").textContent = new Date(
+            factura.fecha_emision
+          ).toLocaleDateString();
+          document.getElementById("facturaCliente").textContent =
+            factura.cliente_nombre;
+          document.getElementById("facturaVehiculo").textContent =
+            `${factura.marca} (${factura.placa})`;
+
           // Mostrar detalles de servicios
-          let detallesHtml = '';
+          let detallesHtml = "";
           let subtotal = 0;
-          
-          factura.detalles.forEach(detalle => {
+
+          factura.detalles.forEach((detalle) => {
             const cantidad = parseInt(detalle.cantidad) || 0;
             const precioUnitario = parseFloat(detalle.precio_unitario) || 0;
             const total = cantidad * precioUnitario;
@@ -862,334 +705,145 @@ import Layout from '../../layouts/Layout.astro';
               </tr>
             `;
           });
-          
+
           const iva = subtotal * 0.15;
           const total = subtotal + iva;
-          
-          document.getElementById('detalleServicios').innerHTML = detallesHtml;
-          document.getElementById('facturaSubtotal').textContent = `$${subtotal.toFixed(2)}`;
-          document.getElementById('facturaIva').textContent = `$${iva.toFixed(2)}`;
-          document.getElementById('facturaTotal').textContent = `$${total.toFixed(2)}`;
-          
+
+          document.getElementById("detalleServicios").innerHTML = detallesHtml;
+          document.getElementById("facturaSubtotal").textContent =
+            `$${subtotal.toFixed(2)}`;
+          document.getElementById("facturaIva").textContent =
+            `$${iva.toFixed(2)}`;
+          document.getElementById("facturaTotal").textContent =
+            `$${total.toFixed(2)}`;
+
           // Mostrar el modal
-          const modal = document.getElementById('modalDetalleFactura');
+          const modal = document.getElementById("modalDetalleFactura");
           if (modal && modal.showModal) modal.showModal();
         } else {
-          alert('Error al cargar los detalles de la factura');
+          alert("Error al cargar los detalles de la factura");
         }
       } catch (error) {
-        console.error('Error:', error);
-        alert('Error al cargar los detalles de la factura');
+        console.error("Error:", error);
+        alert("Error al cargar los detalles de la factura");
       }
     }
 
     function generarPdfFactura(facturaId) {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         const url = `/api/facturas/pdf/${facturaId}`;
-        
+
         // Abrir el PDF en una nueva ventana
-        const ventanaPdf = window.open('', '_blank');
+        const ventanaPdf = window.open("", "_blank");
         if (ventanaPdf) {
-          ventanaPdf.document.write('<div style="text-align: center; padding: 50px;">Generando PDF...</div>');
-          
+          ventanaPdf.document.write(
+            '<div style="text-align: center; padding: 50px;">Generando PDF...</div>'
+          );
+
           fetch(url, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           })
-          .then(response => {
-            if (response.ok) {
-              return response.text();
-            }
-            throw new Error('Error al generar PDF');
-          })
-          .then(html => {
-            ventanaPdf.document.open();
-            ventanaPdf.document.write(html);
-            ventanaPdf.document.close();
-            
-            // Agregar función de impresión automática
-            ventanaPdf.onload = () => {
-              setTimeout(() => {
-                ventanaPdf.print();
-              }, 500);
-            };
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            ventanaPdf.document.write('<div style="text-align: center; padding: 50px; color: red;">Error al generar el PDF</div>');
-          });
+            .then((response) => {
+              if (response.ok) {
+                return response.text();
+              }
+              throw new Error("Error al generar PDF");
+            })
+            .then((html) => {
+              ventanaPdf.document.open();
+              ventanaPdf.document.write(html);
+              ventanaPdf.document.close();
+
+              // Agregar función de impresión automática
+              ventanaPdf.onload = () => {
+                setTimeout(() => {
+                  ventanaPdf.print();
+                }, 500);
+              };
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              ventanaPdf.document.write(
+                '<div style="text-align: center; padding: 50px; color: red;">Error al generar el PDF</div>'
+              );
+            });
         } else {
-          alert('No se pudo abrir la ventana del PDF. Verifique que no esté bloqueada por el navegador.');
+          alert(
+            "No se pudo abrir la ventana del PDF. Verifique que no esté bloqueada por el navegador."
+          );
         }
       } catch (error) {
-        console.error('Error al generar PDF:', error);
-        alert('Error al generar el PDF');
+        console.error("Error al generar PDF:", error);
+        alert("Error al generar el PDF");
       }
     }
 
     // Confirmar facturación
-    const btnConfirmar = document.getElementById('btnConfirmarFactura');
+    const btnConfirmar = document.getElementById("btnConfirmarFactura");
     if (btnConfirmar) {
-      btnConfirmar.addEventListener('click', async () => {
+      btnConfirmar.addEventListener("click", async () => {
         if (!ordenActual) return;
-        
-        const token = localStorage.getItem('token');
+
+        const token = localStorage.getItem("token");
         const tipoSelect = document.querySelector('[name="tipo_factura"]');
-        const tipoFactura = tipoSelect ? tipoSelect.value : 'general';
-        
+        const tipoFactura = tipoSelect ? tipoSelect.value : "general";
+
         try {
-          const response = await fetch(`/api/facturas/desde-orden/${ordenActual.id}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ tipo_factura: tipoFactura })
-          });
-          
+          const response = await fetch(
+            `/api/facturas/desde-orden/${ordenActual.id}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ tipo_factura: tipoFactura }),
+            }
+          );
+
           const result = await response.json();
-          
+
           if (result.success) {
             alert(`Factura ${result.numero_factura} generada exitosamente`);
-            const modal = document.getElementById('modalFacturar');
+            const modal = document.getElementById("modalFacturar");
             if (modal && modal.close) modal.close();
             await loadKPIs();
             await loadOrdenesPendientes();
           } else {
-            alert(result.message || 'Error al generar factura');
+            alert(result.message || "Error al generar factura");
           }
         } catch (error) {
-          console.error('Error:', error);
-          alert('Error al generar factura');
+          console.error("Error:", error);
+          alert("Error al generar factura");
         }
       });
     }
 
     // Cerrar modales
-    const closeFacturar = document.getElementById('closeFacturar');
+    const closeFacturar = document.getElementById("closeFacturar");
     if (closeFacturar) {
-      closeFacturar.addEventListener('click', () => {
-        const modal = document.getElementById('modalFacturar');
+      closeFacturar.addEventListener("click", () => {
+        const modal = document.getElementById("modalFacturar");
         if (modal && modal.close) modal.close();
       });
     }
 
-    const closeDetalle = document.getElementById('closeDetalle');
+    const closeDetalle = document.getElementById("closeDetalle");
     if (closeDetalle) {
-      closeDetalle.addEventListener('click', () => {
-        const modal = document.getElementById('modalDetalleFactura');
+      closeDetalle.addEventListener("click", () => {
+        const modal = document.getElementById("modalDetalleFactura");
         if (modal && modal.close) modal.close();
       });
     }
 
-    const btnCerrarDetalle = document.getElementById('btnCerrarDetalle');
+    const btnCerrarDetalle = document.getElementById("btnCerrarDetalle");
     if (btnCerrarDetalle) {
-      btnCerrarDetalle.addEventListener('click', () => {
-        const modal = document.getElementById('modalDetalleFactura');
+      btnCerrarDetalle.addEventListener("click", () => {
+        const modal = document.getElementById("modalDetalleFactura");
         if (modal && modal.close) modal.close();
       });
     }
   </script>
-
-  <style>
-    /* Estilos del header - copiados de la página de órdenes */
-    .navbar {
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-      color: white;
-      padding: 1rem 0;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .logo-circle {
-      width: 40px;
-      height: 40px;
-      background: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-    }
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .user-chip {
-      background: rgba(255,255,255,0.2);
-      padding: 0.5rem 1rem;
-      border-radius: 1rem;
-      font-size: 0.9rem;
-    }
-    .page {
-      padding: 2rem 0;
-      min-height: calc(100vh - 80px);
-      background: #f8fafc;
-    }
-
-    /* Estilos de la sección de KPIs */
-    .section {
-      margin: 2rem 0;
-    }
-
-    .section-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: var(--color-text);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .section-title::before {
-      content: "📊";
-      font-size: 1.5rem;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .kpi-card {
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      border-radius: 12px;
-      padding: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .kpi-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .kpi-icon {
-      font-size: 2.5rem;
-      line-height: 1;
-      opacity: 0.8;
-    }
-
-    .kpi-value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      margin: 0 0 0.25rem 0;
-      color: var(--color-text);
-    }
-
-    .kpi-label {
-      font-size: 0.875rem;
-      color: var(--color-text-muted);
-      margin: 0;
-      font-weight: 500;
-    }
-
-    .kpi-orange {
-      border-left: 4px solid var(--color-orange);
-    }
-
-    .kpi-amber {
-      border-left: 4px solid #f59e0b;
-    }
-
-    .kpi-green {
-      border-left: 4px solid #10b981;
-    }
-
-    .tabs-wrapper {
-      margin-top: 2rem;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    @media (max-width: 768px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-      
-      .kpi-card {
-        padding: 1rem;
-      }
-    }
-
-    /* Estilos para el modal de detalle de factura */
-    .detalle-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-
-    .info-section, .servicios-section {
-      background: #f8fafc;
-      padding: 1.5rem;
-      border-radius: 8px;
-      border: 1px solid #e5e7eb;
-    }
-
-    .info-section h4, .servicios-section h4 {
-      margin: 0 0 1rem 0;
-      color: #1e3a8a;
-      font-size: 1.1rem;
-      font-weight: 600;
-      border-bottom: 2px solid #3b82f6;
-      padding-bottom: 0.5rem;
-    }
-
-    .info-section p {
-      margin: 0.5rem 0;
-      font-size: 0.95rem;
-    }
-
-    .info-section strong {
-      color: #374151;
-      margin-right: 0.5rem;
-    }
-
-    .totales-section {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 2px solid #e5e7eb;
-    }
-
-    .totales-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.5rem 0;
-      font-size: 1rem;
-    }
-
-    .totales-row.total-final {
-      background: #1e3a8a;
-      color: white;
-      padding: 0.75rem 1rem;
-      border-radius: 6px;
-      margin-top: 0.5rem;
-      font-size: 1.1rem;
-    }
-
-    .modal.large {
-      max-width: 800px;
-      width: 90vw;
-    }
-
-    @media (min-width: 768px) {
-      .detalle-grid {
-        grid-template-columns: 1fr 2fr;
-      }
-    }
-  </style>
+  
 </Layout>
