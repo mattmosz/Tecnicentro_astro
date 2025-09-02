@@ -424,9 +424,14 @@ import Layout from '../../layouts/Layout.astro';
         justify-content: flex-start;
       }
     }
+    
   </style>
   <style is:global>
 /* ===== VEHÍCULOS – fuerzas globales sobre la tabla del listado ===== */
+/* Encabezados de la tabla alineados a la izquierda */
+main.page .card .card-body #wrapTable thead th {
+  text-align: left !important;
+}
 
 /* Layout básico + separación entre filas */
 main.page .card .card-body #wrapTable table{
@@ -470,9 +475,10 @@ main.page .card .card-body #wrapTable tbody td:first-child{
 main.page .card .card-body #wrapTable tbody td:last-child{
   border-top-right-radius:12px !important;
   border-bottom-right-radius:12px !important;
-  text-align:right !important;
+  text-align:left !important;    /* 👈 ahora a la izquierda */
   white-space:nowrap !important;
 }
+
 
 /* Anchos de columnas (ajusta si quieres) */
 main.page .card .card-body #wrapTable thead th:nth-child(1){ width:130px !important; } /* Placa */
@@ -540,6 +546,7 @@ main.page .card .card-body #wrapTable .row-actions button:last-child:hover{
   main.page .card .card-body #wrapTable thead th:nth-child(2){ width:140px !important; }
   main.page .card .card-body #wrapTable thead th:nth-child(3){ width:200px !important; }
 }
+
 </style>
 
 
@@ -654,7 +661,7 @@ main.page .card .card-body #wrapTable .row-actions button:last-child:hover{
       wrap.innerHTML = `
         <table>
           <thead><tr>
-            <th>Placa</th><th>Marca</th><th>Cliente</th><th>Kilometraje</th><th></th>
+            <th>Placa</th><th>Marca</th><th>Cliente</th><th>Kilometraje</th><th>Acciones</th>
           </tr></thead>
           <tbody>
             ${items.map(v => `

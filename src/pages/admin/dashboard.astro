@@ -1,5 +1,5 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from "../../layouts/Layout.astro";
 ---
 
 <Layout title="Panel Administrativo - TecniCentro Ibarra Express">
@@ -77,12 +77,36 @@ import Layout from '../../layouts/Layout.astro';
       <section class="section">
         <h2 class="section-title">Módulos del Sistema</h2>
         <nav class="nav-grid">
-          <a href="/admin/clientes"   class="nav-card tone-blue"><div class="nav-icon">👥</div><h3>Gestión de Clientes</h3><p>Administrar información de clientes y contactos</p></a>
-          <a href="/admin/vehiculos"  class="nav-card tone-green"><div class="nav-icon">🚗</div><h3>Gestión de Vehículos</h3><p>Registro y seguimiento de vehículos</p></a>
-          <a href="/admin/servicios"  class="nav-card tone-orange"><div class="nav-icon">🔧</div><h3>Servicios del Taller</h3><p>Catálogo de servicios y tarifas</p></a>
-          <a href="/admin/ordenes"    class="nav-card tone-amber"><div class="nav-icon">📋</div><h3>Órdenes de Trabajo</h3><p>Gestión de órdenes y asignaciones</p></a>
-          <a href="/admin/facturas"   class="nav-card tone-cyan"><div class="nav-icon">🧾</div><h3>Facturación</h3><p>Emisión y control de facturas</p></a>
-          <a href="/admin/reportes"   class="nav-card tone-slate"><div class="nav-icon">📊</div><h3>Reportes y Análisis</h3><p>Estadísticas y reportes del negocio</p></a>
+          <a href="/admin/clientes" class="nav-card tone-blue"
+            ><div class="nav-icon">👥</div><h3>Gestión de Clientes</h3><p>
+              Administrar información de clientes y contactos
+            </p></a
+          >
+          <a href="/admin/vehiculos" class="nav-card tone-green"
+            ><div class="nav-icon">🚗</div><h3>Gestión de Vehículos</h3><p>
+              Registro y seguimiento de vehículos
+            </p></a
+          >
+          <a href="/admin/servicios" class="nav-card tone-orange"
+            ><div class="nav-icon">🔧</div><h3>Servicios del Taller</h3><p>
+              Catálogo de servicios y tarifas
+            </p></a
+          >
+          <a href="/admin/ordenes" class="nav-card tone-amber"
+            ><div class="nav-icon">📋</div><h3>Órdenes de Trabajo</h3><p>
+              Gestión de órdenes y asignaciones
+            </p></a
+          >
+          <a href="/admin/facturas" class="nav-card tone-cyan"
+            ><div class="nav-icon">🧾</div><h3>Facturación</h3><p>
+              Emisión y control de facturas
+            </p></a
+          >
+          <a href="/admin/reportes" class="nav-card tone-slate"
+            ><div class="nav-icon">📊</div><h3>Reportes y Análisis</h3><p>
+              Estadísticas y reportes del negocio
+            </p></a
+          >
         </nav>
       </section>
 
@@ -113,124 +137,635 @@ import Layout from '../../layouts/Layout.astro';
   </main>
 
   <style>
-    :root{
-      --bg:#f6f8fb;
-      --card:#fff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --blue:#1e40af;
-      --blue-500:#3b82f6;
-      --green-500:#22c55e;
-      --amber-500:#f59e0b;
-      --orange-500:#fb923c;
-      --cyan-500:#06b6d4;
-      --slate-500:#64748b;
-      --ring: 0 1px 2px rgba(0,0,0,.04), 0 10px 20px rgba(2,6,23,.08);
-      --radius:16px;
-      --container:1200px;
+    :root {
+      --bg: #f6f8fb;
+      --card: #fff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --blue: #1e40af;
+      --blue-500: #3b82f6;
+      --green-500: #22c55e;
+      --amber-500: #f59e0b;
+      --orange-500: #fb923c;
+      --cyan-500: #06b6d4;
+      --slate-500: #64748b;
+      --ring: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 20px rgba(2, 6, 23, 0.08);
+      --radius: 16px;
+      --container: 1200px;
     }
 
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-    .muted{color:var(--muted)}
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .muted {
+      color: var(--muted);
+    }
 
-    body{background:var(--bg)}
-    .container{max-width:var(--container);margin-inline:auto;padding:0 20px}
+    body {
+      background: var(--bg);
+    }
+    .container {
+      max-width: var(--container);
+      margin-inline: auto;
+      padding: 0 20px;
+    }
 
     /* Navbar fija */
-    .navbar{position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid #eef2f7;z-index:20}
-    .navbar .container{display:flex;align-items:center;justify-content:space-between;height:64px}
-    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700}
-    .logo-circle{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--orange-500),#ffb07a);box-shadow:var(--ring)}
-    .brand-text{letter-spacing:.2px}
+    .navbar {
+      position: sticky;
+      top: 0;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: saturate(180%) blur(10px);
+      border-bottom: 1px solid #eef2f7;
+      z-index: 20;
+    }
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+    }
+    .logo-circle {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--orange-500), #ffb07a);
+      box-shadow: var(--ring);
+    }
+    .brand-text {
+      letter-spacing: 0.2px;
+    }
 
-    .user-menu{display:flex;align-items:center;gap:12px}
-    .user-chip{font-weight:600;color:var(--text)}
-    .btn{border:0;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
-    .btn-outline{background:#fff;border:1px solid #e5e7eb}
-    .btn-outline:hover{box-shadow:var(--ring)}
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-chip {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-outline {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+    }
+    .btn-outline:hover {
+      box-shadow: var(--ring);
+    }
 
-    .page{padding:24px 0 48px}
+    .page {
+      padding: 24px 0 48px;
+    }
 
     /* Header */
-    .dashboard-header{display:flex;align-items:end;justify-content:space-between;margin:16px 0 24px}
-    .dashboard-header h1{margin:0;font-size:28px;color:var(--text)}
+    .dashboard-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      margin: 16px 0 24px;
+    }
+    .dashboard-header h1 {
+      margin: 0;
+      font-size: 28px;
+      color: var(--text);
+    }
 
     /* KPIs */
-    .stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
-    .kpi-card{display:flex;gap:14px;align-items:center;background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--ring);position:relative;overflow:hidden}
-    .kpi-card::after{content:"";position:absolute;inset:auto 0 0 0;height:4px}
-    .kpi-blue::after{background:linear-gradient(90deg,var(--blue),var(--blue-500))}
-    .kpi-green::after{background:linear-gradient(90deg,#16a34a,var(--green-500))}
-    .kpi-amber::after{background:linear-gradient(90deg,#d97706,var(--amber-500))}
-    .kpi-orange::after{background:linear-gradient(90deg,#f97316,var(--orange-500))}
-    .kpi-icon{font-size:28px}
-    .kpi-value{margin:0;font-size:28px;line-height:1.1}
-    .kpi-label{margin:2px 0 0;color:var(--muted);font-size:13px}
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .kpi-card {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--ring);
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 4px;
+    }
+    .kpi-blue::after {
+      background: linear-gradient(90deg, var(--blue), var(--blue-500));
+    }
+    .kpi-green::after {
+      background: linear-gradient(90deg, #16a34a, var(--green-500));
+    }
+    .kpi-amber::after {
+      background: linear-gradient(90deg, #d97706, var(--amber-500));
+    }
+    .kpi-orange::after {
+      background: linear-gradient(90deg, #f97316, var(--orange-500));
+    }
+    .kpi-icon {
+      font-size: 28px;
+    }
+    .kpi-value {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.1;
+    }
+    .kpi-label {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
 
     /* Módulos */
-    .section{margin:28px 0}
-    .section-title{text-align:center;margin:0 0 18px;color:var(--text);font-size:22px}
-    .nav-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
-    .nav-card{display:flex;flex-direction:column;gap:6px;min-height:150px;background:var(--card);border-radius:var(--radius);padding:18px;text-decoration:none;color:var(--text);box-shadow:var(--ring);transition:transform .2s ease}
-    .nav-card:hover{transform:translateY(-4px)}
-    .nav-icon{font-size:26px;opacity:.9;margin-bottom:6px}
-    .nav-card h3{margin:0 0 4px;font-size:18px}
-    .nav-card p{margin:0;color:var(--muted);font-size:13px}
-    .tone-blue{border-top:3px solid var(--blue-500)}
-    .tone-green{border-top:3px solid var(--green-500)}
-    .tone-amber{border-top:3px solid var(--amber-500)}
-    .tone-orange{border-top:3px solid var(--orange-500)}
-    .tone-cyan{border-top:3px solid var(--cyan-500)}
-    .tone-slate{border-top:3px solid var(--slate-500)}
+    .section {
+      margin: 28px 0;
+    }
+    .section-title {
+      text-align: center;
+      margin: 0 0 18px;
+      color: var(--text);
+      font-size: 22px;
+    }
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .nav-card {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 150px;
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 18px;
+      text-decoration: none;
+      color: var(--text);
+      box-shadow: var(--ring);
+      transition: transform 0.2s ease;
+    }
+    .nav-card:hover {
+      transform: translateY(-4px);
+    }
+    .nav-icon {
+      font-size: 26px;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+    .nav-card h3 {
+      margin: 0 0 4px;
+      font-size: 18px;
+    }
+    .nav-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .tone-blue {
+      border-top: 3px solid var(--blue-500);
+    }
+    .tone-green {
+      border-top: 3px solid var(--green-500);
+    }
+    .tone-amber {
+      border-top: 3px solid var(--amber-500);
+    }
+    .tone-orange {
+      border-top: 3px solid var(--orange-500);
+    }
+    .tone-cyan {
+      border-top: 3px solid var(--cyan-500);
+    }
+    .tone-slate {
+      border-top: 3px solid var(--slate-500);
+    }
 
     /* Actividad */
-    .activity{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--ring);overflow:hidden}
-    .card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eef2f7}
-    .card-head h3{margin:0;font-size:16px}
-    .card-body{padding:10px 16px 16px}
+    .activity {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--ring);
+      overflow: hidden;
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid #eef2f7;
+    }
+    .card-head h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+    .card-body {
+      padding: 10px 16px 16px;
+    }
 
-    table{width:100%;border-collapse:separate;border-spacing:0}
-    thead th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);text-align:left;padding:10px}
-    tbody td{padding:12px 10px;border-top:1px solid #eef2f7}
-    tr:hover td{background:#fafafa}
-    .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
-    .badge-warning{background:#fff7ed;color:#c2410c}
-    .badge-primary{background:#eff6ff;color:#1e40af}
-    .badge-success{background:#ecfdf5;color:#065f46}
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    thead th {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      text-align: left;
+      padding: 10px;
+    }
+    tbody td {
+      padding: 12px 10px;
+      border-top: 1px solid #eef2f7;
+    }
+    tr:hover td {
+      background: #fafafa;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .badge-warning {
+      background: #fff7ed;
+      color: #c2410c;
+    }
+    .badge-primary {
+      background: #eff6ff;
+      color: #1e40af;
+    }
+    .badge-success {
+      background: #ecfdf5;
+      color: #065f46;
+    }
 
     /* Skeleton */
-    .skeleton{height:64px;border-radius:12px;background:linear-gradient(90deg,#f2f4f8 25%,#e6eaf1 37%,#f2f4f8 63%);background-size:400% 100%;animation:shimmer 1.2s infinite}
-    @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+    .skeleton {
+      height: 64px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #f2f4f8 25%, #e6eaf1 37%, #f2f4f8 63%);
+      background-size: 400% 100%;
+      animation: shimmer 1.2s infinite;
+    }
+    @keyframes shimmer {
+      0% {
+        background-position: 100% 0;
+      }
+      100% {
+        background-position: 0 0;
+      }
+    }
 
-    @media (max-width: 1024px){
-      .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .nav-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .activity{grid-template-columns:1fr}
+    @media (max-width: 1024px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .nav-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .activity {
+        grid-template-columns: 1fr;
+      }
     }
-    @media (max-width: 640px){
-      .stats-grid,.nav-grid{grid-template-columns:1fr}
-      .brand-text{display:none}
+    @media (max-width: 640px) {
+      .stats-grid,
+      .nav-grid {
+        grid-template-columns: 1fr;
+      }
+      .brand-text {
+        display: none;
+      }
     }
+  </style>
+  <style is:global>
+    /* ===== ACTIVIDAD RECIENTE COMO TARJETAS (Órdenes y Facturas) ===== */
+    #recentOrders table,
+    #recentFacturas table {
+      width: 100% !important;
+      border-collapse: separate !important;
+      border-spacing: 0 10px !important; /* aire entre filas */
+    }
+
+    #recentOrders thead th,
+    #recentFacturas thead th {
+      background: #fff !important;
+      font-size: 12px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.04em !important;
+      color: #64748b !important;
+      padding: 8px 10px !important;
+      border-bottom: 1px solid #eef2f7 !important;
+      text-align: left !important;
+    }
+
+    #recentOrders tbody tr,
+    #recentFacturas tbody tr {
+      background: transparent !important;
+    }
+
+    #recentOrders tbody td,
+    #recentFacturas tbody td {
+      background: #fff !important;
+      padding: 12px 10px !important;
+      border-top: none !important;
+      box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.04),
+        0 8px 18px rgba(2, 6, 23, 0.06) !important;
+      vertical-align: middle !important;
+    }
+
+    #recentOrders tbody tr:hover td,
+    #recentFacturas tbody tr:hover td {
+      background: #fcfcff !important;
+    }
+
+    /* redondeo de “tarjetas” por fila */
+    #recentOrders tbody td:first-child,
+    #recentFacturas tbody td:first-child {
+      border-top-left-radius: 12px !important;
+      border-bottom-left-radius: 12px !important;
+    }
+    #recentOrders tbody td:last-child,
+    #recentFacturas tbody td:last-child {
+      border-top-right-radius: 12px !important;
+      border-bottom-right-radius: 12px !important;
+    }
+
+    /* chips de estado */
+    #recentOrders .badge,
+    #recentFacturas .badge {
+      display: inline-block !important;
+      padding: 4px 10px !important;
+      border-radius: 999px !important;
+      font-size: 12px !important;
+      font-weight: 700 !important;
+    }
+    #recentOrders .badge-warning,
+    #recentFacturas .badge-warning {
+      background: #fff7ed !important;
+      color: #9a3412 !important;
+      border: 1px solid #fdba74 !important;
+    }
+    #recentOrders .badge-primary,
+    #recentFacturas .badge-primary {
+      background: #eff6ff !important;
+      color: #1e40af !important;
+      border: 1px solid #93c5fd !important;
+    }
+    #recentOrders .badge-success,
+    #recentFacturas .badge-success {
+      background: #ecfdf5 !important;
+      color: #065f46 !important;
+      border: 1px solid #86efac !important;
+    }
+
+    /* estado vacío bonito */
+    #recentOrders .muted,
+    #recentFacturas .muted {
+      border: 1px dashed #e5e7eb !important;
+      border-radius: 12px !important;
+      padding: 14px !important;
+      text-align: center !important;
+      background: #fafafa !important;
+    }
+
+    /* ================== MEJORAS VISUALES GLOBALES ================== */
+
+    /* 1) Tipografía y espaciado */
+    :root {
+      --font-sans: "Inter", system-ui, -apple-system, Segoe UI, Roboto,
+        sans-serif;
+      --leading: 1.55;
+      --tracking: 0.2px;
+      --elev-1: 0 1px 2px rgba(15, 23, 42, 0.06),
+        0 8px 20px rgba(2, 6, 23, 0.06);
+      --elev-2: 0 6px 14px rgba(15, 23, 42, 0.08),
+        0 20px 40px rgba(2, 6, 23, 0.1);
+      --radius: 16px;
+    }
+    body {
+      font-family: var(--font-sans);
+      letter-spacing: var(--tracking);
+      line-height: var(--leading);
+    }
+    h1 {
+      font-weight: 800;
+      font-size: clamp(24px, 2.3vw, 32px);
+      letter-spacing: 0.1px;
+    }
+    h2.section-title {
+      font-weight: 800;
+      font-size: clamp(18px, 1.6vw, 22px);
+    }
+
+    /* 2) Elevaciones */
+    .card {
+      border-radius: var(--radius);
+      box-shadow: var(--elev-1);
+      transition: box-shadow 0.18s ease;
+    }
+    .card:hover {
+      box-shadow: var(--elev-2);
+    }
+
+    /* 3) Encabezados de sección */
+    .section-title {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .section-title::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #1e40af, #3b82f6 50%, #fb923c);
+      opacity: 0.18;
+    }
+
+    /* 4) KPIs */
+    .kpi-card {
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card .kpi-icon {
+      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.06));
+    }
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      inset: auto -20% 0 -20%;
+      height: 4px;
+      background: linear-gradient(
+        90deg,
+        rgba(59, 130, 246, 0.6),
+        rgba(251, 146, 60, 0.6)
+      );
+      transform: translateY(6px);
+      opacity: 0;
+      transition: 0.25s ease;
+    }
+    .kpi-card:hover::before {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .kpi-value {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* 5) Tarjetas de módulos */
+    .nav-card {
+      position: relative;
+      border: 1px solid #eef2f7;
+    }
+    .nav-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(
+        135deg,
+        rgba(59, 130, 246, 0.18),
+        rgba(251, 146, 60, 0.18)
+      );
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .nav-card:hover {
+      transform: translateY(-3px);
+    }
+    .nav-card:hover::after {
+      opacity: 1;
+    }
+
+    /* 6) Actividad reciente estilo timeline */
+    .activity .card-body table tbody tr {
+      position: relative;
+    }
+    .activity .card-body table tbody td:first-child {
+      padding-left: 34px;
+    }
+    .activity .card-body table tbody tr::before {
+      content: "";
+      position: absolute;
+      left: 14px;
+      top: 16px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+    }
+    .activity .card-body table tbody tr::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: 28px;
+      bottom: -10px;
+      width: 2px;
+      background: linear-gradient(#e5e7eb, #f1f5f9);
+    }
+    .activity .card-body table tbody tr:last-child::after {
+      display: none;
+    }
+
+    /* 7) Botones */
+    .btn {
+      transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease,
+        background 0.12s ease;
+    }
+    .btn:active {
+      transform: translateY(0);
+    }
+    .btn:focus-visible {
+      outline: 2px solid #3b82f6;
+      outline-offset: 2px;
+    }
+    .btn-orange {
+      background: #fb923c;
+    }
+    .btn-orange:hover {
+      background: #f97316;
+      box-shadow: 0 8px 18px rgba(249, 115, 22, 0.25);
+    }
+    .btn-outline:hover {
+      box-shadow: var(--elev-1);
+    }
+
+    /* 8) Estados vacíos */
+    .empty {
+      border: 1px dashed #e5e7eb;
+      background: #fafafa;
+      color: #64748b;
+      padding: 18px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
   </style>
 
   <script>
     /* ---------- LOGOUT ROBUSTO (delegado + global) ---------- */
     function _hardLogout() {
       try {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       } finally {
         // Evita volver al dashboard con "Atrás"
-        location.replace('/');
+        location.replace("/");
       }
     }
     // Disponible para cualquier onclick inline
     window.logout = _hardLogout;
 
     // Delegado: funciona aunque el botón se renderice después
-    document.addEventListener('click', (ev) => {
-      const btn = ev.target.closest('#btnLogout');
+    document.addEventListener("click", (ev) => {
+      const btn = ev.target.closest("#btnLogout");
       if (!btn) return;
       ev.preventDefault();
       _hardLogout();
@@ -238,13 +773,15 @@ import Layout from '../../layouts/Layout.astro';
 
     /* ---------- Guard de autenticación ---------- */
     (async () => {
-      const token = localStorage.getItem('token');
-      const userStr = localStorage.getItem('user');
+      const token = localStorage.getItem("token");
+      const userStr = localStorage.getItem("user");
       if (!token || !userStr) return _hardLogout();
 
       // Verifica que el token siga vigente
       try {
-        const r = await fetch('/api/auth/verify', { headers: { Authorization: `Bearer ${token}` } });
+        const r = await fetch("/api/auth/verify", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await r.json().catch(() => ({}));
         if (!r.ok || !data?.success) return _hardLogout();
       } catch {
@@ -252,121 +789,152 @@ import Layout from '../../layouts/Layout.astro';
       }
 
       const user = JSON.parse(userStr);
-      if (user.rol !== 'admin') return _hardLogout();
+      if (user.rol !== "admin") return _hardLogout();
 
-      document.getElementById('userWelcome').textContent = `Bienvenido, ${user.nombre}`;
+      document.getElementById("userWelcome").textContent =
+        `Bienvenido, ${user.nombre}`;
       loadDashboardData();
     })();
 
     /* ---------- Dashboard data ---------- */
-    const fmtNum = new Intl.NumberFormat('es-EC');
-    const fmtMoney = new Intl.NumberFormat('es-EC',{ style:'currency', currency:'USD', maximumFractionDigits:0 });
+    const fmtNum = new Intl.NumberFormat("es-EC");
+    const fmtMoney = new Intl.NumberFormat("es-EC", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    });
 
-    async function loadDashboardData(){
-      try{
-        console.log('Cargando datos del dashboard...');
-        const token = localStorage.getItem('token');
-        console.log('Token:', token ? 'presente' : 'ausente');
-        const statsRes = await fetch('/api/admin/stats', { headers:{ Authorization:`Bearer ${token}` }});
-        console.log('Response status:', statsRes.status);
-        if (statsRes.ok){
+    async function loadDashboardData() {
+      try {
+        console.log("Cargando datos del dashboard...");
+        const token = localStorage.getItem("token");
+        console.log("Token:", token ? "presente" : "ausente");
+        const statsRes = await fetch("/api/admin/stats", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log("Response status:", statsRes.status);
+        if (statsRes.ok) {
           const s = await statsRes.json();
-          console.log('Stats recibidas:', s);
-          document.getElementById('totalClientes').textContent  = fmtNum.format(s.clientes||0);
-          document.getElementById('totalVehiculos').textContent = fmtNum.format(s.vehiculos||0);
-          document.getElementById('ordenesActivas').textContent = fmtNum.format(s.ordenesActivas||0);
-          document.getElementById('facturasHoy').textContent    = fmtMoney.format(s.facturacionHoy||0);
-          
+          console.log("Stats recibidas:", s);
+          document.getElementById("totalClientes").textContent = fmtNum.format(
+            s.clientes || 0
+          );
+          document.getElementById("totalVehiculos").textContent = fmtNum.format(
+            s.vehiculos || 0
+          );
+          document.getElementById("ordenesActivas").textContent = fmtNum.format(
+            s.ordenesActivas || 0
+          );
+          document.getElementById("facturasHoy").textContent = fmtMoney.format(
+            s.facturacionHoy || 0
+          );
+
           // Renderizar las últimas facturas que ya vienen en las estadísticas
           renderFacturas(s.ultimasFacturas || []);
         } else {
-          console.error('Error en respuesta:', await statsRes.text());
+          console.error("Error en respuesta:", await statsRes.text());
         }
         await loadRecentActivity();
-      }catch(err){ 
-        console.error('Error cargando dashboard:', err); 
+      } catch (err) {
+        console.error("Error cargando dashboard:", err);
       }
     }
 
-    async function loadRecentActivity(){
-      try{
-        const token = localStorage.getItem('token');
+    async function loadRecentActivity() {
+      try {
+        const token = localStorage.getItem("token");
         // Solo cargar órdenes recientes, las facturas ya vienen del endpoint de stats
-        const ordenesRes = await fetch('/api/ordenes?limit=5',  { headers:{ Authorization:`Bearer ${token}` }});
+        const ordenesRes = await fetch("/api/ordenes?limit=5", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        if (ordenesRes.ok){
+        if (ordenesRes.ok) {
           const response = await ordenesRes.json();
           const list = response.success ? response.data : [];
           renderOrdenes(list);
         }
-      }catch(err){ console.error(err); }
+      } catch (err) {
+        console.error(err);
+      }
     }
 
-    function renderOrdenes(ordenes=[]){
-      console.log('Renderizando órdenes:', ordenes);
-      const el = document.getElementById('recentOrders');
+    function renderOrdenes(ordenes = []) {
+      console.log("Renderizando órdenes:", ordenes);
+      const el = document.getElementById("recentOrders");
       if (!el) {
-        console.error('Elemento recentOrders no encontrado');
+        console.error("Elemento recentOrders no encontrado");
         return;
       }
-      if (!ordenes.length){ 
-        el.innerHTML = '<div class="muted">No hay órdenes registradas</div>'; 
-        return; 
+      if (!ordenes.length) {
+        el.innerHTML = '<div class="muted">No hay órdenes registradas</div>';
+        return;
       }
       el.innerHTML = `
         <div class="table-wrap">
           <table>
             <thead><tr><th>ID</th><th>Cliente</th><th>Estado</th><th>Fecha</th></tr></thead>
             <tbody>
-              ${ordenes.map(o=>`
+              ${ordenes
+                .map(
+                  (o) => `
                 <tr>
                   <td>#${o.id}</td>
-                  <td>${o.cliente_nombre||'N/A'}</td>
+                  <td>${o.cliente_nombre || "N/A"}</td>
                   <td><span class="badge ${badge(o.estado)}">${o.estado}</span></td>
-                  <td>${new Date(o.fecha_creacion||o.fecha_ingreso).toLocaleDateString()}</td>
+                  <td>${new Date(o.fecha_creacion || o.fecha_ingreso).toLocaleDateString()}</td>
                 </tr>
-              `).join('')}
+              `
+                )
+                .join("")}
             </tbody>
           </table>
         </div>`;
     }
 
-    function renderFacturas(facturas=[]){
-      console.log('Renderizando facturas:', facturas);
-      const el = document.getElementById('recentFacturas');
+    function renderFacturas(facturas = []) {
+      console.log("Renderizando facturas:", facturas);
+      const el = document.getElementById("recentFacturas");
       if (!el) {
-        console.error('Elemento recentFacturas no encontrado');
+        console.error("Elemento recentFacturas no encontrado");
         return;
       }
-      if (!facturas.length){ 
-        el.innerHTML = '<div class="muted">No hay facturas registradas</div>'; 
-        return; 
+      if (!facturas.length) {
+        el.innerHTML = '<div class="muted">No hay facturas registradas</div>';
+        return;
       }
       el.innerHTML = `
         <div class="table-wrap">
           <table>
             <thead><tr><th>Número</th><th>Cliente</th><th>Total</th><th>Fecha</th></tr></thead>
             <tbody>
-              ${facturas.map(f=>`
+              ${facturas
+                .map(
+                  (f) => `
                 <tr>
-                  <td>#${f.numero_factura||'N/A'}</td>
-                  <td>${f.cliente_nombre||'N/A'}</td>
-                  <td>${fmtMoney.format(f.total||0)}</td>
+                  <td>#${f.numero_factura || "N/A"}</td>
+                  <td>${f.cliente_nombre || "N/A"}</td>
+                  <td>${fmtMoney.format(f.total || 0)}</td>
                   <td>${new Date(f.fecha_emision).toLocaleDateString()}</td>
                 </tr>
-              `).join('')}
+              `
+                )
+                .join("")}
             </tbody>
           </table>
         </div>`;
     }
 
-    function badge(estado=''){
-      switch(estado.toLowerCase()){
-        case 'pendiente': return 'badge badge-warning';
-        case 'en proceso': return 'badge badge-primary';
-        case 'completado':
-        case 'entregado': return 'badge badge-success';
-        default: return 'badge badge-primary';
+    function badge(estado = "") {
+      switch (estado.toLowerCase()) {
+        case "pendiente":
+          return "badge badge-warning";
+        case "en proceso":
+          return "badge badge-primary";
+        case "completado":
+        case "entregado":
+          return "badge badge-success";
+        default:
+          return "badge badge-primary";
       }
     }
   </script>

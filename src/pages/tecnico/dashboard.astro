@@ -1,5 +1,5 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from "../../layouts/Layout.astro";
 ---
 
 <Layout title="Panel Técnico - TecniCentro Ibarra Express">
@@ -13,7 +13,12 @@ import Layout from '../../layouts/Layout.astro';
 
       <div class="user-menu">
         <span id="userName" class="user-chip">Técnico</span>
-        <button type="button" class="btn btn-orange" id="logoutBtn" onclick="window.logout?.()">Cerrar Sesión</button>
+        <button
+          type="button"
+          class="btn btn-orange"
+          id="logoutBtn"
+          onclick="window.logout?.()">Cerrar Sesión</button
+        >
       </div>
     </div>
   </header>
@@ -55,8 +60,13 @@ import Layout from '../../layouts/Layout.astro';
               <span class="btn-ico">➕</span> Nueva Orden
             </button>
             <div class="plate-search">
-              <input id="placaQuick" type="text" placeholder="Buscar por placa…" />
-              <button id="buscarQuickBtn" class="btn btn-outline">Buscar</button>
+              <input
+                id="placaQuick"
+                type="text"
+                placeholder="Buscar por placa…"
+              />
+              <button id="buscarQuickBtn" class="btn btn-outline">Buscar</button
+              >
             </div>
           </div>
           <div class="quick-right">
@@ -76,13 +86,21 @@ import Layout from '../../layouts/Layout.astro';
           <div class="card-head">
             <h2 class="card-title">Mis Órdenes</h2>
             <div class="card-tools">
-              <input id="buscarOrdenInput" class="input" placeholder="Buscar (placa / cliente / #orden)" />
+              <input
+                id="buscarOrdenInput"
+                class="input"
+                placeholder="Buscar (placa / cliente / #orden)"
+              />
             </div>
           </div>
 
           <div id="ordenesContainer" class="card-body">
             <div class="table-wrap">
-              <table class="table" id="tablaOrdenes" aria-describedby="tabla de órdenes">
+              <table
+                class="table"
+                id="tablaOrdenes"
+                aria-describedby="tabla de órdenes"
+              >
                 <thead>
                   <tr>
                     <th>N°</th>
@@ -125,30 +143,57 @@ import Layout from '../../layouts/Layout.astro';
               <label for="placaVehiculo">Placa del vehículo</label>
               <div class="input-wrap">
                 <span class="input-ico">🚘</span>
-                <input id="placaVehiculo" class="form-control" placeholder="ABC-1234" />
+                <input
+                  id="placaVehiculo"
+                  class="form-control"
+                  placeholder="ABC-1234"
+                />
               </div>
             </div>
             <div class="form-group">
               <label>&nbsp;</label>
-              <button type="button" id="buscarVehiculoBtn" class="btn btn-outline">Buscar</button>
+              <button
+                type="button"
+                id="buscarVehiculoBtn"
+                class="btn btn-outline">Buscar</button
+              >
             </div>
           </div>
 
           <div id="vehiculoInfo" class="veh-card" style="display:none;">
             <div class="veh-left">
-              <div class="veh-line"><strong>Marca:</strong> <span id="vehMarca"></span></div>
-              <div class="veh-line"><strong>Modelo:</strong> <span id="vehModelo"></span></div>
-              <div class="veh-line"><strong>Placa:</strong> <span id="vehPlaca"></span></div>
+              <div class="veh-line">
+                <strong>Marca:</strong>
+                <span id="vehMarca"></span>
+              </div>
+              <div class="veh-line">
+                <strong>Modelo:</strong>
+                <span id="vehModelo"></span>
+              </div>
+              <div class="veh-line">
+                <strong>Placa:</strong>
+                <span id="vehPlaca"></span>
+              </div>
             </div>
             <div class="veh-right">
-              <div class="veh-line"><strong>Cliente:</strong> <span id="vehCliente"></span></div>
-              <div class="veh-line"><strong>Teléfono:</strong> <span id="vehTelefono"></span></div>
+              <div class="veh-line">
+                <strong>Cliente:</strong>
+                <span id="vehCliente"></span>
+              </div>
+              <div class="veh-line">
+                <strong>Teléfono:</strong>
+                <span id="vehTelefono"></span>
+              </div>
             </div>
           </div>
 
           <div class="form-group">
             <label for="observaciones">Observaciones</label>
-            <textarea id="observaciones" rows="3" class="form-control" placeholder="Notas iniciales, síntomas, etc."></textarea>
+            <textarea
+              id="observaciones"
+              rows="3"
+              class="form-control"
+              placeholder="Notas iniciales, síntomas, etc."></textarea>
           </div>
 
           <!-- Servicios -->
@@ -167,9 +212,18 @@ import Layout from '../../layouts/Layout.astro';
               <label for="buscarServicio">Buscar</label>
               <div class="input-wrap">
                 <span class="input-ico">🔎</span>
-                <input id="buscarServicio" class="form-control" placeholder="Código o descripción" />
+                <input
+                  id="buscarServicio"
+                  class="form-control"
+                  placeholder="Código o descripción"
+                />
               </div>
-              <div id="serviciosEncontrados" class="results" style="display:none;"></div>
+              <div
+                id="serviciosEncontrados"
+                class="results"
+                style="display:none;"
+              >
+              </div>
             </div>
           </div>
 
@@ -197,7 +251,9 @@ import Layout from '../../layouts/Layout.astro';
           </div>
 
           <div class="modal-actions">
-            <button type="submit" class="btn btn-success"><span class="btn-ico">💾</span> Crear Orden</button>
+            <button type="submit" class="btn btn-success"
+              ><span class="btn-ico">💾</span> Crear Orden</button
+            >
             <button type="button" class="btn modal-close">Cancelar</button>
           </div>
         </form>
@@ -206,293 +262,1540 @@ import Layout from '../../layouts/Layout.astro';
   </div>
 
   <style>
-    :root{
+    :root {
       /* caen a tu paleta global si ya existen */
-      --text:#0f172a;
-      --muted:#64748b;
-      --ring: 0 1px 2px rgba(0,0,0,.04), 0 10px 20px rgba(2,6,23,.08);
-      --radius:16px;
-      --container:1200px;
+      --text: #0f172a;
+      --muted: #64748b;
+      --ring: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 20px rgba(2, 6, 23, 0.08);
+      --radius: 16px;
+      --container: 1200px;
     }
 
     /* -------- layout -------- */
-    .container{max-width:var(--container); margin-inline:auto; padding:0 20px}
-    .page{ padding:20px 0 48px; background:#f7f9fc }
+    .container {
+      max-width: var(--container);
+      margin-inline: auto;
+      padding: 0 20px;
+    }
+    .page {
+      padding: 20px 0 48px;
+      background: #f7f9fc;
+    }
 
     /* navbar */
-    .navbar{position:sticky; top:0; z-index:20; background:rgba(255,255,255,.92); border-bottom:1px solid #eef2f7; backdrop-filter:saturate(180%) blur(10px)}
-    .navbar .container{display:flex; align-items:center; justify-content:space-between; height:64px}
-    .brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text); font-weight:800}
-    .logo-circle{display:grid; place-items:center; width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--primary-orange), #ffb07a); box-shadow:var(--ring)}
-    .brand-text{letter-spacing:.2px}
-    .user-menu{display:flex; align-items:center; gap:12px}
-    .user-chip{font-weight:700}
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.92);
+      border-bottom: 1px solid #eef2f7;
+      backdrop-filter: saturate(180%) blur(10px);
+    }
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 800;
+    }
+    .logo-circle {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-orange), #ffb07a);
+      box-shadow: var(--ring);
+    }
+    .brand-text {
+      letter-spacing: 0.2px;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-chip {
+      font-weight: 700;
+    }
 
     /* buttons / inputs */
-    .btn{border:0; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer; background:#fff}
-    .btn-outline{border:1px solid #e5e7eb}
-    .btn-outline:hover{box-shadow:var(--ring)}
-    .btn-orange{background:linear-gradient(135deg,var(--primary-orange), #ff974d); color:#fff}
-    .btn-success{background:linear-gradient(135deg,#16a34a, #22c55e); color:#fff}
-    .btn .btn-ico{margin-right:6px}
-    .input{border:1px solid #e5e7eb; border-radius:10px; padding:10px 12px; outline:none}
-    .input:focus{border-color:var(--primary-blue); box-shadow:0 0 0 4px rgba(30,77,139,.12)}
-    .input-wrap{display:flex; align-items:center; border:1.5px solid #e7eaf0; border-radius:12px; background:#fff}
-    .input-wrap:focus-within{border-color:var(--primary-blue); box-shadow:0 0 0 4px rgba(30,77,139,.12)}
-    .input-ico{padding:0 10px; font-size:16px; opacity:.85}
-    .form-control{width:100%; padding:12px 14px; border:0; outline:none; background:transparent; border-radius:12px}
-    .form-group{display:flex; flex-direction:column; gap:6px}
-    .form-row{display:flex; gap:14px; align-items:flex-end}
-    .form-row .grow{flex:1}
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #fff;
+    }
+    .btn-outline {
+      border: 1px solid #e5e7eb;
+    }
+    .btn-outline:hover {
+      box-shadow: var(--ring);
+    }
+    .btn-orange {
+      background: linear-gradient(135deg, var(--primary-orange), #ff974d);
+      color: #fff;
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: #fff;
+    }
+    .btn .btn-ico {
+      margin-right: 6px;
+    }
+    .input {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px 12px;
+      outline: none;
+    }
+    .input:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 4px rgba(30, 77, 139, 0.12);
+    }
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid #e7eaf0;
+      border-radius: 12px;
+      background: #fff;
+    }
+    .input-wrap:focus-within {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 4px rgba(30, 77, 139, 0.12);
+    }
+    .input-ico {
+      padding: 0 10px;
+      font-size: 16px;
+      opacity: 0.85;
+    }
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 0;
+      outline: none;
+      background: transparent;
+      border-radius: 12px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-end;
+    }
+    .form-row .grow {
+      flex: 1;
+    }
 
     /* cards */
-    .card{background:#fff; border-radius:var(--radius); box-shadow:var(--ring); overflow:hidden}
-    .card-head{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid #eef2f7}
-    .card-title{margin:0; font-size:18px}
-    .card-tools{display:flex; gap:10px}
-    .card-body{padding:14px 16px}
+    .card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--ring);
+      overflow: hidden;
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid #eef2f7;
+    }
+    .card-title {
+      margin: 0;
+      font-size: 18px;
+    }
+    .card-tools {
+      display: flex;
+      gap: 10px;
+    }
+    .card-body {
+      padding: 14px 16px;
+    }
 
     /* KPIs */
-    .kpi-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px}
-    .kpi-card{display:flex; align-items:center; gap:14px; background:#fff; border-radius:16px; padding:18px; box-shadow:var(--ring); position:relative}
-    .kpi-card::after{content:""; position:absolute; inset:auto 0 0 0; height:4px}
-    .kpi-blue::after{background:linear-gradient(90deg,var(--primary-blue), #3b82f6)}
-    .kpi-amber::after{background:linear-gradient(90deg,#d97706, #f59e0b)}
-    .kpi-green::after{background:linear-gradient(90deg,#16a34a, #22c55e)}
-    .kpi-icon{font-size:26px}
-    .kpi-value{margin:0; font-size:26px}
-    .kpi-label{margin:2px 0 0; color:var(--muted); font-size:13px}
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .kpi-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: var(--ring);
+      position: relative;
+    }
+    .kpi-card::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 4px;
+    }
+    .kpi-blue::after {
+      background: linear-gradient(90deg, var(--primary-blue), #3b82f6);
+    }
+    .kpi-amber::after {
+      background: linear-gradient(90deg, #d97706, #f59e0b);
+    }
+    .kpi-green::after {
+      background: linear-gradient(90deg, #16a34a, #22c55e);
+    }
+    .kpi-icon {
+      font-size: 26px;
+    }
+    .kpi-value {
+      margin: 0;
+      font-size: 26px;
+    }
+    .kpi-label {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
 
     /* quick actions */
-    .quick{display:flex; align-items:center; justify-content:space-between; gap:18px}
-    .quick-left{display:flex; gap:12px; align-items:center}
-    .plate-search{display:flex; gap:8px; align-items:center}
-    .plate-search input{height:40px; border-radius:10px; border:1px solid #e5e7eb; padding:0 12px}
+    .quick {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .quick-left {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .plate-search {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .plate-search input {
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      padding: 0 12px;
+    }
 
-    .filters{display:flex; gap:8px; flex-wrap:wrap}
-    .pill{border:1px solid #e5e7eb; background:#fff; color:#334155; padding:8px 12px; border-radius:999px; cursor:pointer; font-weight:700}
-    .pill.active{background:linear-gradient(135deg,var(--primary-blue), #567bd6); color:#fff; border-color:transparent}
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      color: #334155;
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .pill.active {
+      background: linear-gradient(135deg, var(--primary-blue), #567bd6);
+      color: #fff;
+      border-color: transparent;
+    }
 
     /* table */
-    .table-wrap{overflow:auto}
-    .table{width:100%; border-collapse:separate; border-spacing:0}
-    thead th{font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); text-align:left; padding:10px; background:#fbfcfe; position:sticky; top:0}
-    tbody td{padding:12px 10px; border-top:1px solid #eef2f7}
-    tr:hover td{background:#fafafa}
-    .t-right{text-align:right}
+    .table-wrap {
+      overflow: auto;
+    }
+    .table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    thead th {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      text-align: left;
+      padding: 10px;
+      background: #fbfcfe;
+      position: sticky;
+      top: 0;
+    }
+    tbody td {
+      padding: 12px 10px;
+      border-top: 1px solid #eef2f7;
+    }
+    tr:hover td {
+      background: #fafafa;
+    }
+    .t-right {
+      text-align: right;
+    }
 
-    .badge{display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:800}
-    .badge-warning{background:#fff7ed; color:#c2410c}
-    .badge-primary{background:#eff6ff; color:#1e40af}
-    .badge-success{background:#ecfdf5; color:#065f46}
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .badge-warning {
+      background: #fff7ed;
+      color: #c2410c;
+    }
+    .badge-primary {
+      background: #eff6ff;
+      color: #1e40af;
+    }
+    .badge-success {
+      background: #ecfdf5;
+      color: #065f46;
+    }
 
-    .empty{display:grid; place-items:center; padding:30px; color:#94a3b8}
-    .empty-ico{font-size:28px; margin-bottom:6px}
+    .empty {
+      display: grid;
+      place-items: center;
+      padding: 30px;
+      color: #94a3b8;
+    }
+    .empty-ico {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
 
     /* modal */
-    .modal{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(15,23,42,.45); z-index:50}
-    .modal-content{background:#fff; width:min(900px, 95vw); max-height:92vh; overflow:auto; border-radius:16px; box-shadow:0 24px 60px rgba(2,6,23,.24)}
-    .modal-header{display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid #eef2f7}
-    .modal-close{border:0; background:#fff; width:34px; height:34px; border-radius:10px; font-size:20px; cursor:pointer}
-    .modal-close:hover{box-shadow:var(--ring)}
-    .modal-body{padding:16px 18px}
-    .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:12px}
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 50;
+    }
+    .modal-content {
+      background: #fff;
+      width: min(900px, 95vw);
+      max-height: 92vh;
+      overflow: auto;
+      border-radius: 16px;
+      box-shadow: 0 24px 60px rgba(2, 6, 23, 0.24);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      border-bottom: 1px solid #eef2f7;
+    }
+    .modal-close {
+      border: 0;
+      background: #fff;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .modal-close:hover {
+      box-shadow: var(--ring);
+    }
+    .modal-body {
+      padding: 16px 18px;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 12px;
+    }
 
-    .subtle-title{margin:10px 0 8px; color:#0f172a}
+    .subtle-title {
+      margin: 10px 0 8px;
+      color: #0f172a;
+    }
 
-    .veh-card{display:flex; justify-content:space-between; gap:12px; background:#fbfcfe; border:1px solid #eef2f7; border-radius:12px; padding:12px 14px; margin-bottom:8px}
-    .veh-line{color:#0f172a}
+    .veh-card {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      background: #fbfcfe;
+      border: 1px solid #eef2f7;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+    }
+    .veh-line {
+      color: #0f172a;
+    }
 
-    .results{border:1px solid #e7eaf0; border-radius:12px; margin-top:6px; overflow:hidden; max-height:240px; overflow-y:auto; box-shadow:0 8px 20px rgba(2,6,23,.06)}
-    .result-item{display:flex; justify-content:space-between; gap:8px; padding:10px 12px; background:#fff; cursor:pointer}
-    .result-item:hover{background:#f7f9fc}
-    .result-meta{color:#64748b; font-size:12px}
+    .results {
+      border: 1px solid #e7eaf0;
+      border-radius: 12px;
+      margin-top: 6px;
+      overflow: hidden;
+      max-height: 240px;
+      overflow-y: auto;
+      box-shadow: 0 8px 20px rgba(2, 6, 23, 0.06);
+    }
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .result-item:hover {
+      background: #f7f9fc;
+    }
+    .result-meta {
+      color: #64748b;
+      font-size: 12px;
+    }
 
-    .qty-wrap{display:inline-flex; align-items:center; gap:6px}
-    .qty-btn{width:26px; height:26px; border-radius:8px; border:1px solid #e5e7eb; background:#fff; cursor:pointer}
-    .qty{min-width:26px; text-align:center}
+    .qty-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .qty-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      cursor: pointer;
+    }
+    .qty {
+      min-width: 26px;
+      text-align: center;
+    }
 
     /* toast */
-    .toast{position:fixed; left:20px; right:20px; bottom:24px; background:#fff; border:1px solid #ffd3cf; border-left:4px solid #ef4444; color:#b42318; padding:12px 14px; border-radius:12px; box-shadow:0 12px 26px rgba(0,0,0,.08); display:none; font-weight:700}
-    .toast.show{display:block; animation:fadeIn .18s ease}
-    @keyframes fadeIn{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
-
-    @media (max-width: 1024px){
-      .kpi-grid{grid-template-columns:1fr 1fr}
-      .quick{flex-direction:column; align-items:stretch}
-      .quick-left{justify-content:space-between}
+    .toast {
+      position: fixed;
+      left: 20px;
+      right: 20px;
+      bottom: 24px;
+      background: #fff;
+      border: 1px solid #ffd3cf;
+      border-left: 4px solid #ef4444;
+      color: #b42318;
+      padding: 12px 14px;
+      border-radius: 12px;
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
+      display: none;
+      font-weight: 700;
     }
-    @media (max-width: 640px){
-      .kpi-grid{grid-template-columns:1fr}
-      .brand-text{display:none}
-      .form-row{flex-direction:column}
+    .toast.show {
+      display: block;
+      animation: fadeIn 0.18s ease;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .kpi-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .quick {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .quick-left {
+        justify-content: space-between;
+      }
+    }
+    @media (max-width: 640px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+      .brand-text {
+        display: none;
+      }
+      .form-row {
+        flex-direction: column;
+      }
+    }
+
+    /* ==== FIX modal técnico: solo CSS del modal ==== */
+
+    /* Un pequeño padding al overlay para que el contenido no toque los bordes */
+    #nuevaOrdenModal {
+      padding: 16px !important;
+      box-sizing: border-box !important;
+    }
+
+    /* El contenedor del modal NO puede superar el viewport; sin scroll horizontal */
+    #nuevaOrdenModal .modal-content {
+      display: flex !important; /* header + body + footer en columna  */
+      flex-direction: column !important;
+      box-sizing: border-box !important;
+      width: min(
+        980px,
+        calc(100vw - 32px)
+      ) !important; /* 16px por lado = 32px  */
+      max-height: calc(100vh - 32px) !important;
+      overflow: hidden !important; /* corta cualquier desborde en X/Y    */
+      border-radius: 16px;
+    }
+
+    /* El cuerpo del modal hace el scroll interno; no crece a lo ancho */
+    #nuevaOrdenModal .modal-body {
+      flex: 1 1 auto !important;
+      min-width: 0 !important; /* evita “empujar” el ancho            */
+      overflow: auto !important; /* scroll dentro del modal             */
+    }
+
+    /* Tablas u otros bloques anchos: scroll solo dentro, nunca afuera */
+    #nuevaOrdenModal .table-wrap.soft {
+      max-width: 100% !important;
+      overflow-x: auto !important;
+    }
+
+    /* Footer pegado al borde inferior del modal y con ancho completo */
+    #nuevaOrdenModal .modal-actions {
+      position: sticky !important;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      justify-content: flex-end !important;
+      gap: 12px !important;
+      padding: 14px 16px !important;
+      border-top: 1px solid #eef2f7 !important;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.96) 0%,
+        #fff 80%
+      ) !important;
+      overflow-x: hidden !important; /* por si acaso, nada de X en el pie  */
+    }
+
+    /* Evita que el texto de los botones se parta */
+    #nuevaOrdenModal .modal-actions .btn {
+      white-space: nowrap !important;
+    }
+
+    /* Seguridad: todo lo del modal en border-box para que los paddings no sumen ancho */
+    #nuevaOrdenModal *,
+    #nuevaOrdenModal *::before,
+    #nuevaOrdenModal *::after {
+      box-sizing: border-box !important;
+    }
+    /* === FIX DEFINITIVO: .modal-close del header vs footer === */
+
+    /* El botón ✕ del header sí es pequeño */
+    #nuevaOrdenModal .modal-header > .modal-close {
+      width: 36px !important;
+      height: 36px !important;
+      padding: 0 !important;
+      font-size: 20px !important;
+      line-height: 1 !important;
+    }
+
+    /* El botón "Cancelar" del footer debe ser un botón normal */
+    #nuevaOrdenModal .modal-actions .modal-close {
+      width: auto !important;
+      height: auto !important;
+      padding: 10px 16px !important;
+      font-size: 16px !important;
+      line-height: 1.2 !important;
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+
+      /* tus estilos de apariencia */
+      background: #f3f4f6 !important;
+      color: #374151 !important;
+      border: 1px solid #e5e7eb !important;
+      border-radius: 10px !important;
+      white-space: nowrap !important;
+    }
+
+    /* Por si acaso, que el pie no recorte nada */
+    #nuevaOrdenModal .modal-actions {
+      overflow: visible !important;
+    }
+    /* =========================
+   MEJORAS VISUALES DEL MODAL (solo CSS)
+   ========================= */
+
+    /* 1) Estructura y respiración */
+    #nuevaOrdenModal .modal-header {
+      padding: 18px 22px;
+    }
+    #nuevaOrdenModal .modal-body {
+      padding: 20px 22px 0;
+    }
+    #nuevaOrdenModal .subtle-title {
+      margin: 16px 0 10px;
+    }
+
+    /* 2) Inputs/Select: alto consistente y foco elegante */
+    #nuevaOrdenModal .form-control,
+    #nuevaOrdenModal select.form-control {
+      height: 44px;
+      border-radius: 12px;
+    }
+    #nuevaOrdenModal .input-wrap {
+      min-height: 44px;
+    }
+    #nuevaOrdenModal .input-wrap:focus-within {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    /* 3) Columna “Tipo” con ancho fijo para que todo alinee mejor */
+    #nuevaOrdenModal .form-row .form-group:first-child {
+      min-width: 220px;
+    }
+
+    /* 4) Dropdown de resultados: look + no tapa el footer */
+    #nuevaOrdenModal .results {
+      border-radius: 12px;
+      border: 1px solid #e6eaf1;
+      box-shadow: 0 18px 40px rgba(2, 6, 23, 0.14);
+      max-height: calc(60vh); /* no invadir el footer */
+      overflow: auto;
+    }
+    #nuevaOrdenModal .result-item {
+      gap: 12px;
+      padding: 12px 14px;
+      line-height: 1.15;
+    }
+    #nuevaOrdenModal .result-item + .result-item {
+      border-top: 1px dashed #f1f5f9;
+    }
+    #nuevaOrdenModal .result-item:hover {
+      background: #f8fafc;
+    }
+
+    /* Scrollbar suave dentro de resultados / tabla */
+    #nuevaOrdenModal .results::-webkit-scrollbar,
+    #nuevaOrdenModal .table-wrap.soft::-webkit-scrollbar {
+      height: 8px;
+      width: 8px;
+    }
+    #nuevaOrdenModal .results::-webkit-scrollbar-thumb,
+    #nuevaOrdenModal .table-wrap.soft::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 8px;
+    }
+
+    /* 5) Tabla: header flotante con sombra, filas cebreadas y celdas más compactas */
+    #nuevaOrdenModal thead th {
+      top: 0;
+      background: #f8fafc;
+      border-bottom: 1px solid #eef2f7;
+      box-shadow: 0 2px 0 rgba(2, 6, 23, 0.03);
+    }
+    #nuevaOrdenModal tbody td {
+      padding: 10px 12px;
+    }
+    #nuevaOrdenModal tbody tr:nth-child(odd) td {
+      background: #fff;
+    }
+    #nuevaOrdenModal tbody tr:nth-child(even) td {
+      background: #fcfdff;
+    }
+    #nuevaOrdenModal tbody tr:hover td {
+      background: #f7fafc;
+    }
+
+    /* 6) Cantidades (+/-) más cómodas */
+    #nuevaOrdenModal .qty-btn {
+      width: 30px;
+      height: 30px;
+    }
+    #nuevaOrdenModal .qty {
+      min-width: 30px;
+    }
+
+    /* 7) Footer pegajoso con leve blur y separación visual del contenido */
+    #nuevaOrdenModal .modal-actions {
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.9) 0%,
+        #fff 70%
+      );
+      backdrop-filter: blur(4px);
+      border-top: 1px solid #eef2f7;
+      box-shadow: 0 -6px 20px rgba(2, 6, 23, 0.06);
+    }
+
+    /* 8) Botones: tamaños iguales y estados */
+    #nuevaOrdenModal .modal-actions .btn {
+      height: 44px;
+      padding: 0 16px;
+      font-weight: 800;
+    }
+    #nuevaOrdenModal .modal-actions .btn.btn-success {
+      box-shadow: 0 8px 18px rgba(22, 163, 74, 0.22);
+    }
+    #nuevaOrdenModal .modal-actions .btn.modal-close {
+      background: #f3f4f6;
+      color: #111827;
+      border: 1px solid #e5e7eb;
+    }
+    #nuevaOrdenModal .modal-actions .btn.modal-close:hover {
+      background: #e5e7eb;
+    }
+
+    /* 9) Pequeño realce al total */
+    #nuevaOrdenModal tfoot td strong#totalOrden {
+      font-size: 1.1rem;
+    }
+
+    /* 10) Micro-detalles: evitar desbordes y cortes de texto */
+    #nuevaOrdenModal .table-wrap.soft {
+      border-radius: 12px;
+    }
+    #nuevaOrdenModal .modal-content {
+      overflow: hidden;
+    }
+    #nuevaOrdenModal .modal-body,
+    #nuevaOrdenModal .table-wrap.soft {
+      overflow-x: auto;
+    }
+    #nuevaOrdenModal .modal-actions .btn {
+      white-space: nowrap;
     }
   </style>
+  <style is:global>
+    /* ====== Dropdown de resultados (buscar servicios) ====== */
+    #nuevaOrdenModal .form-group.grow {
+      position: relative;
+    }
 
+    #nuevaOrdenModal .results {
+      position: absolute;
+      inset-inline: 0; /* mismo ancho que el input */
+      top: 100%;
+      margin-top: 8px;
+      z-index: 30; /* por encima de la tabla */
+      background: #fff;
+      border: 1px solid #e7eaf0;
+      border-radius: 12px;
+      box-shadow: 0 14px 30px rgba(2, 6, 23, 0.12);
+      overflow: auto;
+      max-height: min(50vh, 360px); /* no tapa el footer del modal */
+      overscroll-behavior: contain;
+    }
+
+    /* Cabecera “fake” tipo tabla */
+    #nuevaOrdenModal .results::before {
+      content: "CÓDIGO   DESCRIPCIÓN   PRECIO";
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #64748b;
+      text-transform: uppercase;
+      background: #fbfcfe;
+      border-bottom: 1px solid #eef2f7;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    /* Fila */
+    #nuevaOrdenModal .result-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+    #nuevaOrdenModal .result-item:hover {
+      background: #f7f9fc;
+    }
+
+    /* Columna izquierda (código + descripción + meta) */
+    #nuevaOrdenModal .result-item > div:first-child {
+      flex: 1 1 auto;
+      min-width: 0; /* permite elipsis */
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Código como chip monoespaciado con ancho fijo */
+    #nuevaOrdenModal .result-item strong {
+      display: inline-block;
+      width: 110px;
+      text-align: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-weight: 800;
+      color: #0f172a;
+      background: #f1f5f9;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 3px 8px;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    /* Descripción en una sola línea con elipsis */
+    #nuevaOrdenModal .result-item > div:first-child {
+      /* ya definido arriba; agregamos el contenedor de texto */
+    }
+    #nuevaOrdenModal .result-item > div:first-child > :not(strong) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Meta (Tipo: …) en estilo sutil debajo cuando envuelva */
+    #nuevaOrdenModal .result-meta {
+      display: block;
+      margin-left: 122px; /* alinea con el chip del código */
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    /* Columna derecha (precio) fija y marcada */
+    #nuevaOrdenModal .result-item > div:last-child {
+      flex: 0 0 auto;
+      font-weight: 800;
+      color: #111827;
+      white-space: nowrap;
+      min-width: 90px;
+      text-align: right;
+    }
+
+    /* Bordes entre filas */
+    #nuevaOrdenModal .result-item + .result-item {
+      border-top: 1px solid #f1f5f9;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      #nuevaOrdenModal .results {
+        max-height: min(55vh, 420px);
+      }
+      #nuevaOrdenModal .result-item strong {
+        width: 88px;
+      }
+      #nuevaOrdenModal .result-meta {
+        margin-left: 100px;
+      }
+    }
+    /* ============================
+   MODAL – Resultados como tabla
+   ============================ */
+
+    /* contenedor del dropdown */
+    #nuevaOrdenModal .results {
+      position: relative;
+      margin-top: 8px;
+      border: 1px solid #e7eaf0;
+      border-radius: 12px;
+      overflow: auto;
+      max-height: 56vh; /* alto cómodo; scroll interno */
+      background: #fff;
+      box-shadow: 0 14px 30px rgba(2, 6, 23, 0.12);
+      padding-top: 42px; /* espacio para la cabecera sticky */
+    }
+
+    /* cabecera “tabla” (izq.)  */
+    #nuevaOrdenModal .results::before {
+      content: "CÓDIGO · DESCRIPCIÓN";
+      position: sticky;
+      top: 0;
+      left: 0;
+      display: block;
+      padding: 10px 14px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e5e7eb;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+      z-index: 2;
+    }
+
+    /* cabecera “tabla” (der. PRECIO) */
+    #nuevaOrdenModal .results::after {
+      content: "PRECIO";
+      position: sticky;
+      top: 0;
+      float: right; /* permanece al borde derecho */
+      margin-top: -42px; /* mismo alto de la barra para superponer */
+      padding: 10px 14px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e5e7eb;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+      z-index: 3;
+    }
+
+    /* fila estilo “tabla”: 2 columnas (texto + precio) */
+    #nuevaOrdenModal .result-item {
+      display: grid;
+      grid-template-columns: 1fr auto; /* izq. flexible, der. precio auto */
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #fff;
+      border-top: 1px solid #f1f5f9;
+      cursor: pointer;
+    }
+    #nuevaOrdenModal .result-item:hover {
+      background: #f9fafb;
+    }
+
+    /* bloque izquierdo (código “pill” + descripción + meta) */
+    #nuevaOrdenModal .result-item > div:first-child {
+      min-width: 0; /* evita empujar la columna de precio */
+      color: #0f172a;
+      line-height: 1.25;
+      display: block;
+    }
+
+    /* código destacado como “pill” */
+    #nuevaOrdenModal .result-item > div:first-child strong {
+      display: inline-block;
+      margin-right: 10px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #1e40af;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    /* meta inferior (tipo, etc.) */
+    #nuevaOrdenModal .result-meta {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* columna precio a la derecha, bold y monoespaciado sutil */
+    #nuevaOrdenModal .result-item > div:last-child {
+      font-weight: 800;
+      font-variant-numeric: tabular-nums; /* alinea dígitos */
+      text-align: right;
+      white-space: nowrap;
+      color: #0f172a;
+      min-width: 84px; /* ancho mínimo para $xx,xxx */
+    }
+
+    /* separación visual arriba cuando el dropdown se abre bajo el input */
+    #nuevaOrdenModal .input-wrap + .results {
+      margin-top: 6px;
+    }
+
+    /* barra de scroll discreta (WebKit) */
+    #nuevaOrdenModal .results::-webkit-scrollbar {
+      height: 10px;
+      width: 10px;
+    }
+    #nuevaOrdenModal .results::-webkit-scrollbar-thumb {
+      background: #e2e8f0;
+      border-radius: 999px;
+    }
+    #nuevaOrdenModal .results::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    /* Responsive: en pantallas muy estrechas el precio baja a una segunda línea */
+    @media (max-width: 520px) {
+      #nuevaOrdenModal .result-item {
+        grid-template-columns: 1fr;
+      }
+      #nuevaOrdenModal .result-item > div:last-child {
+        text-align: left;
+        margin-top: 6px;
+      }
+      #nuevaOrdenModal .results::after {
+        display: none; /* oculta encabezado “PRECIO” en móvil */
+      }
+      #nuevaOrdenModal .results {
+        padding-top: 42px; /* conserva encabezado izquierdo */
+      }
+    }
+    /* ===== Resultados del buscador con encabezado sticky tipo tabla ===== */
+    #nuevaOrdenModal .results {
+      /* contenedor scrolleable */
+      --resHeadH: 42px;
+      position: relative;
+      overflow: auto;
+      max-height: 56vh;
+      border: 1px solid #e7eaf0;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 14px 30px rgba(2, 6, 23, 0.12);
+      padding-top: 0; /* << quitamos el padding que “mueve” el header */
+    }
+
+    /* dejamos espacio para el header sin usar padding */
+    #nuevaOrdenModal .results > :first-child {
+      margin-top: var(--resHeadH); /* el listado comienza debajo del header */
+    }
+
+    /* barra de encabezado (izquierda) */
+    #nuevaOrdenModal .results::before {
+      content: "CÓDIGO · DESCRIPCIÓN";
+      position: sticky;
+      top: 0;
+      display: block;
+      height: var(--resHeadH);
+      line-height: var(--resHeadH);
+      padding: 0 14px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e5e7eb;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+      z-index: 3; /* por encima de las filas */
+      pointer-events: none;
+    }
+
+    /* título PRECIO a la derecha, en la misma barra */
+    #nuevaOrdenModal .results::after {
+      content: "PRECIO";
+      position: sticky;
+      top: 0;
+      display: block;
+      height: var(--resHeadH);
+      line-height: var(--resHeadH);
+      padding: 0 14px;
+      text-align: right;
+      background: #f8fafc; /* misma barra visual */
+      border-bottom: 1px solid #e5e7eb;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+      z-index: 4; /* sobre el ::before para que no se tape */
+      pointer-events: none;
+    }
+
+    /* Fila: dos columnas (texto + precio) */
+    #nuevaOrdenModal .result-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #fff;
+      border-top: 1px solid #f1f5f9;
+      cursor: pointer;
+    }
+    #nuevaOrdenModal .result-item:hover {
+      background: #f9fafb;
+    }
+
+    /* código “pill” */
+    #nuevaOrdenModal .result-item > div:first-child strong {
+      display: inline-block;
+      margin-right: 10px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #1e40af;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    /* meta */
+    #nuevaOrdenModal .result-meta {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* precio a la derecha */
+    #nuevaOrdenModal .result-item > div:last-child {
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      white-space: nowrap;
+      min-width: 84px;
+      color: #0f172a;
+    }
+
+    /* Scrollbar sutil */
+    #nuevaOrdenModal .results::-webkit-scrollbar {
+      height: 10px;
+      width: 10px;
+    }
+    #nuevaOrdenModal .results::-webkit-scrollbar-thumb {
+      background: #e2e8f0;
+      border-radius: 999px;
+    }
+    #nuevaOrdenModal .results::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    /* En móviles, el precio baja a segunda línea */
+    @media (max-width: 520px) {
+      #nuevaOrdenModal .result-item {
+        grid-template-columns: 1fr;
+      }
+      #nuevaOrdenModal .result-item > div:last-child {
+        text-align: left;
+        margin-top: 6px;
+      }
+      #nuevaOrdenModal .results::after {
+        display: none;
+      } /* ocultamos título “PRECIO” en móvil */
+    }
+
+    /* ===== Tabla de servicios: layout fijo y footer impecable ===== */
+    #nuevaOrdenModal #serviciosAgregados {
+      table-layout: fixed; /* columnas con anchos deterministas */
+      width: 100%;
+    }
+
+    /* Anchos de columnas (coinciden thead/tbody/tfoot) */
+    #nuevaOrdenModal #serviciosAgregados th:nth-child(1),
+    #nuevaOrdenModal #serviciosAgregados td:nth-child(1) {
+      width: 120px;
+    } /* CÓDIGO */
+    #nuevaOrdenModal #serviciosAgregados th:nth-child(2),
+    #nuevaOrdenModal #serviciosAgregados td:nth-child(2) {
+      width: auto;
+    } /* DESCRIPCIÓN (se expande) */
+    #nuevaOrdenModal #serviciosAgregados th:nth-child(3),
+    #nuevaOrdenModal #serviciosAgregados td:nth-child(3) {
+      width: 140px;
+      text-align: center;
+    } /* CANTIDAD */
+    #nuevaOrdenModal #serviciosAgregados th:nth-child(4),
+    #nuevaOrdenModal #serviciosAgregados td:nth-child(4) {
+      width: 120px;
+      text-align: right;
+    } /* PRECIO */
+    #nuevaOrdenModal #serviciosAgregados th:nth-child(5),
+    #nuevaOrdenModal #serviciosAgregados td:nth-child(5) {
+      width: 140px;
+      text-align: right;
+    } /* SUBTOTAL */
+    #nuevaOrdenModal #serviciosAgregados th:nth-child(6),
+    #nuevaOrdenModal #serviciosAgregados td:nth-child(6) {
+      width: 64px;
+      text-align: center;
+    } /* acciones */
+
+    /* Footer sticky bonito y alineado con SUBTOTAL */
+    #nuevaOrdenModal #serviciosAgregados tfoot td {
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.96) 0%,
+        #fff 80%
+      );
+      border-top: 2px solid #e5e7eb;
+      padding: 14px 12px;
+      z-index: 1;
+    }
+
+    /* Celda "Total" (colspan=4) alineada al borde de la columna SUBTOTAL */
+    #nuevaOrdenModal #serviciosAgregados tfoot td.t-right {
+      text-align: right;
+      padding-right: 12px; /* respira respecto a la columna de SUBTOTAL */
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    /* Importe del total: tipografía uniforme con números tabulares */
+    #nuevaOrdenModal #serviciosAgregados tfoot td:nth-child(2) {
+      text-align: right;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Detalle fino: el header también a la derecha para PRECIO/SUBTOTAL */
+    #nuevaOrdenModal #serviciosAgregados thead th:nth-child(4),
+    #nuevaOrdenModal #serviciosAgregados thead th:nth-child(5) {
+      text-align: right;
+    }
+    /* Dropdown robusto */
+    #nuevaOrdenModal #serviciosEncontrados {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      margin-top: 8px;
+      background: #fff;
+      border: 1px solid #e7eaf0;
+      border-radius: 12px;
+      max-height: 340px;
+      overflow: auto;
+      box-shadow: 0 18px 36px rgba(2, 6, 23, 0.16);
+      z-index: 30;
+      display: none; /* tu JS lo cambia a block cuando hay datos */
+      /* para poder “pegar” la X arriba sin estorbar */
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Cabecera sticky */
+    #nuevaOrdenModal #serviciosEncontrados::before {
+      content: "CÓDIGO · DESCRIPCIÓN";
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      display: block;
+      padding: 10px 14px;
+      background: #f6f9fc;
+      border-bottom: 1px solid #e7eaf0;
+      font-weight: 800;
+      color: #24324a;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* Botón de cierre real (no pseudo) — lo insertamos por JS */
+    #nuevaOrdenModal #serviciosEncontrados .results-close {
+      position: sticky;
+      top: 8px; /* se queda arriba al hacer scroll */
+      align-self: flex-end; /* empuja a la derecha */
+      margin: 0 10px 6px 0;
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+      text-align: center;
+      border: 1px solid #e7eaf0;
+      border-radius: 8px;
+      background: #fff;
+      color: #64748b;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    #nuevaOrdenModal #serviciosEncontrados .results-close:hover {
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    /* Ítems */
+    #nuevaOrdenModal #serviciosEncontrados .result-item {
+      display: grid;
+      grid-template-columns: 1fr max-content;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 14px;
+      border-bottom: 1px solid #f1f4f8;
+    }
+    #nuevaOrdenModal #serviciosEncontrados .result-item:last-child {
+      border-bottom: 0;
+    }
+    #nuevaOrdenModal #serviciosEncontrados .result-item:hover {
+      background: #f8fafc;
+    }
+
+    #nuevaOrdenModal #serviciosEncontrados .result-item strong {
+      display: inline-block;
+      min-width: 104px;
+      padding: 8px 12px;
+      background: #eef3ff;
+      border-radius: 12px;
+      color: #1e40af;
+    }
+    #nuevaOrdenModal #serviciosEncontrados .result-item > div:last-child {
+      min-width: 84px;
+      text-align: right;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+    #nuevaOrdenModal #serviciosEncontrados .result-meta {
+      margin-top: 4px;
+      color: #7a8797;
+      font-size: 0.8rem;
+    }
+    /* --- Dropdown de resultados: tapa lo de atrás y sin fugas arriba --- */
+    #nuevaOrdenModal #serviciosEncontrados {
+      margin-top: 8px; /* puedes ajustar este gap si quieres */
+      background: #fff !important; /* fondo opaco: no se verá la tabla detrás */
+      border: 1px solid #e7eaf0;
+      border-radius: 12px;
+      overflow: auto;
+      box-shadow: 0 14px 30px rgba(2, 6, 23, 0.12);
+    }
+
+    /* Si en algún momento se inyectó un título con ::before, lo anulamos */
+    #nuevaOrdenModal #serviciosEncontrados::before {
+      content: none !important;
+      display: none !important;
+    }
+
+    /* --- Header sticky con el título y la X --- */
+    #nuevaOrdenModal #serviciosEncontrados .results-header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: #f3f6fa; /* opaco para tapar el fondo al hacer scroll */
+      border-bottom: 1px solid #e7eaf0;
+      font-weight: 800;
+      color: #24324a;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* evitar headers duplicados si por cualquier motivo se agregara otro */
+    #nuevaOrdenModal #serviciosEncontrados .results-header:not(:first-child) {
+      display: none !important;
+    }
+
+    /* Botón X al extremo derecho */
+    #nuevaOrdenModal #serviciosEncontrados .results-close {
+      margin-left: auto; /* empuja la X a la derecha */
+      width: 28px;
+      height: 28px;
+      line-height: 26px;
+      text-align: center;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fff;
+      color: #64748b;
+      font-weight: 900;
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        color 0.2s ease;
+    }
+    #nuevaOrdenModal #serviciosEncontrados .results-close:hover {
+      background: #e5e7eb;
+      color: #111827;
+    }
+  </style>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener("DOMContentLoaded", () => {
       // ---------- AUTH ----------
-      const token = localStorage.getItem('token');
-      const userStr = localStorage.getItem('user');
+      const token = localStorage.getItem("token");
+      const userStr = localStorage.getItem("user");
       if (!token || !userStr) return hardLogout();
 
       const user = JSON.parse(userStr);
-      if (user.rol !== 'tecnico') return hardLogout();
-      document.getElementById('userName').textContent = `${user.nombre} ${user.apellido ?? ''}`.trim();
+      if (user.rol !== "tecnico") return hardLogout();
+      document.getElementById("userName").textContent =
+        `${user.nombre} ${user.apellido ?? ""}`.trim();
 
       // logout robusto
-      function hardLogout(){
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        location.replace('/');
+      function hardLogout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        location.replace("/");
       }
       window.logout = hardLogout;
-      document.addEventListener('click', (ev) => {
-        const btn = ev.target.closest('#logoutBtn');
+      document.addEventListener("click", (ev) => {
+        const btn = ev.target.closest("#logoutBtn");
         if (!btn) return;
         ev.preventDefault();
         hardLogout();
       });
 
       // ---------- UI refs ----------
-      const toast = document.getElementById('toast');
+      const toast = document.getElementById("toast");
 
-      const nuevaOrdenBtn = document.getElementById('nuevaOrdenBtn');
-      const nuevaOrdenModal = document.getElementById('nuevaOrdenModal');
-      const modalCloseBtns = nuevaOrdenModal.querySelectorAll('.modal-close');
+      const nuevaOrdenBtn = document.getElementById("nuevaOrdenBtn");
+      const nuevaOrdenModal = document.getElementById("nuevaOrdenModal");
+      const modalCloseBtns = nuevaOrdenModal.querySelectorAll(".modal-close");
 
-      const placaQuick = document.getElementById('placaQuick');
-      const buscarQuickBtn = document.getElementById('buscarQuickBtn');
+      const placaQuick = document.getElementById("placaQuick");
+      const buscarQuickBtn = document.getElementById("buscarQuickBtn");
 
-      const buscarOrdenInput = document.getElementById('buscarOrdenInput');
-      const ordenesTbody = document.querySelector('#tablaOrdenes tbody');
-      const emptyOrders = document.getElementById('emptyOrders');
+      const buscarOrdenInput = document.getElementById("buscarOrdenInput");
+      const ordenesTbody = document.querySelector("#tablaOrdenes tbody");
+      const emptyOrders = document.getElementById("emptyOrders");
 
       // modal refs
-      const placaVehiculo = document.getElementById('placaVehiculo');
-      const buscarVehiculoBtn = document.getElementById('buscarVehiculoBtn');
-      const vehBox = document.getElementById('vehiculoInfo');
-      const vehMarca = document.getElementById('vehMarca');
-      const vehModelo = document.getElementById('vehModelo');
-      const vehPlaca = document.getElementById('vehPlaca');
-      const vehCliente = document.getElementById('vehCliente');
-      const vehTelefono = document.getElementById('vehTelefono');
+      const placaVehiculo = document.getElementById("placaVehiculo");
+      const buscarVehiculoBtn = document.getElementById("buscarVehiculoBtn");
+      const vehBox = document.getElementById("vehiculoInfo");
+      const vehMarca = document.getElementById("vehMarca");
+      const vehModelo = document.getElementById("vehModelo");
+      const vehPlaca = document.getElementById("vehPlaca");
+      const vehCliente = document.getElementById("vehCliente");
+      const vehTelefono = document.getElementById("vehTelefono");
 
-      const tipoServicio = document.getElementById('tipoServicio');
-      const buscarServicio = document.getElementById('buscarServicio');
-      const serviciosEncontrados = document.getElementById('serviciosEncontrados');
-      const serviciosTbody = document.querySelector('#serviciosAgregados tbody');
-      const totalOrdenEl = document.getElementById('totalOrden');
+      const tipoServicio = document.getElementById("tipoServicio");
+      const buscarServicio = document.getElementById("buscarServicio");
+      const serviciosEncontrados = document.getElementById(
+        "serviciosEncontrados"
+      );
+      const serviciosTbody = document.querySelector(
+        "#serviciosAgregados tbody"
+      );
+      const totalOrdenEl = document.getElementById("totalOrden");
 
       // ---------- state ----------
       let vehiculoSeleccionado = null;
       let serviciosSeleccionados = [];
       let todasLasOrdenes = [];
-      let filtroEstado = 'todas';
+      let filtroEstado = "todas";
 
       // ---------- helpers ----------
-      const money = new Intl.NumberFormat('es-EC',{ style:'currency', currency:'USD' });
-      const fmt = new Intl.NumberFormat('es-EC');
+      const money = new Intl.NumberFormat("es-EC", {
+        style: "currency",
+        currency: "USD",
+      });
+      const fmt = new Intl.NumberFormat("es-EC");
 
       const showToast = (msg) => {
         toast.textContent = msg;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 3000);
       };
 
-      const badge = (estado='') => {
-        switch(estado.toLowerCase()){
-          case 'pendiente': return 'badge badge-warning';
-          case 'en proceso': return 'badge badge-primary';
-          case 'completado':
-          case 'entregado': return 'badge badge-success';
-          default: return 'badge badge-primary';
+      const badge = (estado = "") => {
+        switch (estado.toLowerCase()) {
+          case "pendiente":
+            return "badge badge-warning";
+          case "en proceso":
+            return "badge badge-primary";
+          case "completado":
+          case "entregado":
+            return "badge badge-success";
+          default:
+            return "badge badge-primary";
         }
       };
 
       // ---------- nueva orden (modal) ----------
-      nuevaOrdenBtn.addEventListener('click', () => {
-        nuevaOrdenModal.style.display = 'flex';
+      nuevaOrdenBtn.addEventListener("click", () => {
+        nuevaOrdenModal.style.display = "flex";
         placaVehiculo.focus();
       });
-      modalCloseBtns.forEach(b => b.addEventListener('click', () => {
-        nuevaOrdenModal.style.display = 'none';
-      }));
+      modalCloseBtns.forEach((b) =>
+        b.addEventListener("click", () => {
+          nuevaOrdenModal.style.display = "none";
+        })
+      );
 
-      document.getElementById('nuevaOrdenForm').addEventListener('submit', crearOrden);
+      document
+        .getElementById("nuevaOrdenForm")
+        .addEventListener("submit", crearOrden);
 
-      buscarVehiculoBtn.addEventListener('click', buscarVehiculo);
-      buscarServicio.addEventListener('input', debounce(buscarServicios, 280));
-      tipoServicio.addEventListener('change', buscarServicios);
+      buscarVehiculoBtn.addEventListener("click", buscarVehiculo);
+      buscarServicio.addEventListener("input", debounce(buscarServicios, 280));
+      tipoServicio.addEventListener("change", buscarServicios);
 
       // botones filtros
-      document.querySelectorAll('.pill').forEach(p => {
-        p.addEventListener('click', () => {
-          document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
-          p.classList.add('active');
+      document.querySelectorAll(".pill").forEach((p) => {
+        p.addEventListener("click", () => {
+          document
+            .querySelectorAll(".pill")
+            .forEach((x) => x.classList.remove("active"));
+          p.classList.add("active");
           filtroEstado = p.dataset.estado;
           pintarOrdenes();
         });
       });
 
       // búsqueda rápida por placa arriba
-      buscarQuickBtn.addEventListener('click', async () => {
-        const placa = (placaQuick.value || '').trim();
-        if(!placa) return;
+      buscarQuickBtn.addEventListener("click", async () => {
+        const placa = (placaQuick.value || "").trim();
+        if (!placa) return;
         await buscarVehiculo(placa, true); // muestra en modal
-        nuevaOrdenModal.style.display = 'flex';
+        nuevaOrdenModal.style.display = "flex";
       });
 
       // búsqueda en tabla
-      buscarOrdenInput.addEventListener('input', pintarOrdenes);
+      buscarOrdenInput.addEventListener("input", pintarOrdenes);
 
       // ---------- carga inicial ----------
       cargarMisOrdenes();
 
       // ---------- funciones de datos ----------
-      async function cargarMisOrdenes(){
-        try{
-          const r = await fetch('http://localhost:3001/api/ordenes/mis-ordenes', {
-            headers:{ 'Authorization': `Bearer ${token}` }
-          });
+      async function cargarMisOrdenes() {
+        try {
+          const r = await fetch(
+            "http://localhost:3001/api/ordenes/mis-ordenes",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           const data = await r.json();
-          if(!data?.success) return;
+          if (!data?.success) return;
           todasLasOrdenes = data.data || [];
           kpis(todasLasOrdenes);
           pintarOrdenes();
-        }catch(e){
+        } catch (e) {
           console.error(e);
-          showToast('No se pudieron cargar tus órdenes');
+          showToast("No se pudieron cargar tus órdenes");
         }
       }
 
-      function kpis(list){
+      function kpis(list) {
         const hoy = new Date().toDateString();
-        const asignadasHoy = list.filter(o => new Date(o.fecha_ingreso).toDateString() === hoy).length;
-        const enProc = list.filter(o => (o.estado || '').toLowerCase() === 'en proceso').length;
-        const comp = list.filter(o => ['completado','entregado'].includes((o.estado||'').toLowerCase())).length;
+        const asignadasHoy = list.filter(
+          (o) => new Date(o.fecha_ingreso).toDateString() === hoy
+        ).length;
+        const enProc = list.filter(
+          (o) => (o.estado || "").toLowerCase() === "en proceso"
+        ).length;
+        const comp = list.filter((o) =>
+          ["completado", "entregado"].includes((o.estado || "").toLowerCase())
+        ).length;
 
-        document.getElementById('kpiAsignadas').textContent = fmt.format(asignadasHoy);
-        document.getElementById('kpiProceso').textContent   = fmt.format(enProc);
-        document.getElementById('kpiCompletadas').textContent = fmt.format(comp);
+        document.getElementById("kpiAsignadas").textContent =
+          fmt.format(asignadasHoy);
+        document.getElementById("kpiProceso").textContent = fmt.format(enProc);
+        document.getElementById("kpiCompletadas").textContent =
+          fmt.format(comp);
       }
 
-      function pintarOrdenes(){
-        const q = (buscarOrdenInput.value || '').toLowerCase().trim();
+      function pintarOrdenes() {
+        const q = (buscarOrdenInput.value || "").toLowerCase().trim();
         let list = [...todasLasOrdenes];
 
-        if (filtroEstado !== 'todas'){
-          list = list.filter(o => (o.estado||'').toLowerCase() === filtroEstado);
+        if (filtroEstado !== "todas") {
+          list = list.filter(
+            (o) => (o.estado || "").toLowerCase() === filtroEstado
+          );
         }
-        if (q){
-          list = list.filter(o =>
-            String(o.numero_orden).toLowerCase().includes(q) ||
-            (o.placa||'').toLowerCase().includes(q) ||
-            (o.cliente_nombre||'').toLowerCase().includes(q)
+        if (q) {
+          list = list.filter(
+            (o) =>
+              String(o.numero_orden).toLowerCase().includes(q) ||
+              (o.placa || "").toLowerCase().includes(q) ||
+              (o.cliente_nombre || "").toLowerCase().includes(q)
           );
         }
 
-        ordenesTbody.innerHTML = list.map(o => `
+        ordenesTbody.innerHTML = list
+          .map(
+            (o) => `
           <tr>
             <td>${o.numero_orden}</td>
             <td>${new Date(o.fecha_ingreso).toLocaleString()}</td>
@@ -503,104 +1806,133 @@ import Layout from '../../layouts/Layout.astro';
               <button class="btn btn-outline btn-sm" onclick="verDetalleOrden(${o.id})">Ver</button>
             </td>
           </tr>
-        `).join('');
+        `
+          )
+          .join("");
 
-        emptyOrders.style.display = list.length ? 'none' : 'grid';
+        emptyOrders.style.display = list.length ? "none" : "grid";
       }
 
       // ---------- buscar vehículo ----------
-      async function buscarVehiculo(forcedPlaca=null, desdeQuick=false){
+      async function buscarVehiculo(forcedPlaca = null, desdeQuick = false) {
         const placa = (forcedPlaca ?? placaVehiculo.value).trim();
-        if(!placa) return;
+        if (!placa) return;
 
-        try{
-          const r = await fetch(`http://localhost:3001/api/vehiculos/buscar/${encodeURIComponent(placa)}`, {
-            headers:{ 'Authorization': `Bearer ${token}` }
-          });
+        try {
+          const r = await fetch(
+            `http://localhost:3001/api/vehiculos/buscar/${encodeURIComponent(placa)}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           const data = await r.json();
-          if(data?.success && (data.data?.length || 0) > 0){
+          if (data?.success && (data.data?.length || 0) > 0) {
             vehiculoSeleccionado = data.data[0];
-            vehMarca.textContent   = vehiculoSeleccionado.marca;
-            vehModelo.textContent  = vehiculoSeleccionado.modelo;
-            vehPlaca.textContent   = vehiculoSeleccionado.placa;
+            vehMarca.textContent = vehiculoSeleccionado.marca;
+            vehModelo.textContent = vehiculoSeleccionado.modelo;
+            vehPlaca.textContent = vehiculoSeleccionado.placa;
             vehCliente.textContent = vehiculoSeleccionado.cliente_nombre;
-            vehTelefono.textContent= vehiculoSeleccionado.telefono || 'N/D';
-            vehBox.style.display = 'flex';
-            if(desdeQuick){ placaVehiculo.value = placa; }
-          }else{
-            vehBox.style.display = 'none';
+            vehTelefono.textContent = vehiculoSeleccionado.telefono || "N/D";
+            vehBox.style.display = "flex";
+            if (desdeQuick) {
+              placaVehiculo.value = placa;
+            }
+          } else {
+            vehBox.style.display = "none";
             vehiculoSeleccionado = null;
-            showToast('Vehículo no encontrado');
+            showToast("Vehículo no encontrado");
           }
-        }catch(e){
+        } catch (e) {
           console.error(e);
-          showToast('Error al buscar vehículo');
+          showToast("Error al buscar vehículo");
         }
       }
 
       // ---------- buscar servicios ----------
-      async function buscarServicios(){
-        const termino = (buscarServicio.value || '').trim();
-        const tipo = (tipoServicio.value || '').trim();
+      async function buscarServicios() {
+        const termino = (buscarServicio.value || "").trim();
+        const tipo = (tipoServicio.value || "").trim();
 
-        let url = 'http://localhost:3001/api/servicios';
-        if (tipo && termino) url = `http://localhost:3001/api/servicios/buscar/${encodeURIComponent(termino)}`;
-        else if (tipo)      url = `http://localhost:3001/api/servicios/tipo/${encodeURIComponent(tipo)}`;
-        else if (termino)   url = `http://localhost:3001/api/servicios/buscar/${encodeURIComponent(termino)}`;
+        let url = "http://localhost:3001/api/servicios";
+        if (tipo && termino)
+          url = `http://localhost:3001/api/servicios/buscar/${encodeURIComponent(termino)}`;
+        else if (tipo)
+          url = `http://localhost:3001/api/servicios/tipo/${encodeURIComponent(tipo)}`;
+        else if (termino)
+          url = `http://localhost:3001/api/servicios/buscar/${encodeURIComponent(termino)}`;
 
-        try{
-          const r = await fetch(url, { headers:{ 'Authorization': `Bearer ${token}` }});
+        try {
+          const r = await fetch(url, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
           const data = await r.json();
-          if(!data?.success) return (serviciosEncontrados.style.display='none');
+          if (!data?.success)
+            return (serviciosEncontrados.style.display = "none");
 
           const arr = data.data || [];
-          if(!arr.length){ serviciosEncontrados.style.display='none'; return; }
+          if (!arr.length) {
+            serviciosEncontrados.style.display = "none";
+            return;
+          }
 
-          serviciosEncontrados.innerHTML = arr.map(s => `
-            <div class="result-item" onclick='agregarServicio(${JSON.stringify(s).replace(/"/g,"&quot;")})'>
+          serviciosEncontrados.innerHTML = arr
+            .map(
+              (s) => `
+            <div class="result-item" onclick='agregarServicio(${JSON.stringify(s).replace(/"/g, "&quot;")})'>
               <div>
                 <strong>${s.codigo}</strong> - ${s.descripcion}
                 <div class="result-meta">Tipo: ${s.tipo}</div>
               </div>
-              <div>${money.format(s.precio_unitario||0)}</div>
+              <div>${money.format(s.precio_unitario || 0)}</div>
             </div>
-          `).join('');
-          serviciosEncontrados.style.display = 'block';
-        }catch(e){
+          `
+            )
+            .join("");
+          serviciosEncontrados.style.display = "block";
+        } catch (e) {
           console.error(e);
         }
       }
 
       // expuesto para inline
-      window.agregarServicio = function(s){
-        if (serviciosSeleccionados.find(x => x.id === s.id)) { showToast('Ya está agregado'); return; }
-        const item = { ...s, cantidad: 1, subtotal: (s.precio_unitario||0) };
+      window.agregarServicio = function (s) {
+        if (serviciosSeleccionados.find((x) => x.id === s.id)) {
+          showToast("Ya está agregado");
+          return;
+        }
+        const item = { ...s, cantidad: 1, subtotal: s.precio_unitario || 0 };
         serviciosSeleccionados.push(item);
-        serviciosEncontrados.style.display = 'none';
-        buscarServicio.value = '';
+        serviciosEncontrados.style.display = "none";
+        buscarServicio.value = "";
         pintarServicios();
       };
 
-      window.removerServicio = function(i){
-        serviciosSeleccionados.splice(i,1);
+      window.removerServicio = function (i) {
+        serviciosSeleccionados.splice(i, 1);
         pintarServicios();
       };
 
-      window.incQty = function(i){
+      window.incQty = function (i) {
         serviciosSeleccionados[i].cantidad += 1;
-        serviciosSeleccionados[i].subtotal = (serviciosSeleccionados[i].precio_unitario||0) * serviciosSeleccionados[i].cantidad;
+        serviciosSeleccionados[i].subtotal =
+          (serviciosSeleccionados[i].precio_unitario || 0) *
+          serviciosSeleccionados[i].cantidad;
         pintarServicios();
       };
 
-      window.decQty = function(i){
+      window.decQty = function (i) {
         if (serviciosSeleccionados[i].cantidad <= 1) return;
         serviciosSeleccionados[i].cantidad -= 1;
-        serviciosSeleccionados[i].subtotal = (serviciosSeleccionados[i].precio_unitario||0) * serviciosSeleccionados[i].cantidad;
+        serviciosSeleccionados[i].subtotal =
+          (serviciosSeleccionados[i].precio_unitario || 0) *
+          serviciosSeleccionados[i].cantidad;
         pintarServicios();
       };
 
-      function pintarServicios(){
-        serviciosTbody.innerHTML = serviciosSeleccionados.map((s,i) => `
+      function pintarServicios() {
+        serviciosTbody.innerHTML = serviciosSeleccionados
+          .map(
+            (s, i) => `
           <tr>
             <td>${s.codigo}</td>
             <td>${s.descripcion}</td>
@@ -611,80 +1943,144 @@ import Layout from '../../layouts/Layout.astro';
                 <button class="qty-btn" onclick="incQty(${i})">+</button>
               </div>
             </td>
-            <td>${money.format(s.precio_unitario||0)}</td>
-            <td>${money.format(s.subtotal||0)}</td>
+            <td>${money.format(s.precio_unitario || 0)}</td>
+            <td>${money.format(s.subtotal || 0)}</td>
             <td><button class="btn btn-outline" onclick="removerServicio(${i})">✕</button></td>
           </tr>
-        `).join('');
+        `
+          )
+          .join("");
 
-        const total = serviciosSeleccionados.reduce((a,b) => a + (b.subtotal||0), 0);
+        const total = serviciosSeleccionados.reduce(
+          (a, b) => a + (b.subtotal || 0),
+          0
+        );
         totalOrdenEl.textContent = money.format(total);
       }
 
       // ---------- crear orden ----------
-      async function crearOrden(ev){
+      async function crearOrden(ev) {
         ev.preventDefault();
-        if(!vehiculoSeleccionado) return showToast('Busca y selecciona un vehículo');
-        if(!serviciosSeleccionados.length) return showToast('Agrega al menos un servicio');
+        if (!vehiculoSeleccionado)
+          return showToast("Busca y selecciona un vehículo");
+        if (!serviciosSeleccionados.length)
+          return showToast("Agrega al menos un servicio");
 
         const ordenData = {
           id_vehiculo: vehiculoSeleccionado.id,
-          observaciones: (document.getElementById('observaciones').value || '').trim(),
-          servicios: serviciosSeleccionados.map(s => ({
+          observaciones: (
+            document.getElementById("observaciones").value || ""
+          ).trim(),
+          servicios: serviciosSeleccionados.map((s) => ({
             id_servicio: s.id,
             cantidad: s.cantidad,
-            precio_unitario: s.precio_unitario
-          }))
+            precio_unitario: s.precio_unitario,
+          })),
         };
 
-        try{
-          const r = await fetch('http://localhost:3001/api/ordenes', {
-            method:'POST',
-            headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify(ordenData)
+        try {
+          const r = await fetch("http://localhost:3001/api/ordenes", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(ordenData),
           });
           const data = await r.json();
-          if(!data?.success){ showToast(data?.message || 'No se pudo crear la orden'); return; }
+          if (!data?.success) {
+            showToast(data?.message || "No se pudo crear la orden");
+            return;
+          }
 
-          nuevaOrdenModal.style.display = 'none';
+          nuevaOrdenModal.style.display = "none";
           // reset UI
-          document.getElementById('nuevaOrdenForm').reset();
+          document.getElementById("nuevaOrdenForm").reset();
           vehiculoSeleccionado = null;
           serviciosSeleccionados = [];
-          vehBox.style.display = 'none';
+          vehBox.style.display = "none";
           pintarServicios();
           showToast(`Orden #${data.numero_orden} creada correctamente`);
           cargarMisOrdenes();
-        }catch(e){
+        } catch (e) {
           console.error(e);
-          showToast('Error al crear la orden');
+          showToast("Error al crear la orden");
         }
       }
 
       // ---------- ver detalle ----------
-      window.verDetalleOrden = async function(ordenId){
-        try{
-          const r = await fetch(`http://localhost:3001/api/ordenes/${ordenId}/detalle`, {
-            headers:{ 'Authorization': `Bearer ${token}` }
-          });
+      window.verDetalleOrden = async function (ordenId) {
+        try {
+          const r = await fetch(
+            `http://localhost:3001/api/ordenes/${ordenId}/detalle`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           const data = await r.json();
-          if(!data?.success) return;
+          if (!data?.success) return;
 
-          const detalle = (data.data || []).map(d => (
-            `${d.codigo} - ${d.descripcion} (x${d.cantidad})  ${money.format(d.precio_unitario)}  →  ${money.format(d.subtotal)}`
-          )).join('\n');
+          const detalle = (data.data || [])
+            .map(
+              (d) =>
+                `${d.codigo} - ${d.descripcion} (x${d.cantidad})  ${money.format(d.precio_unitario)}  →  ${money.format(d.subtotal)}`
+            )
+            .join("\n");
 
           // toast largo: usa alert estilizada simple
-          showToast('Detalle obtenido. Revisa la consola.');
-          console.log('Detalle de orden #'+ordenId+'\n\n'+detalle);
-        }catch(e){
+          showToast("Detalle obtenido. Revisa la consola.");
+          console.log("Detalle de orden #" + ordenId + "\n\n" + detalle);
+        } catch (e) {
           console.error(e);
         }
       };
 
+      (function () {
+        if (!serviciosEncontrados) return;
+
+        // header contenedor
+        const header = document.createElement("div");
+        header.className = "results-header";
+        header.innerHTML = `<span>CÓDIGO · DESCRIPCIÓN</span>`;
+
+        // botón X
+        const closeBtn = document.createElement("button");
+        closeBtn.type = "button";
+        closeBtn.className = "results-close";
+        closeBtn.setAttribute("aria-label", "Cerrar resultados");
+        closeBtn.textContent = "✕";
+        header.appendChild(closeBtn);
+
+        // cerrar al click
+        closeBtn.addEventListener("click", () => {
+          serviciosEncontrados.style.display = "none";
+        });
+
+        // cerrar con Escape
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") serviciosEncontrados.style.display = "none";
+        });
+
+        // siempre se inserta arriba aunque se regenere innerHTML
+        const ensureHeader = () => {
+          if (!serviciosEncontrados.querySelector(".results-header")) {
+            serviciosEncontrados.prepend(header);
+          }
+        };
+
+        const mo = new MutationObserver(ensureHeader);
+        mo.observe(serviciosEncontrados, { childList: true });
+
+        ensureHeader();
+      })();
+
       // ---------- utils ----------
-      function debounce(fn, t=300){
-        let id; return (...args) => { clearTimeout(id); id = setTimeout(() => fn(...args), t); };
+      function debounce(fn, t = 300) {
+        let id;
+        return (...args) => {
+          clearTimeout(id);
+          id = setTimeout(() => fn(...args), t);
+        };
       }
     });
   </script>

@@ -852,6 +852,12 @@ import Layout from "../../layouts/Layout.astro";
       border-color: #fca5a5 !important;
       color: #7f1d1d !important;
     }
+
+    #wrapTable thead th:last-child,
+    #wrapTable tbody td:last-child {
+      text-align: left !important;
+      padding-left: 10px !important;
+    }
   </style>
 
   <script>
@@ -942,7 +948,7 @@ import Layout from "../../layouts/Layout.astro";
               <th>Teléfono</th>
               <th>Email</th>
               <th>Dirección</th>
-              <th></th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
