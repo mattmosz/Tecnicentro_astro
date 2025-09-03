@@ -750,20 +750,20 @@ import Layout from "../../layouts/Layout.astro";
   </style>
 
   <script>
-    /* ---------- LOGOUT ROBUSTO (delegado + global) ---------- */
+    
     function _hardLogout() {
       try {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
       } finally {
-        // Evita volver al dashboard con "Atrás"
+        
         location.replace("/");
       }
     }
-    // Disponible para cualquier onclick inline
+    
     window.logout = _hardLogout;
 
-    // Delegado: funciona aunque el botón se renderice después
+    
     document.addEventListener("click", (ev) => {
       const btn = ev.target.closest("#btnLogout");
       if (!btn) return;
@@ -771,7 +771,7 @@ import Layout from "../../layouts/Layout.astro";
       _hardLogout();
     });
 
-    /* ---------- Guard de autenticación ---------- */
+    
     (async () => {
       const token = localStorage.getItem("token");
       const userStr = localStorage.getItem("user");
@@ -796,7 +796,7 @@ import Layout from "../../layouts/Layout.astro";
       loadDashboardData();
     })();
 
-    /* ---------- Dashboard data ---------- */
+    
     const fmtNum = new Intl.NumberFormat("es-EC");
     const fmtMoney = new Intl.NumberFormat("es-EC", {
       style: "currency",
