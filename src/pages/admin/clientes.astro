@@ -862,7 +862,6 @@ import Layout from "../../layouts/Layout.astro";
 
   <script>
     //@ts-nocheck
-    // -------- logout & guard ----------
     function _hardLogout() {
       try {
         localStorage.removeItem("token");
@@ -904,7 +903,7 @@ import Layout from "../../layouts/Layout.astro";
       loadPage();
     })();
 
-    // -------- page logic ----------
+    
     let page = 1,
       limit = 10,
       total = 0,
