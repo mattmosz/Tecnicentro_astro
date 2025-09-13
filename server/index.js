@@ -18,6 +18,7 @@ import serviciosRoutes from './routes/servicios.js';
 import ordenesRoutes from './routes/ordenes.js';
 import facturasRoutes from './routes/facturas.js';
 import adminRoutes from './routes/admin.js';
+import reportesRouter from './routes/reportes.js';
 
 const app = express();
 const PORT = Number(process.env.PORT || 3001);
@@ -48,6 +49,7 @@ app.use('/api/servicios', serviciosRoutes);
 app.use('/api/ordenes', ordenesRoutes);
 app.use('/api/facturas', facturasRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/reportes', reportesRouter);
 
 // Health
 app.get('/api/health', (_req, res) => {
