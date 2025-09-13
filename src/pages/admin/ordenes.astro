@@ -1,5 +1,5 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from "../../layouts/Layout.astro";
 ---
 
 <Layout title="Gestión de Órdenes de Trabajo - TecniCentro Ibarra Express">
@@ -11,7 +11,12 @@ import Layout from '../../layouts/Layout.astro';
       </a>
       <div class="user-menu">
         <span id="userWelcome" class="user-chip">Cargando…</span>
-        <button type="button" id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">
+        <button
+          type="button"
+          id="btnLogout"
+          class="btn btn-orange"
+          onclick="window.logout?.()"
+        >
           Cerrar Sesión
         </button>
       </div>
@@ -26,7 +31,11 @@ import Layout from '../../layouts/Layout.astro';
           <p class="muted">Administra las órdenes de servicio del taller</p>
         </div>
         <div class="actions">
-          <input id="searchInput" class="input" placeholder="Buscar por número, cliente o placa" />
+          <input
+            id="searchInput"
+            class="input"
+            placeholder="Buscar por número, cliente o placa"
+          />
           <select id="estadoFilter" class="input">
             <option value="">Todos los estados</option>
             <option value="pendiente">Pendientes</option>
@@ -67,7 +76,13 @@ import Layout from '../../layouts/Layout.astro';
           </label>
           <label>
             Vehículo *
-            <select name="id_vehiculo" id="vehiculoSelect" required class="input" disabled>
+            <select
+              name="id_vehiculo"
+              id="vehiculoSelect"
+              required
+              class="input"
+              disabled
+            >
               <option value="">Primero seleccione un cliente</option>
             </select>
           </label>
@@ -89,13 +104,22 @@ import Layout from '../../layouts/Layout.astro';
         </div>
         <label>
           Observaciones
-          <textarea name="observaciones" class="input" rows="3" placeholder="Observaciones sobre el vehículo o trabajo a realizar"></textarea>
+          <textarea
+            name="observaciones"
+            class="input"
+            rows="3"
+            placeholder="Observaciones sobre el vehículo o trabajo a realizar"
+          ></textarea>
         </label>
-        
+
         <div class="servicios-section">
           <div class="section-header">
             <h4>Servicios a Realizar</h4>
-            <button type="button" id="btnAgregarServicio" class="btn btn-small btn-outline">+ Agregar Servicio</button>
+            <button
+              type="button"
+              id="btnAgregarServicio"
+              class="btn btn-small btn-outline">+ Agregar Servicio</button
+            >
           </div>
           <div id="serviciosContainer">
             <!-- Los servicios se agregarán dinámicamente aquí -->
@@ -104,7 +128,9 @@ import Layout from '../../layouts/Layout.astro';
       </div>
       <div class="modal-foot">
         <button class="btn btn-outline" value="cancel">Cancelar</button>
-        <button class="btn btn-orange" id="btnGuardar" value="default">Guardar</button>
+        <button class="btn btn-orange" id="btnGuardar" value="default"
+          >Guardar</button
+        >
       </div>
     </form>
   </dialog>
@@ -114,13 +140,16 @@ import Layout from '../../layouts/Layout.astro';
     <div class="modal">
       <div class="modal-head">
         <h3 id="detalleTitle">Detalle de Orden</h3>
-        <button class="icon" type="button" id="closeDetalle">✖</button>
       </div>
       <div class="modal-body" id="detalleContent">
         <!-- El contenido se carga dinámicamente -->
       </div>
       <div class="modal-foot">
-        <button class="btn btn-outline" onclick="document.getElementById('detalleModal').close()">Cerrar</button>
+        <button
+          class="btn btn-outline"
+          onclick="document.getElementById('detalleModal').close()"
+          >Cerrar</button
+        >
       </div>
     </div>
   </dialog>
@@ -130,7 +159,7 @@ import Layout from '../../layouts/Layout.astro';
       background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
       color: white;
       padding: 1rem 0;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
     .brand {
       display: flex;
@@ -156,7 +185,7 @@ import Layout from '../../layouts/Layout.astro';
       gap: 1rem;
     }
     .user-chip {
-      background: rgba(255,255,255,0.2);
+      background: rgba(255, 255, 255, 0.2);
       padding: 0.5rem 1rem;
       border-radius: 1rem;
       font-size: 0.9rem;
@@ -181,7 +210,7 @@ import Layout from '../../layouts/Layout.astro';
     .card {
       background: white;
       border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       overflow: hidden;
     }
     .card-head {
@@ -199,7 +228,8 @@ import Layout from '../../layouts/Layout.astro';
       width: 100%;
       border-collapse: collapse;
     }
-    th, td {
+    th,
+    td {
       text-align: left;
       padding: 0.75rem;
       border-bottom: 1px solid #e5e7eb;
@@ -288,10 +318,10 @@ import Layout from '../../layouts/Layout.astro';
       border: none;
       border-radius: 12px;
       padding: 0;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     }
     .modal::backdrop {
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
     }
     .modal-head {
       display: flex;
@@ -353,8 +383,12 @@ import Layout from '../../layouts/Layout.astro';
       border-radius: 0.375rem;
     }
     @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
     }
     .muted {
       color: #6b7280;
@@ -369,7 +403,8 @@ import Layout from '../../layouts/Layout.astro';
       margin: 0 0 0.5rem 0;
       color: #1f2937;
     }
-    h3, h4 {
+    h3,
+    h4 {
       margin: 0;
       color: #1f2937;
     }
@@ -394,118 +429,515 @@ import Layout from '../../layouts/Layout.astro';
     }
     /* ====== TOPBAR ACOMODADA Y MÁS ESTÉTICA ====== */
 
-/* La barra ocupa todo el ancho y queda fija/pegajosa arriba */
-.navbar{
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-  color: #fff;
-  border: 0;
-  box-shadow: 0 4px 16px rgba(2, 6, 23, .10);
-}
+    /* La barra ocupa todo el ancho y queda fija/pegajosa arriba */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: #fff;
+      border: 0;
+      box-shadow: 0 4px 16px rgba(2, 6, 23, 0.1);
+    }
 
-/* Contenedor interno con layout flexible */
-.navbar .container{
-  max-width: var(--container, 1200px);
-  margin: 0 auto;
-  padding: 10px 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
+    /* Contenedor interno con layout flexible */
+    .navbar .container {
+      max-width: var(--container, 1200px);
+      margin: 0 auto;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
 
-/* Marca (logo + texto) a la izquierda */
-.brand{
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: #fff;
-  font-weight: 700;
-}
+    /* Marca (logo + texto) a la izquierda */
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+    }
 
-/* Empuja el user menu completamente a la derecha */
-.navbar .user-menu{
-  margin-left: auto;     /* <-- clave para enviarlo a la derecha */
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-}
+    /* Empuja el user menu completamente a la derecha */
+    .navbar .user-menu {
+      margin-left: auto; /* <-- clave para enviarlo a la derecha */
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-/* Chip de bienvenida más limpio */
-.user-chip{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.15);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,.25);
-  font-weight: 600;
-  font-size: .875rem;
-  backdrop-filter: saturate(140%) blur(2px);
-}
+    /* Chip de bienvenida más limpio */
+    .user-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      font-weight: 600;
+      font-size: 0.875rem;
+      backdrop-filter: saturate(140%) blur(2px);
+    }
 
-/* Botón “Cerrar Sesión” como CTA */
-#btnLogout.btn{
-  background: #ef4444;             /* rojo suave */
-  color: #fff;
-  border: 0;
-  border-radius: 999px;
-  padding: 10px 14px;
-  font-weight: 700;
-  letter-spacing: .2px;
-  box-shadow: 0 6px 14px rgba(239,68,68,.22);
-  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
-}
-#btnLogout.btn:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 10px 24px rgba(239,68,68,.28);
-}
-#btnLogout.btn:active{
-  transform: translateY(0);
-  box-shadow: 0 6px 14px rgba(239,68,68,.22);
-}
+    /* Botón “Cerrar Sesión” como CTA */
+    #btnLogout.btn {
+      background: #ef4444; /* rojo suave */
+      color: #fff;
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      box-shadow: 0 6px 14px rgba(239, 68, 68, 0.22);
+      transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease,
+        opacity 0.12s ease;
+    }
+    #btnLogout.btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(239, 68, 68, 0.28);
+    }
+    #btnLogout.btn:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 14px rgba(239, 68, 68, 0.22);
+    }
 
-/* Ícono/emoji del logo con mejor contraste */
-.logo-circle{
-  width: 36px; height: 36px;
-  display:grid; place-items:center;
-  border-radius: 50%;
-  background: rgba(255,255,255,.15);
-  color:#fff;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
-}
-.brand-text{ color:#fff; }
-
+    /* Ícono/emoji del logo con mejor contraste */
+    .logo-circle {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+    }
+    .brand-text {
+      color: #fff;
+    }
   </style>
+  <style is:global>
+    /* ===== LISTADO DE ÓRDENES (GLOBAL para el innerHTML de #tableContainer) ===== */
 
+    /* Tabla ocupa todo el ancho y genera “filas tipo card” para evitar vacío a la derecha */
+    #tableContainer table {
+      width: 100% !important;
+      border-collapse: separate !important;
+      border-spacing: 0 10px !important; /* espacio entre filas */
+      table-layout: fixed !important; /* fija distribución y evita columnas gigantes */
+    }
+
+    /* Encabezado limpio y fijo */
+    #tableContainer thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f7f9fc !important;
+      border-bottom: 1px solid #e9eef6 !important;
+      color: var(--muted) !important;
+      font-size: 12px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.04em !important;
+      text-align: left !important;
+      padding: 12px 10px !important;
+    }
+
+    /* Celdas como tarjeta */
+    #tableContainer tbody td {
+      background: #fff !important;
+      border-top: none !important;
+      padding: 14px 12px !important;
+      vertical-align: middle !important;
+      font-size: 0.95rem !important;
+      color: var(--text) !important;
+      box-shadow:
+        0 1px 0 rgba(2, 6, 23, 0.06),
+        0 8px 12px rgba(2, 6, 23, 0.04) !important;
+    }
+    /* Esquinas redondeadas por fila */
+    #tableContainer tbody tr td:first-child {
+      border-radius: 12px 0 0 12px !important;
+    }
+    #tableContainer tbody tr td:last-child {
+      border-radius: 0 12px 12px 0 !important;
+    }
+
+    /* Hover con leve elevación */
+    #tableContainer tbody tr:hover td {
+      transform: translateY(-1px);
+      box-shadow:
+        0 2px 4px rgba(2, 6, 23, 0.08),
+        0 14px 24px rgba(2, 6, 23, 0.06) !important;
+      background: #fbfbfd !important;
+    }
+
+    /* ===== Anchos por columna (ajústalos si deseas) =====
+     1 Número | 2 Cliente | 3 Vehículo | 4 Técnico | 5 Fecha | 6 Estado | 7 Acciones  */
+    #tableContainer thead th:nth-child(1) {
+      width: 180px !important;
+    } /* Número     */
+    #tableContainer thead th:nth-child(2) {
+      width: 260px !important;
+    } /* Cliente    */
+    #tableContainer thead th:nth-child(3) {
+      width: 240px !important;
+    } /* Vehículo   */
+    #tableContainer thead th:nth-child(4) {
+      width: 200px !important;
+    } /* Técnico    */
+    #tableContainer thead th:nth-child(5) {
+      width: 140px !important;
+    } /* Fecha      */
+    #tableContainer thead th:nth-child(6) {
+      width: 120px !important;
+    } /* Estado     */
+    #tableContainer thead th:nth-child(7),
+    #tableContainer tbody td:last-child {
+      width: 120px !important;
+      min-width: 120px !important;
+      text-align: right !important;
+      white-space: nowrap !important;
+    }
+
+    /* Truncamiento elegante en columnas largas */
+    #tableContainer tbody td:nth-child(2),  /* Cliente */
+  #tableContainer tbody td:nth-child(3) {
+      /* Vehículo */
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+
+    /* Alineación acciones aunque tus botones no tengan clases */
+    #tableContainer tbody td:last-child .row-actions {
+      display: inline-flex !important;
+      gap: 8px !important;
+      justify-content: flex-end !important;
+    }
+    #tableContainer tbody td:last-child button {
+      width: 36px !important;
+      height: 36px !important;
+      padding: 0 !important;
+      border: 1px solid #e5e7eb !important;
+      background: #fff !important;
+      color: #334155 !important;
+      border-radius: 10px !important;
+      display: inline-grid !important;
+      place-items: center !important;
+      transition:
+        background 0.15s,
+        border-color 0.15s,
+        transform 0.15s,
+        box-shadow 0.15s !important;
+      font-size: 16px !important;
+      line-height: 1 !important;
+    }
+    #tableContainer tbody td:last-child button:hover {
+      background: #f8fafc !important;
+      border-color: #d1d5db !important;
+      transform: translateY(-1px) !important;
+      box-shadow: var(--ring) !important;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1200px) {
+      #tableContainer thead th:nth-child(2) {
+        width: 220px !important;
+      }
+      #tableContainer thead th:nth-child(3) {
+        width: 200px !important;
+      }
+    }
+    @media (max-width: 992px) {
+      #tableContainer thead th:nth-child(2) {
+        width: 200px !important;
+      }
+      #tableContainer thead th:nth-child(3) {
+        width: 180px !important;
+      }
+      #tableContainer thead th:nth-child(4) {
+        width: 160px !important;
+      }
+    }
+    @media (max-width: 720px) {
+      #tableContainer table {
+        border-spacing: 0 8px !important;
+      }
+      #tableContainer tbody td {
+        padding: 12px 10px !important;
+      }
+    }
+    /* ===== Ajuste para que la tabla de Órdenes no tenga scroll ===== */
+    #tableContainer .table-wrap {
+      overflow-x: visible !important; /* quita scroll */
+    }
+
+    #tableContainer table {
+      width: 100% !important;
+      table-layout: auto !important; /* que se ajuste al contenido */
+    }
+
+    #tableContainer thead th,
+    #tableContainer tbody td {
+      white-space: normal !important; /* permite saltos de línea */
+      word-break: break-word !important; /* rompe palabras largas si hace falta */
+    }
+
+    /* Opcional: fija un ancho mínimo a cada columna para que no se aplasten demasiado */
+    #tableContainer thead th:nth-child(1) {
+      min-width: 120px;
+    } /* Número */
+    #tableContainer thead th:nth-child(2) {
+      min-width: 160px;
+    } /* Cliente */
+    #tableContainer thead th:nth-child(3) {
+      min-width: 180px;
+    } /* Vehículo */
+    #tableContainer thead th:nth-child(4) {
+      min-width: 140px;
+    } /* Técnico */
+    #tableContainer thead th:nth-child(5) {
+      min-width: 120px;
+    } /* Fecha */
+    #tableContainer thead th:nth-child(6) {
+      min-width: 120px;
+    } /* Estado */
+    #tableContainer thead th:nth-child(7) {
+      min-width: 120px;
+    } /* Acciones */
+    /* Columna Acciones alineada a la izquierda */
+    #tableContainer thead th:last-child,
+    #tableContainer tbody td:last-child {
+      text-align: left !important;
+      padding-left: 10px !important;
+    }
+
+    /* Contenedor de acciones */
+    #tableContainer .row-actions {
+      display: flex !important;
+      gap: 6px !important;
+      justify-content: flex-start !important;
+    }
+
+    /* Botones base */
+    #tableContainer .row-actions button {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    /* ===== Colores por acción ===== */
+
+    /* Ver (👁) */
+    #tableContainer .row-actions button:first-child {
+      background: #dbeafe; /* azul claro */
+      border-color: #bfdbfe;
+      color: #1d4ed8;
+    }
+    #tableContainer .row-actions button:first-child:hover {
+      background: #bfdbfe;
+      color: #1e3a8a;
+    }
+
+    /* Editar (✎) */
+    #tableContainer .row-actions button:nth-child(2) {
+      background: #fef9c3; /* amarillo claro */
+      border-color: #fde68a;
+      color: #b45309;
+    }
+    #tableContainer .row-actions button:nth-child(2):hover {
+      background: #fde68a;
+      color: #92400e;
+    }
+
+    /* Eliminar (🗑) */
+    #tableContainer .row-actions button:last-child {
+      background: #fee2e2; /* rojo claro */
+      border-color: #fecaca;
+      color: #b91c1c;
+    }
+    #tableContainer .row-actions button:last-child:hover {
+      background: #fecaca;
+      color: #7f1d1d;
+    }
+    /* Head sticky pero sin bloquear clics debajo */
+    #tableContainer thead {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 1 !important; /* menor que el body */
+      pointer-events: none !important; /* deja pasar clics */
+    }
+    #tableContainer thead th {
+      background: #f7f9fc !important;
+    }
+
+    /* El body queda por encima y recibe clics */
+    #tableContainer tbody tr,
+    #tableContainer tbody td,
+    #tableContainer tbody td * {
+      position: relative !important;
+      z-index: 2 !important;
+      pointer-events: auto !important;
+    }
+
+    /* ====== MODAL -> Servicios a Realizar (bonito) ====== */
+    #ordenModal .servicios-section {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #eef2f7;
+    }
+
+    #ordenModal .servicios-section .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    #ordenModal .servicios-section h4 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    /* Botón agregar */
+    #ordenModal #btnAgregarServicio {
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-weight: 700;
+    }
+
+    /* Contenedor filas */
+    #ordenModal #serviciosContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Fila de servicio como “card” */
+    #ordenModal #serviciosContainer .servicio-item {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) 110px 160px 40px;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fbfdff;
+      box-shadow:
+        0 1px 0 rgba(2, 6, 23, 0.06),
+        0 6px 10px rgba(2, 6, 23, 0.04);
+    }
+
+    /* Inputs/Selects */
+    #ordenModal #serviciosContainer .servicio-item select,
+    #ordenModal #serviciosContainer .servicio-item input {
+      height: 40px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.95rem;
+      color: #0f172a;
+      background: #fff;
+      transition:
+        border-color 0.15s,
+        box-shadow 0.15s;
+    }
+    #ordenModal #serviciosContainer .servicio-item select:focus,
+    #ordenModal #serviciosContainer .servicio-item input:focus {
+      outline: none;
+      border-color: #fb923c; /* naranja */
+      box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.15);
+    }
+
+    /* Campos específicos (ancho/alineación) */
+    #ordenModal #serviciosContainer .servicio-item input[name*="[cantidad]"] {
+      text-align: right;
+    }
+    #ordenModal
+      #serviciosContainer
+      .servicio-item
+      input[name*="[precio_unitario]"] {
+      text-align: right;
+    }
+
+    /* Botón eliminar */
+    #ordenModal #serviciosContainer .servicio-item .icon-btn {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border-radius: 10px;
+      border: 1px solid #fecaca !important;
+      background: #fee2e2 !important;
+      color: #b91c1c !important;
+      display: grid;
+      place-items: center;
+      transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease,
+        background 0.12s ease;
+    }
+    #ordenModal #serviciosContainer .servicio-item .icon-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 16px rgba(185, 28, 28, 0.12);
+      background: #fecaca !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 840px) {
+      #ordenModal #serviciosContainer .servicio-item {
+        grid-template-columns: 1fr 1fr 1fr 40px; /* se reparte mejor */
+      }
+    }
+    @media (max-width: 640px) {
+      #ordenModal #serviciosContainer .servicio-item {
+        grid-template-columns: 1fr; /* apilar */
+      }
+      #ordenModal #serviciosContainer .servicio-item > * {
+        width: 100%;
+      }
+    }
+  </style>
   <script>
     //@ts-nocheck
     // Autenticación y logout
     function _hardLogout() {
       try {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       } finally {
-        location.replace('/');
+        location.replace("/");
       }
     }
 
     window.logout = _hardLogout;
 
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('#btnLogout');
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("#btnLogout");
       if (!btn) return;
       e.preventDefault();
       _hardLogout();
     });
 
     // Variables globales
-    let currentSearch = '';
-    let currentEstado = '';
+    let currentSearch = "";
+    let currentEstado = "";
     let editingId = null;
     let vehiculos = [];
     let clientes = [];
@@ -514,108 +946,110 @@ import Layout from '../../layouts/Layout.astro';
 
     // Verificación inicial
     (async () => {
-      const token = localStorage.getItem('token');
-      const user = localStorage.getItem('user');
-      
+      const token = localStorage.getItem("token");
+      const user = localStorage.getItem("user");
+
       if (!token || !user) return _hardLogout();
-      
+
       try {
-        const response = await fetch('/api/auth/verify', {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await fetch("/api/auth/verify", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         const result = await response.json().catch(() => ({}));
-        
+
         if (!response.ok || !result?.success) return _hardLogout();
       } catch {
         return _hardLogout();
       }
-      
+
       const userData = JSON.parse(user);
-      if (userData.rol !== 'admin') return _hardLogout();
-      
-      document.getElementById('userWelcome').textContent = `Bienvenido, ${userData.nombre}`;
-      
+      if (userData.rol !== "admin") return _hardLogout();
+
+      document.getElementById("userWelcome").textContent =
+        `Bienvenido, ${userData.nombre}`;
+
       await Promise.all([
         loadClientes(),
         loadServicios(),
         loadTecnicos(),
-        loadOrdenes()
+        loadOrdenes(),
       ]);
     })();
 
     // Cargar datos auxiliares
     async function loadClientes() {
-      const token = localStorage.getItem('token');
-      console.log('Cargando clientes...');
+      const token = localStorage.getItem("token");
+      console.log("Cargando clientes...");
       try {
-        const response = await fetch('/api/clientes/all', {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await fetch("/api/clientes/all", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         const result = await response.json();
-        console.log('Clientes recibidos:', result);
+        console.log("Clientes recibidos:", result);
         if (result.success) {
           clientes = result.data || [];
-          console.log('Clientes cargados:', clientes.length);
+          console.log("Clientes cargados:", clientes.length);
           populateClientesSelect();
         } else {
-          console.error('Error en la respuesta de clientes:', result.message);
+          console.error("Error en la respuesta de clientes:", result.message);
         }
       } catch (error) {
-        console.error('Error cargando clientes:', error);
+        console.error("Error cargando clientes:", error);
       }
     }
 
     async function loadVehiculos(id_cliente = null) {
-      const token = localStorage.getItem('token');
-      console.log('Iniciando carga de vehículos para cliente:', id_cliente);
-      
+      const token = localStorage.getItem("token");
+      console.log("Iniciando carga de vehículos para cliente:", id_cliente);
+
       if (!id_cliente) {
         // Si no hay cliente seleccionado, limpiar el select
-        const select = document.getElementById('vehiculoSelect');
-        select.innerHTML = '<option value="">Primero seleccione un cliente</option>';
+        const select = document.getElementById("vehiculoSelect");
+        select.innerHTML =
+          '<option value="">Primero seleccione un cliente</option>';
         select.disabled = true;
         return;
       }
-      
+
       try {
         const response = await fetch(`/api/vehiculos/cliente/${id_cliente}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
-        console.log('Respuesta del servidor:', response.status);
+        console.log("Respuesta del servidor:", response.status);
         const result = await response.json();
-        console.log('Datos recibidos:', result);
+        console.log("Datos recibidos:", result);
         if (result.success) {
           vehiculos = result.data || [];
-          console.log('Vehículos cargados:', vehiculos.length);
+          console.log("Vehículos cargados:", vehiculos.length);
           populateVehiculosSelect();
         } else {
-          console.error('Error en la respuesta:', result.message);
+          console.error("Error en la respuesta:", result.message);
         }
       } catch (error) {
-        console.error('Error cargando vehículos:', error);
+        console.error("Error cargando vehículos:", error);
       }
     }
 
     async function loadServicios() {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       try {
-        const response = await fetch('/api/servicios', {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await fetch("/api/servicios", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         const result = await response.json();
         if (result.success) {
           servicios = result.data || [];
         }
       } catch (error) {
-        console.error('Error cargando servicios:', error);
+        console.error("Error cargando servicios:", error);
       }
     }
 
     async function loadTecnicos() {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       try {
-        const response = await fetch('/api/ordenes/tecnicos', {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await fetch("/api/ordenes/tecnicos", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         const result = await response.json();
         if (result.success) {
@@ -623,58 +1057,64 @@ import Layout from '../../layouts/Layout.astro';
           populateTecnicosSelect();
         }
       } catch (error) {
-        console.error('Error cargando técnicos:', error);
+        console.error("Error cargando técnicos:", error);
       }
     }
 
     function populateClientesSelect() {
-      console.log('Poblando select de clientes...');
-      const select = document.getElementById('clienteSelect');
+      console.log("Poblando select de clientes...");
+      const select = document.getElementById("clienteSelect");
       select.innerHTML = '<option value="">Seleccionar cliente</option>';
-      
-      clientes.forEach(cliente => {
-        const option = document.createElement('option');
+
+      clientes.forEach((cliente) => {
+        const option = document.createElement("option");
         option.value = cliente.id;
-        const nombre = cliente.tipo === 'particular' 
-          ? `${cliente.nombres} ${cliente.apellidos || ''}`.trim()
-          : cliente.razon_social;
+        const nombre =
+          cliente.tipo === "particular"
+            ? `${cliente.nombres} ${cliente.apellidos || ""}`.trim()
+            : cliente.razon_social;
         option.textContent = `${nombre} (${cliente.identificacion})`;
         select.appendChild(option);
       });
-      console.log('Select de clientes poblado con', clientes.length, 'clientes');
+      console.log(
+        "Select de clientes poblado con",
+        clientes.length,
+        "clientes"
+      );
     }
 
     function populateVehiculosSelect() {
-      console.log('Poblando select de vehículos...');
-      const select = document.getElementById('vehiculoSelect');
-      console.log('Select encontrado:', select);
-      
+      console.log("Poblando select de vehículos...");
+      const select = document.getElementById("vehiculoSelect");
+      console.log("Select encontrado:", select);
+
       if (vehiculos.length === 0) {
-        select.innerHTML = '<option value="">No hay vehículos registrados para este cliente</option>';
+        select.innerHTML =
+          '<option value="">No hay vehículos registrados para este cliente</option>';
         select.disabled = true;
         return;
       }
-      
+
       select.innerHTML = '<option value="">Seleccionar vehículo</option>';
       select.disabled = false;
-      
-      console.log('Vehículos a mostrar:', vehiculos);
-      vehiculos.forEach(vehiculo => {
-        console.log('Procesando vehículo:', vehiculo);
-        const option = document.createElement('option');
+
+      console.log("Vehículos a mostrar:", vehiculos);
+      vehiculos.forEach((vehiculo) => {
+        console.log("Procesando vehículo:", vehiculo);
+        const option = document.createElement("option");
         option.value = vehiculo.id;
         option.textContent = `${vehiculo.placa} - ${vehiculo.marca}`;
         select.appendChild(option);
       });
-      console.log('Select poblado con', vehiculos.length, 'vehículos');
+      console.log("Select poblado con", vehiculos.length, "vehículos");
     }
 
     function populateTecnicosSelect() {
-      const select = document.getElementById('tecnicoSelect');
+      const select = document.getElementById("tecnicoSelect");
       select.innerHTML = '<option value="">Sin asignar</option>';
-      
-      tecnicos.forEach(tecnico => {
-        const option = document.createElement('option');
+
+      tecnicos.forEach((tecnico) => {
+        const option = document.createElement("option");
         option.value = tecnico.id;
         option.textContent = `${tecnico.nombre} ${tecnico.apellido}`;
         select.appendChild(option);
@@ -683,46 +1123,52 @@ import Layout from '../../layouts/Layout.astro';
 
     // Cargar órdenes
     async function loadOrdenes() {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       try {
-        const response = await fetch('/api/ordenes', {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await fetch("/api/ordenes", {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        
+
         const result = await response.json();
         if (result.success) {
           let ordenes = result.data || [];
-          
+
           // Filtrar por búsqueda
           if (currentSearch) {
-            ordenes = ordenes.filter(orden => 
-              orden.numero_orden.toLowerCase().includes(currentSearch.toLowerCase()) ||
-              orden.cliente_nombre.toLowerCase().includes(currentSearch.toLowerCase()) ||
-              orden.placa.toLowerCase().includes(currentSearch.toLowerCase())
+            ordenes = ordenes.filter(
+              (orden) =>
+                orden.numero_orden
+                  .toLowerCase()
+                  .includes(currentSearch.toLowerCase()) ||
+                orden.cliente_nombre
+                  .toLowerCase()
+                  .includes(currentSearch.toLowerCase()) ||
+                orden.placa.toLowerCase().includes(currentSearch.toLowerCase())
             );
           }
-          
+
           // Filtrar por estado
           if (currentEstado) {
-            ordenes = ordenes.filter(orden => orden.estado === currentEstado);
+            ordenes = ordenes.filter((orden) => orden.estado === currentEstado);
           }
-          
+
           renderTable(ordenes);
         } else {
           renderTable([]);
         }
       } catch (error) {
-        console.error('Error cargando órdenes:', error);
+        console.error("Error cargando órdenes:", error);
         renderTable([]);
       }
     }
 
     // Renderizar tabla
     function renderTable(ordenes) {
-      const container = document.getElementById('tableContainer');
-      
+      const container = document.getElementById("tableContainer");
+
       if (!ordenes || ordenes.length === 0) {
-        container.innerHTML = '<div class="muted">No se encontraron órdenes de trabajo</div>';
+        container.innerHTML =
+          '<div class="muted">No se encontraron órdenes de trabajo</div>';
         return;
       }
 
@@ -740,12 +1186,14 @@ import Layout from '../../layouts/Layout.astro';
             </tr>
           </thead>
           <tbody>
-            ${ordenes.map(orden => `
+            ${ordenes
+              .map(
+                (orden) => `
               <tr>
                 <td>${orden.numero_orden}</td>
                 <td>${orden.cliente_nombre}</td>
                 <td>${orden.placa} - ${orden.marca}</td>
-                <td>${orden.tecnico_nombre ? `${orden.tecnico_nombre} ${orden.tecnico_apellido}` : 'Sin asignar'}</td>
+                <td>${orden.tecnico_nombre ? `${orden.tecnico_nombre} ${orden.tecnico_apellido}` : "Sin asignar"}</td>
                 <td>${new Date(orden.fecha_ingreso).toLocaleDateString()}</td>
                 <td><span class="badge badge-${orden.estado}">${orden.estado}</span></td>
                 <td>
@@ -756,94 +1204,105 @@ import Layout from '../../layouts/Layout.astro';
                   </div>
                 </td>
               </tr>
-            `).join('')}
+            `
+              )
+              .join("")}
           </tbody>
         </table>
       `;
-      
+
       container.innerHTML = tableHTML;
     }
 
     // Event listeners
-    document.getElementById('btnBuscar').addEventListener('click', () => {
-      currentSearch = document.getElementById('searchInput').value.trim();
-      currentEstado = document.getElementById('estadoFilter').value;
+    document.getElementById("btnBuscar").addEventListener("click", () => {
+      currentSearch = document.getElementById("searchInput").value.trim();
+      currentEstado = document.getElementById("estadoFilter").value;
       loadOrdenes();
     });
 
-    document.getElementById('searchInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        document.getElementById('btnBuscar').click();
+    document.getElementById("searchInput").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        document.getElementById("btnBuscar").click();
       }
     });
 
     // Modal de orden
-    const modal = document.getElementById('ordenModal');
-    const form = document.getElementById('ordenForm');
+    const modal = document.getElementById("ordenModal");
+    const form = document.getElementById("ordenForm");
 
-    document.getElementById('btnNuevo').addEventListener('click', () => {
+    document.getElementById("btnNuevo").addEventListener("click", () => {
       editingId = null;
       form.reset();
-      document.getElementById('modalTitle').textContent = 'Nueva Orden de Trabajo';
+      document.getElementById("modalTitle").textContent =
+        "Nueva Orden de Trabajo";
       clearServicios();
       addServicioItem();
       modal.showModal();
     });
 
-    document.getElementById('closeModal').addEventListener('click', () => {
+    document.getElementById("closeModal").addEventListener("click", () => {
       modal.close();
     });
 
     // Event listener para el select de clientes
-    document.getElementById('clienteSelect').addEventListener('change', async (e) => {
-      const id_cliente = e.target.value;
-      console.log('Cliente seleccionado:', id_cliente);
-      if (id_cliente) {
-        await loadVehiculos(id_cliente);
-      } else {
-        await loadVehiculos(); // Esto limpiará el select de vehículos
-      }
-    });
+    document
+      .getElementById("clienteSelect")
+      .addEventListener("change", async (e) => {
+        const id_cliente = e.target.value;
+        console.log("Cliente seleccionado:", id_cliente);
+        if (id_cliente) {
+          await loadVehiculos(id_cliente);
+        } else {
+          await loadVehiculos(); // Esto limpiará el select de vehículos
+        }
+      });
 
     // Gestión de servicios en el modal
     function clearServicios() {
-      document.getElementById('serviciosContainer').innerHTML = '';
+      document.getElementById("serviciosContainer").innerHTML = "";
     }
 
     function addServicioItem(servicio = null) {
-      const container = document.getElementById('serviciosContainer');
+      const container = document.getElementById("serviciosContainer");
       const index = container.children.length;
-      
-      const servicioDiv = document.createElement('div');
-      servicioDiv.className = 'servicio-item';
+
+      const servicioDiv = document.createElement("div");
+      servicioDiv.className = "servicio-item";
       servicioDiv.innerHTML = `
         <select name="servicios[${index}][id_servicio]" required class="input">
           <option value="">Seleccionar servicio</option>
-          ${servicios.map(s => `
+          ${servicios
+            .map(
+              (s) => `
             <option value="${s.id}" data-precio="${s.precio_unitario}" 
-              ${servicio && servicio.id_servicio == s.id ? 'selected' : ''}>
+              ${servicio && servicio.id_servicio == s.id ? "selected" : ""}>
               ${s.codigo} - ${s.descripcion} ($${parseFloat(s.precio_unitario).toFixed(2)})
             </option>
-          `).join('')}
+          `
+            )
+            .join("")}
         </select>
         <input type="number" name="servicios[${index}][cantidad]" 
                value="${servicio ? servicio.cantidad : 1}" 
                min="1" required class="input" placeholder="Cantidad" 
                onchange="updateSubtotal(this)">
         <input type="number" name="servicios[${index}][precio_unitario]" 
-               value="${servicio ? servicio.precio_unitario : ''}" 
+               value="${servicio ? servicio.precio_unitario : ""}" 
                step="0.01" min="0" required class="input" placeholder="Precio" 
                onchange="updateSubtotal(this)">
         <button type="button" onclick="removeServicio(this)" class="icon-btn">🗑</button>
       `;
-      
+
       container.appendChild(servicioDiv);
-      
+
       // Auto-llenar precio cuando se selecciona un servicio
-      const select = servicioDiv.querySelector('select');
-      const precioInput = servicioDiv.querySelector('input[name*="precio_unitario"]');
-      
-      select.addEventListener('change', function() {
+      const select = servicioDiv.querySelector("select");
+      const precioInput = servicioDiv.querySelector(
+        'input[name*="precio_unitario"]'
+      );
+
+      select.addEventListener("change", function () {
         const selectedOption = this.options[this.selectedIndex];
         if (selectedOption.dataset.precio) {
           precioInput.value = selectedOption.dataset.precio;
@@ -852,200 +1311,498 @@ import Layout from '../../layouts/Layout.astro';
       });
     }
 
-    window.updateSubtotal = function(input) {
+    window.updateSubtotal = function (input) {
       // Función para actualizar subtotales si es necesario
     };
 
-    window.removeServicio = function(button) {
-      button.closest('.servicio-item').remove();
+    window.removeServicio = function (button) {
+      button.closest(".servicio-item").remove();
     };
 
-    document.getElementById('btnAgregarServicio').addEventListener('click', () => {
-      addServicioItem();
-    });
+    document
+      .getElementById("btnAgregarServicio")
+      .addEventListener("click", () => {
+        addServicioItem();
+      });
 
     // Ver detalle de orden
-    window.verDetalle = async function(id) {
-      const token = localStorage.getItem('token');
+    window.verDetalle = async function (id) {
+      const token = localStorage.getItem("token");
       try {
-        const response = await fetch(`/api/ordenes/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
+        const res = await fetch(`/api/ordenes/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        
-        const result = await response.json();
-        if (result.success) {
-          const orden = result.data;
-          
-          let detalleHTML = `
-            <div class="grid2">
-              <div><strong>Número:</strong> ${orden.numero_orden}</div>
-              <div><strong>Estado:</strong> <span class="badge badge-${orden.estado}">${orden.estado}</span></div>
-              <div><strong>Cliente:</strong> ${orden.cliente_nombre}</div>
-              <div><strong>Vehículo:</strong> ${orden.placa} - ${orden.marca}</div>
-              <div><strong>Técnico:</strong> ${orden.tecnico_nombre ? `${orden.tecnico_nombre} ${orden.tecnico_apellido}` : 'Sin asignar'}</div>
-              <div><strong>Fecha:</strong> ${new Date(orden.fecha_ingreso).toLocaleDateString()}</div>
-            </div>
-            
-            ${orden.observaciones ? `<div style="margin: 1rem 0;"><strong>Observaciones:</strong><br>${orden.observaciones}</div>` : ''}
-            
-            <h4 style="margin-top: 1.5rem;">Servicios</h4>
-            <table style="margin-top: 0.5rem;">
-              <thead>
-                <tr>
-                  <th>Servicio</th>
-                  <th>Cantidad</th>
-                  <th>Precio Unit.</th>
-                  <th>Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${orden.detalle_servicios.map(detalle => `
-                  <tr>
-                    <td>${detalle.codigo} - ${detalle.descripcion}</td>
-                    <td>${detalle.cantidad}</td>
-                    <td>$${parseFloat(detalle.precio_unitario).toFixed(2)}</td>
-                    <td>$${parseFloat(detalle.subtotal).toFixed(2)}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-            
-            <div class="total-orden">
-              <strong>Total: $${orden.detalle_servicios.reduce((total, d) => total + parseFloat(d.subtotal), 0).toFixed(2)}</strong>
-            </div>
-          `;
-          
-          document.getElementById('detalleTitle').textContent = `Orden ${orden.numero_orden}`;
-          document.getElementById('detalleContent').innerHTML = detalleHTML;
-          document.getElementById('detalleModal').showModal();
+        const out = await res.json().catch(() => ({}));
+        if (!res.ok || !out?.success || !out?.data) {
+          alert("No se pudo cargar el detalle de la orden.");
+          return;
         }
-      } catch (error) {
-        console.error('Error cargando detalle:', error);
+
+        const o = out.data || {};
+        const servicios = Array.isArray(o.detalle_servicios)
+          ? o.detalle_servicios
+          : Array.isArray(o.detalles)
+            ? o.detalles
+            : Array.isArray(o.detalle)
+              ? o.detalle
+              : Array.isArray(o.items)
+                ? o.items
+                : Array.isArray(o.servicios)
+                  ? o.servicios
+                  : [];
+        const total = servicios.reduce(
+          (acc, d) => acc + Number(d?.subtotal ?? 0),
+          0
+        );
+
+        // helpers
+        const fmt = (n) =>
+          Number(n ?? 0).toLocaleString("es-EC", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+        const fecha = o.fecha_ingreso
+          ? new Date(o.fecha_ingreso).toLocaleDateString()
+          : "";
+        const tecnico = o.tecnico_nombre
+          ? `${o.tecnico_nombre} ${o.tecnico_apellido ?? ""}`
+          : "Sin asignar";
+        const estado = (o.estado || "pendiente").toLowerCase();
+
+        const serviciosRows = servicios.length
+          ? servicios
+              .map(
+                (d) => `
+        <tr>
+          <td>
+            <div class="svc">
+              <span class="svc-code">${d?.codigo ?? ""}</span>
+              <span class="svc-name">${d?.descripcion ?? ""}</span>
+            </div>
+          </td>
+          <td class="num">${d?.cantidad ?? 0}</td>
+          <td class="num">$${fmt(d?.precio_unitario)}</td>
+          <td class="num">$${fmt(d?.subtotal)}</td>
+        </tr>
+      `
+              )
+              .join("")
+          : `<tr class="empty"><td colspan="4">Sin servicios cargados</td></tr>`;
+
+        const html = `
+    <style>
+      .detalle-orden{ --muted:#64748b; --border:#e5e7eb; --card:#fff; --soft:#f8fafc; --ink:#0f172a; }
+      .detalle-orden{ display:flex; flex-direction:column; gap:14px; }
+      .do-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 0 4px; }
+      .do-title{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:1.05rem; color:var(--ink); }
+      .do-chip{ display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:var(--soft); color:#111827; font-weight:600; }
+      .do-pill{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-size:.8rem; font-weight:800; text-transform:uppercase; }
+      .do-pill.pendiente{ background:#fef3c7; color:#92400e; border:1px solid #fde68a; }
+      .do-pill.facturada{ background:#d1fae5; color:#065f46; border:1px solid #a7f3d0; }
+      .do-close{ background:none; border:none; font-size:1.3rem; font-weight:bold; color:#64748b; cursor:pointer; transition:color .15s; }
+      .do-close:hover{ color:#ef4444; }
+
+      .do-grid{ display:grid; grid-template-columns: 1.2fr 1.2fr .8fr; gap:12px; }
+      .do-card{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px; }
+      .do-card h5{ margin:0 0 8px; font-size:.9rem; color:#0f172a; font-weight:800; }
+      .do-meta{ display:grid; grid-template-columns: 1fr 1fr; gap:8px 12px; font-size:.92rem; }
+      .do-row small{ color:var(--muted); display:block; margin-bottom:2px; }
+      .do-row span{ color:#0f172a; font-weight:600; }
+
+      .do-veh{ display:flex; flex-direction:column; gap:8px; }
+      .car-plate{ display:inline-flex; align-items:center; gap:8px; border:1px dashed var(--border); padding:8px 10px; border-radius:10px; background:var(--soft); font-weight:700; }
+      .car-brand{ color:#0f172a; font-weight:700; }
+
+      .table{ width:100%; border-collapse:separate; border-spacing:0; }
+      .table thead th{ text-align:left; font-size:.72rem; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); padding:10px 10px; border-bottom:1px solid var(--border); background:#fafbfc; }
+      .table tbody td{ padding:12px 10px; border-top:1px solid var(--border); }
+      .table .num{ text-align:right; white-space:nowrap; }
+      .svc{ display:flex; gap:8px; align-items:center; }
+      .svc-code{ font-weight:800; font-size:.8rem; color:#1e3a8a; background:#dbeafe; border:1px solid #bfdbfe; padding:3px 8px; border-radius:999px; }
+      .svc-name{ color:#0f172a; font-weight:600; }
+      .empty td{ color:var(--muted); text-align:center; }
+
+      .do-total{ display:flex; justify-content:flex-end; gap:16px; align-items:center; padding-top:8px; }
+      .do-total .label{ color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+      .do-total .value{ font-size:1.25rem; font-weight:900; color:#0f172a; }
+
+      @media (max-width: 900px){
+        .do-grid{ grid-template-columns: 1fr; }
+        .do-meta{ grid-template-columns: 1fr 1fr; }
+      }
+    </style>
+
+    <div class="detalle-orden">
+      <div class="do-header">
+        <div class="do-title">
+          <span>🧾 Orden</span>
+          <span class="do-chip">${o.numero_orden ?? ""}</span>
+        </div>
+        <span class="do-pill ${estado}">${estado}</span>
+        <button class="do-close" id="btnCloseDetalle">✖</button>
+      </div>
+
+      <div class="do-grid">
+        <div class="do-card">
+          <h5>Cliente</h5>
+          <div class="do-meta">
+            <div class="do-row"><small>Nombre</small><span>${o.cliente_nombre ?? ""}</span></div>
+            <div class="do-row"><small>Fecha Ingreso</small><span>${fecha}</span></div>
+            ${o.observaciones ? `<div class="do-row" style="grid-column:1/-1;"><small>Observaciones</small><span>${o.observaciones}</span></div>` : ""}
+          </div>
+        </div>
+
+        <div class="do-card do-veh">
+          <h5>Vehículo</h5>
+          <div class="car-plate">🚘 <span>${o.placa ?? ""}</span></div>
+          <div><span class="car-brand">${o.marca ?? ""}</span></div>
+        </div>
+
+        <div class="do-card">
+          <h5>Asignación</h5>
+          <div class="do-meta" style="grid-template-columns:1fr;">
+            <div class="do-row"><small>Técnico</small><span>${tecnico}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="do-card">
+        <h5>Servicios</h5>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Servicio</th>
+              <th style="width:80px;">Cant.</th>
+              <th style="width:120px;">P. Unit.</th>
+              <th style="width:120px;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${serviciosRows}
+          </tbody>
+        </table>
+        <div class="do-total">
+          <span class="label">Total</span>
+          <span class="value">$${fmt(total)}</span>
+        </div>
+      </div>
+    </div>`;
+
+        document.getElementById("detalleTitle").textContent =
+          `Orden ${o.numero_orden ?? ""}`;
+        document.getElementById("detalleContent").innerHTML = html;
+        document.getElementById("detalleModal").showModal();
+
+        // botón X cierra modal
+        document
+          .getElementById("btnCloseDetalle")
+          .addEventListener("click", () => {
+            document.getElementById("detalleModal").close();
+          });
+      } catch (err) {
+        console.error("Error cargando detalle:", err);
+        alert("Error al cargar el detalle.");
       }
     };
 
-    document.getElementById('closeDetalle').addEventListener('click', () => {
-      document.getElementById('detalleModal').close();
-    });
-
     // Editar orden
-    window.editOrden = async function(id) {
-      const token = localStorage.getItem('token');
+    // === Helper: obtener vehículo (para deducir id_cliente si la orden no lo trae)
+    async function _fetchVehiculoById(id) {
+      const token = localStorage.getItem("token");
       try {
-        const response = await fetch(`/api/ordenes/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
+        const r = await fetch(`/api/vehiculos/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        
-        const result = await response.json();
-        if (result.success) {
-          const orden = result.data;
-          editingId = id;
-          
-          form.id_vehiculo.value = orden.id_vehiculo;
-          form.id_tecnico.value = orden.id_tecnico || '';
-          form.estado.value = orden.estado;
-          form.observaciones.value = orden.observaciones || '';
-          
-          // Limpiar y llenar servicios
-          clearServicios();
-          orden.detalle_servicios.forEach(detalle => {
+        const j = await r.json().catch(() => ({}));
+        return j?.data || null;
+      } catch {
+        return null;
+      }
+    }
+
+    // === Editar orden (REEMPLAZO COMPLETO) ===
+    window.editOrden = async function (id) {
+      const token = localStorage.getItem("token");
+
+      // Utilidad: asignar valor a un <select> si existe esa opción
+      const setSelectValue = (sel, val) => {
+        if (!sel) return false;
+        const s = String(val);
+        const exists = [...sel.options].some((o) => String(o.value) === s);
+        if (exists) {
+          sel.value = s;
+          sel.dispatchEvent(new Event("change"));
+          return true;
+        }
+        return false;
+      };
+
+      try {
+        // 1) Traer orden
+        const resp = await fetch(`/api/ordenes/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const res = await resp.json().catch(() => ({}));
+
+        if (!resp.ok || !res?.success || !res?.data) {
+          console.error("Orden no disponible:", res);
+          alert("No se pudo cargar la orden.");
+          return;
+        }
+
+        const o = res.data || {};
+        editingId = id;
+
+        // 2) Resolver IDs con tolerancia a nombres
+        let idCliente = o.id_cliente ?? o.cliente_id ?? o.cliente?.id ?? null;
+        const idVehiculo =
+          o.id_vehiculo ?? o.vehiculo_id ?? o.vehiculo?.id ?? null;
+
+        // Si no vino id_cliente, intenta deducirlo a partir del vehículo
+        if (!idCliente && idVehiculo) {
+          const veh = await _fetchVehiculoById(idVehiculo);
+          idCliente = veh?.id_cliente ?? veh?.cliente_id ?? null;
+        }
+
+        // 3) Asegurar datos auxiliares cargados
+        if (!clientes?.length) await loadClientes();
+        if (!tecnicos?.length) await loadTecnicos();
+        if (!servicios?.length) await loadServicios();
+
+        // 4) Cliente -> cargar vehículos del cliente -> seleccionar vehículo
+        const clienteSel = document.getElementById("clienteSelect");
+        const vehiculoSel = document.getElementById("vehiculoSelect");
+
+        if (idCliente) {
+          setSelectValue(clienteSel, idCliente);
+          await loadVehiculos(idCliente); // llena opciones del select vehículo
+        } else {
+          vehiculoSel.disabled = false;
+        }
+        if (idVehiculo) {
+          setSelectValue(vehiculoSel, idVehiculo);
+        }
+
+        // 5) Resto de campos simples
+        form.id_tecnico.value = o.id_tecnico ?? o.tecnico_id ?? "";
+        form.estado.value = o.estado ?? "pendiente";
+        form.observaciones.value = o.observaciones ?? "";
+
+        // 6) Servicios de la orden (acepta varios nombres)
+        const dets = Array.isArray(o.detalle_servicios)
+          ? o.detalle_servicios
+          : Array.isArray(o.detalles)
+            ? o.detalles
+            : Array.isArray(o.detalle)
+              ? o.detalle
+              : Array.isArray(o.items)
+                ? o.items
+                : Array.isArray(o.servicios)
+                  ? o.servicios
+                  : [];
+
+        clearServicios();
+
+        if (dets.length) {
+          dets.forEach((d) => {
             addServicioItem({
-              id_servicio: detalle.id_servicio,
-              cantidad: detalle.cantidad,
-              precio_unitario: detalle.precio_unitario
+              id_servicio: d?.id_servicio ?? d?.servicio_id ?? d?.id ?? "",
+              cantidad: d?.cantidad ?? 1,
+              precio_unitario: d?.precio_unitario ?? d?.precio ?? 0,
             });
           });
-          
-          document.getElementById('modalTitle').textContent = 'Editar Orden de Trabajo';
-          modal.showModal();
+
+          // Refuerzo: asegura que los inputs queden con el valor correcto
+          document
+            .querySelectorAll("#serviciosContainer .servicio-item")
+            .forEach((row, idx) => {
+              const d = dets[idx] || {};
+              const sel = row.querySelector('select[name^="servicios"]');
+              const qty = row.querySelector('input[name*="[cantidad]"]');
+              const prc = row.querySelector('input[name*="[precio_unitario]"]');
+              if (sel)
+                sel.value = String(
+                  d?.id_servicio ?? d?.servicio_id ?? d?.id ?? ""
+                );
+              if (qty) qty.value = String(d?.cantidad ?? 1);
+              if (prc)
+                prc.value = Number(
+                  d?.precio_unitario ?? d?.precio ?? 0
+                ).toFixed(2);
+            });
+        } else {
+          // si no hay detalle, deja una fila vacía para editar
+          addServicioItem();
         }
-      } catch (error) {
-        console.error('Error cargando orden:', error);
-        alert('Error al cargar la orden');
+
+        // 7) Título y abrir modal
+        document.getElementById("modalTitle").textContent =
+          "Editar Orden de Trabajo";
+        document.getElementById("ordenModal").showModal();
+      } catch (err) {
+        console.error("Error cargando orden:", err);
+        alert("Error al cargar la orden");
       }
     };
 
     // Eliminar orden
-    window.deleteOrden = async function(id) {
-      if (!confirm('¿Está seguro de que desea eliminar esta orden? Esta acción no se puede deshacer.')) return;
-      
-      const token = localStorage.getItem('token');
+    window.deleteOrden = async function (id) {
+      if (
+        !confirm(
+          "¿Está seguro de que desea eliminar esta orden? Esta acción no se puede deshacer."
+        )
+      )
+        return;
+
+      const token = localStorage.getItem("token");
       try {
         const response = await fetch(`/api/ordenes/${id}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` }
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
         });
-        
+
         const result = await response.json();
         if (result.success) {
           await loadOrdenes();
         } else {
-          alert('Error al eliminar la orden: ' + (result.message || 'Error desconocido'));
+          alert(
+            "Error al eliminar la orden: " +
+              (result.message || "Error desconocido")
+          );
         }
       } catch (error) {
-        console.error('Error eliminando orden:', error);
-        alert('Error al eliminar la orden');
+        console.error("Error eliminando orden:", error);
+        alert("Error al eliminar la orden");
       }
     };
 
     // Guardar orden
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      
-      const formData = new FormData(form);
-      const data = {
-        id_vehiculo: formData.get('id_vehiculo'),
-        id_tecnico: formData.get('id_tecnico') || null,
-        estado: formData.get('estado'),
-        observaciones: formData.get('observaciones'),
-        servicios: []
-      };
-      
-      // Recopilar servicios
-      const servicioItems = document.querySelectorAll('.servicio-item');
-      servicioItems.forEach((item, index) => {
-        const idServicio = formData.get(`servicios[${index}][id_servicio]`);
-        const cantidad = formData.get(`servicios[${index}][cantidad]`);
-        const precioUnitario = formData.get(`servicios[${index}][precio_unitario]`);
-        
-        if (idServicio && cantidad && precioUnitario) {
-          data.servicios.push({
-            id_servicio: parseInt(idServicio),
-            cantidad: parseInt(cantidad),
-            precio_unitario: parseFloat(precioUnitario)
-          });
-        }
-      });
-      
-      if (data.servicios.length === 0) {
-        alert('Debe agregar al menos un servicio');
-        return;
+
+      // --- capturar selects/campos
+      const clienteSel = document.getElementById("clienteSelect");
+      const vehiculoSel = document.getElementById("vehiculoSelect");
+      const tecnicoSel = document.getElementById("tecnicoSelect");
+
+      const id_cliente = clienteSel?.value ? Number(clienteSel.value) : NaN;
+      const id_vehiculo = vehiculoSel?.value ? Number(vehiculoSel.value) : NaN;
+      const id_tecnico = tecnicoSel?.value ? Number(tecnicoSel.value) : null;
+      const estado = form.estado.value;
+      const observaciones = form.observaciones.value?.trim() || "";
+
+      if (!Number.isFinite(id_cliente)) return alert("Selecciona un cliente.");
+      if (!Number.isFinite(id_vehiculo))
+        return alert("Selecciona un vehículo.");
+
+      // --- construir detalle desde el DOM (sin depender de índices de FormData)
+      const rows = Array.from(
+        document.querySelectorAll("#serviciosContainer .servicio-item")
+      );
+      const detalle = rows
+        .map((row) => {
+          const sel = row.querySelector('select[name^="servicios"]');
+          const qty = row.querySelector('input[name*="[cantidad]"]');
+          const prc = row.querySelector('input[name*="[precio_unitario]"]');
+          const id_servicio = sel?.value ? Number(sel.value) : NaN;
+          const cantidad = qty?.value ? Number(qty.value) : NaN;
+          const precio_unitario = prc?.value ? Number(prc.value) : NaN;
+          const ok =
+            Number.isFinite(id_servicio) &&
+            id_servicio > 0 &&
+            Number.isFinite(cantidad) &&
+            cantidad > 0 &&
+            Number.isFinite(precio_unitario) &&
+            precio_unitario >= 0;
+          if (!ok) return null;
+          const subtotal = cantidad * precio_unitario;
+          return {
+            id_servicio,
+            cantidad,
+            precio_unitario, // nombre A
+            precio: precio_unitario, // alias B por si el backend usa "precio"
+            subtotal,
+          };
+        })
+        .filter(Boolean);
+
+      if (!detalle.length) {
+        return alert("Agrega al menos un servicio con cantidad y precio.");
       }
-      
-      const token = localStorage.getItem('token');
+
+      const total = detalle.reduce((a, d) => a + (d.subtotal || 0), 0);
+
+      // --- payload con alias para máxima compatibilidad
+      const payload = {
+        id_cliente,
+        id_vehiculo,
+        id_tecnico, // puede ir null
+        estado,
+        observaciones,
+        total,
+        servicios: detalle, // alias 1
+        detalle_servicios: detalle, // alias 2
+        detalle: detalle, // alias 3
+      };
+
+      const token = localStorage.getItem("token");
+      const url = editingId ? `/api/ordenes/${editingId}` : "/api/ordenes";
+      const method = editingId ? "PUT" : "POST";
+
+      console.log("➡️ ENVIANDO ORDEN", { url, method, payload });
+
       try {
-        const url = editingId ? `/api/ordenes/${editingId}` : '/api/ordenes';
-        const method = editingId ? 'PUT' : 'POST';
-        
-        const response = await fetch(url, {
+        const r = await fetch(url, {
           method,
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify(payload),
         });
-        
-        const result = await response.json();
-        if (result.success) {
-          modal.close();
-          await loadOrdenes();
-        } else {
-          alert('Error al guardar la orden: ' + (result.message || 'Error desconocido'));
+
+        // intentar leer JSON siempre
+        let j = null;
+        try {
+          j = await r.json();
+        } catch {
+          j = null;
         }
-      } catch (error) {
-        console.error('Error guardando orden:', error);
-        alert('Error al guardar la orden');
+
+        if (!r.ok || !j?.success) {
+          console.error("❌ ERROR API", r.status, j);
+          const msg = (j && (j.message || j.error)) || `HTTP ${r.status}`;
+          alert("Error al guardar la orden: " + msg);
+          return;
+        }
+
+        // cerrar modal solo si el servidor dijo OK
+        document.getElementById("ordenModal").close();
+
+        // ID creado o el que editamos
+        const savedId = j?.data?.id ?? editingId ?? null;
+
+        // recargar listado
+        await loadOrdenes();
+
+        // verificación activa: si tenemos ID, pide la orden al backend y muestra
+        if (savedId) {
+          const vr = await fetch(`/api/ordenes/${savedId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const vd = await vr.json().catch(() => ({}));
+          console.log("✅ ORDEN GUARDADA ->", vd);
+          // abre el detalle para comprobar que el backend devolvió el detalle
+          if (vd?.success) window.verDetalle(savedId);
+        } else {
+          console.warn(
+            "No llegó id de orden en la respuesta, revisa el backend."
+          );
+        }
+      } catch (err) {
+        console.error("💥 Error guardando orden", err);
+        alert("Error de red al guardar la orden");
       }
     });
   </script>
