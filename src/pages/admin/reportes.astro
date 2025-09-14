@@ -1,5 +1,5 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from "../../layouts/Layout.astro";
 ---
 
 <Layout title="Reportes y Análisis - TecniCentro Ibarra Express">
@@ -11,7 +11,12 @@ import Layout from '../../layouts/Layout.astro';
       </a>
       <div class="user-menu">
         <span id="userWelcome" class="user-chip">Cargando…</span>
-        <button type="button" id="btnLogout" class="btn btn-orange" onclick="window.logout?.()">Cerrar Sesión</button>
+        <button
+          type="button"
+          id="btnLogout"
+          class="btn btn-orange"
+          onclick="window.logout?.()">Cerrar Sesión</button
+        >
       </div>
     </div>
   </header>
@@ -67,19 +72,32 @@ import Layout from '../../layouts/Layout.astro';
       </div>
 
       <div class="grid2">
+        <!-- Ventas por día (línea) -->
         <div class="card">
           <div class="card-head"><h3>Ventas por día</h3></div>
           <div class="card-body">
-            <div id="ventasDia" class="bars">
-              <div class="muted">Sin datos</div>
+            <div class="chart-box">
+              <canvas id="cVentas"></canvas>
+            </div>
+            <div id="ventasInfo" class="insight-box"></div>
+            <!-- fallback cuando no hay datos -->
+            <div id="ventasEmpty" class="muted" style="display:none">
+              Sin datos
             </div>
           </div>
         </div>
 
+        <!-- Top servicios (barras + tabla) -->
         <div class="card">
           <div class="card-head"><h3>Top servicios</h3></div>
           <div class="card-body">
-            <div id="topServicios" class="table-wrap">
+            <div class="chart-box">
+              <canvas id="cTopServicios"></canvas>
+            </div>
+            <div class="chart-box" style="margin-top:20px">
+              <canvas id="cPieServicios"></canvas>
+            </div>
+            <div id="topServicios" class="table-wrap" style="margin-top:12px;">
               <div class="muted">Sin datos</div>
             </div>
           </div>
@@ -88,173 +106,395 @@ import Layout from '../../layouts/Layout.astro';
     </div>
   </main>
 
+  <!-- Chart.js (CDN UMD) -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
+  ></script>
+
   <!-- ===== Script ===== -->
   <script>
     //@ts-nocheck
     /* ===== logout & guard ===== */
-    function _hardLogout(){
-      try{
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      }finally{
-        location.replace('/');
+    function _hardLogout() {
+      try {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      } finally {
+        location.replace("/");
       }
     }
     window.logout = _hardLogout;
 
-    document.addEventListener('click',(e)=>{
-      const b = e.target.closest('#btnLogout');
-      if(!b) return;
+    document.addEventListener("click", (e) => {
+      const b = e.target.closest("#btnLogout");
+      if (!b) return;
       e.preventDefault();
       _hardLogout();
     });
 
-    (async()=>{
-      const token = localStorage.getItem('token');
-      const uStr  = localStorage.getItem('user');
-      if(!token || !uStr) return _hardLogout();
+    (async () => {
+      const token = localStorage.getItem("token");
+      const uStr = localStorage.getItem("user");
+      if (!token || !uStr) return _hardLogout();
 
-      try{
-        const r = await fetch('/api/auth/verify', { headers:{ Authorization:`Bearer ${token}` }});
-        const j = await r.json().catch(()=>({}));
-        if(!r.ok || !j?.success) return _hardLogout();
-      }catch{ return _hardLogout(); }
+      try {
+        const r = await fetch("/api/auth/verify", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j?.success) return _hardLogout();
+      } catch {
+        return _hardLogout();
+      }
 
       const user = JSON.parse(uStr);
-      if(user.rol !== 'admin') return _hardLogout();
-      document.getElementById('userWelcome').textContent = `Bienvenido, ${user.nombre}`;
+      if (user.rol !== "admin") return _hardLogout();
+      document.getElementById("userWelcome").textContent =
+        `Bienvenido, ${user.nombre}`;
 
       // Fechas por defecto (1º del mes → hoy)
-      const dDesde = document.getElementById('fDesde');
-      const dHasta = document.getElementById('fHasta');
-      const today  = new Date();
-      const yyyy   = today.getFullYear();
-      const mm     = String(today.getMonth()+1).padStart(2,'0');
-      const dd     = String(today.getDate()).padStart(2,'0');
-      if(!dDesde.value) dDesde.value = `${yyyy}-${mm}-01`;
-      if(!dHasta.value) dHasta.value = `${yyyy}-${mm}-${dd}`;
+      const dDesde = document.getElementById("fDesde");
+      const dHasta = document.getElementById("fHasta");
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const dd = String(today.getDate()).padStart(2, "0");
+      if (!dDesde.value) dDesde.value = `${yyyy}-${mm}-01`;
+      if (!dHasta.value) dHasta.value = `${yyyy}-${mm}-${dd}`;
 
       apply();
     })();
 
     /* ===== UI events ===== */
-    document.getElementById('btnAplicar')?.addEventListener('click', apply);
-    document.getElementById('btnExport')?.addEventListener('click', exportCSV);
+    document.getElementById("btnAplicar")?.addEventListener("click", apply);
+    document.getElementById("btnExport")?.addEventListener("click", exportCSV);
 
     /* ===== Utils ===== */
-    const money = new Intl.NumberFormat('es-EC', { style:'currency', currency:'USD' });
-
-    /* ===== API calls ===== */
-async function apply(){
-  const token = localStorage.getItem('token');
-  const desde = document.getElementById('fDesde').value;
-  const hasta = document.getElementById('fHasta').value;
-
-  const url = new URL('/api/reportes', location.origin);
-  if (desde) url.searchParams.set('desde', desde);
-  if (hasta) url.searchParams.set('hasta', hasta);
-  url.searchParams.set('_ts', Date.now()); // ← cache buster
-
-  let data = { resumen:{}, ventas_dia:[], top_servicios:[] };
-  try{
-    const r = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: 'no-store' // ← no cache
+    const money = new Intl.NumberFormat("es-EC", {
+      style: "currency",
+      currency: "USD",
     });
-    if (r.status === 401) return _hardLogout();
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    data = await r.json();
-  }catch(err){
-    console.error('Reporte: error consultando API', err);
-  }
 
-  const { resumen = {}, ventas_dia = [], top_servicios = [] } = data;
-  document.getElementById('kTotal').textContent    = money.format(resumen.total || 0);
-  document.getElementById('kOT').textContent       = resumen.ordenes || 0;
-  document.getElementById('kClientes').textContent = resumen.clientes_nuevos || 0;
-  document.getElementById('kTopSrv').textContent   = top_servicios?.[0]?.nombre || '—';
+    /* ===== Charts state ===== */
+    let ventasChart = null;
+    let topChart = null;
 
-  renderVentasDia(ventas_dia);
-  renderTopServicios(top_servicios);
-}
-
-async function exportCSV(){
-  const token = localStorage.getItem('token');
-  const desde = document.getElementById('fDesde').value;
-  const hasta = document.getElementById('fHasta').value;
-
-  const url = new URL('/api/reportes/export', location.origin);
-  if (desde) url.searchParams.set('desde', desde);
-  if (hasta) url.searchParams.set('hasta', hasta);
-  url.searchParams.set('_ts', Date.now()); // ← cache buster
-
-  try{
-    const r = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-store' // ← por si acaso
-      },
-      cache: 'no-store'
-    });
-    if (r.status === 401) return _hardLogout();
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-
-    const blob = await r.blob();
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'reportes.csv';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }catch(err){
-    console.error('Export CSV: error', err);
-    alert('No se pudo exportar');
-  }
-}
-
-    /* ===== Render ===== */
-    function renderVentasDia(rows){
-      const cont = document.getElementById('ventasDia');
-      if(!rows.length){
-        cont.innerHTML = '<div class="muted">Sin datos</div>';
-        return;
+    function destroyCharts() {
+      if (ventasChart) {
+        ventasChart.destroy();
+        ventasChart = null;
       }
-      const max = Math.max(...rows.map(r => +r.total || 0), 1);
-      cont.innerHTML = rows.map(r => {
-        const w = Math.round(((+r.total || 0) / max) * 100);
-        const f = isNaN(Date.parse(r.fecha)) ? r.fecha : new Date(r.fecha).toLocaleDateString('es-EC');
-        return `
-          <div class="bar">
-            <div class="label">${f}</div>
-            <div class="track"><div class="fill" style="width:${w}%"></div></div>
-            <div class="label">${money.format(+r.total || 0)}</div>
-          </div>`;
-      }).join('');
+      if (topChart) {
+        topChart.destroy();
+        topChart = null;
+      }
     }
 
-    function renderTopServicios(items){
-      const wrap = document.getElementById('topServicios');
-      if(!items.length){
+    /* ===== API calls ===== */
+    async function apply() {
+      const token = localStorage.getItem("token");
+      const desde = document.getElementById("fDesde").value;
+      const hasta = document.getElementById("fHasta").value;
+
+      const url = new URL("/api/reportes", location.origin);
+      if (desde) url.searchParams.set("desde", desde);
+      if (hasta) url.searchParams.set("hasta", hasta);
+      url.searchParams.set("_ts", Date.now()); // ← cache buster
+
+      let data = { resumen: {}, ventas_dia: [], top_servicios: [] };
+      try {
+        const r = await fetch(url, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
+        });
+        if (r.status === 401) return _hardLogout();
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        data = await r.json();
+      } catch (err) {
+        console.error("Reporte: error consultando API", err);
+      }
+
+      const { resumen = {}, ventas_dia = [], top_servicios = [] } = data;
+      document.getElementById("kTotal").textContent = money.format(
+        resumen.total || 0
+      );
+      document.getElementById("kOT").textContent = resumen.ordenes || 0;
+      document.getElementById("kClientes").textContent =
+        resumen.clientes_nuevos || 0;
+      document.getElementById("kTopSrv").textContent =
+        top_servicios?.[0]?.nombre || "—";
+
+      renderVentasDiaChart(ventas_dia);
+      renderTopServicios(top_servicios);
+      renderTopServiciosChart(top_servicios);
+      renderPieServicios(top_servicios);
+      renderVentasDescripcion(ventas_dia, resumen, {
+        desde: document.getElementById("fDesde").value,
+        hasta: document.getElementById("fHasta").value,
+      });
+    }
+
+    async function exportCSV() {
+      const token = localStorage.getItem("token");
+      const desde = document.getElementById("fDesde").value;
+      const hasta = document.getElementById("fHasta").value;
+
+      const url = new URL("/api/reportes/export", location.origin);
+      if (desde) url.searchParams.set("desde", desde);
+      if (hasta) url.searchParams.set("hasta", hasta);
+      url.searchParams.set("_ts", Date.now());
+
+      try {
+        const r = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Cache-Control": "no-store",
+          },
+          cache: "no-store",
+        });
+        if (r.status === 401) return _hardLogout();
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+
+        const blob = await r.blob();
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "reportes.csv";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      } catch (err) {
+        console.error("Export CSV: error", err);
+        alert("No se pudo exportar");
+      }
+    }
+    // Paleta corporativa para todos los charts
+    const COLORS = [
+      "#ff4500",
+      "#3b82f6",
+      "#22c55e",
+      "#f59e0b",
+      "#8b5cf6",
+      "#06b6d4",
+    ];
+
+    /* ===== Render (tabla) ===== */
+    function renderTopServicios(items) {
+      const wrap = document.getElementById("topServicios");
+      if (!items.length) {
         wrap.innerHTML = '<div class="muted">Sin datos</div>';
         return;
       }
+      const total = items.reduce((a, b) => a + (+b.total || 0), 0) || 1;
+
       wrap.innerHTML = `
-        <table>
-          <thead><tr><th>Servicio</th><th>Veces</th><th>Ingresos</th></tr></thead>
-          <tbody>
-            ${items.map(s => `
-              <tr>
-                <td>${s.nombre}</td>
-                <td>${s.cantidad}</td>
-                <td>${money.format(+s.total || 0)}</td>
-              </tr>`).join('')}
-          </tbody>
-        </table>`;
+    <table>
+      <thead>
+        <tr>
+          <th>Servicio</th>
+          <th>Veces</th>
+          <th>Ingresos</th>
+          <th>% del total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${items
+          .map(
+            (s) => `
+          <tr>
+            <td>${s.nombre}</td>
+            <td>${s.cantidad}</td>
+            <td>${money.format(+s.total || 0)}</td>
+            <td>${(((+s.total || 0) / total) * 100).toFixed(1)}%</td>
+          </tr>`
+          )
+          .join("")}
+      </tbody>
+    </table>`;
+    }
+
+    /* ===== Render (charts) ===== */
+    function renderVentasDiaChart(rows) {
+      const empty = document.getElementById("ventasEmpty");
+      const ctx = document.getElementById("cVentas");
+
+      if (!rows.length) {
+        destroyCharts();
+        empty.style.display = "block";
+        return;
+      }
+      empty.style.display = "none";
+
+      const labels = rows.map((r) => {
+        const d = isNaN(Date.parse(r.fecha))
+          ? r.fecha
+          : new Date(r.fecha).toLocaleDateString("es-EC");
+        return d;
+      });
+      const values = rows.map((r) => Number(r.total || 0));
+
+      if (ventasChart) ventasChart.destroy();
+      ventasChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Ventas por día",
+              data: values,
+              borderColor: COLORS[0], // naranja
+              backgroundColor: "rgba(255,69,0,0.15)", // sombra
+              tension: 0.3,
+              pointRadius: 4,
+              pointBackgroundColor: COLORS[0],
+              fill: true,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: { label: (ctx) => money.format(ctx.parsed.y) },
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: (v) => "$" + Number(v).toLocaleString("es-EC"),
+              },
+            },
+          },
+        },
+      });
+    }
+
+    function renderTopServiciosChart(items) {
+      const ctx = document.getElementById("cTopServicios");
+      const sorted = (items || []).slice().sort((a, b) => b.total - a.total);
+      const labels = sorted.map((i) => i.nombre);
+      const values = sorted.map((i) => Number(i.total || 0));
+
+      if (topChart) topChart.destroy();
+      topChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Ingresos por servicio",
+              data: values,
+              backgroundColor: COLORS[1], // azul
+              hoverBackgroundColor: "#2563eb",
+              borderRadius: 8, // esquinas redondeadas
+            },
+          ],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: { label: (ctx) => money.format(ctx.parsed.x) },
+            },
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: {
+                callback: (v) => "$" + Number(v).toLocaleString("es-EC"),
+              },
+            },
+          },
+        },
+      });
+    }
+
+    let pieChart = null;
+    function renderPieServicios(items) {
+      const ctx = document.getElementById("cPieServicios");
+      if (pieChart) pieChart.destroy();
+      if (!items.length) return;
+
+      const labels = items.map((i) => i.nombre);
+      const values = items.map((i) => Number(i.total || 0));
+
+      pieChart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels,
+          datasets: [
+            {
+              data: values,
+              backgroundColor: COLORS.slice(0, values.length),
+              borderColor: "#fff",
+              borderWidth: 2,
+              hoverOffset: 8,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: "bottom" },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const total = values.reduce((a, b) => a + b, 0) || 1;
+                  const val = ctx.parsed;
+                  const pct = ((val / total) * 100).toFixed(1);
+                  return `${ctx.label}: ${money.format(val)} (${pct}%)`;
+                },
+              },
+            },
+          },
+        },
+      });
+    }
+    function renderVentasDescripcion(rows, resumen, rango) {
+      const el = document.getElementById("ventasInfo");
+      const total = Number(resumen?.total || 0);
+      const ordenes = Number(resumen?.ordenes || 0);
+
+      const diasConVenta = rows.filter((r) => Number(r.total || 0) > 0).length;
+      const sumRows = rows.reduce((a, r) => a + Number(r.total || 0), 0);
+      const promedioDia = diasConVenta ? sumRows / diasConVenta : 0;
+
+      const mejor = rows.reduce(
+        (best, r) => {
+          const v = Number(r.total || 0);
+          if (v > best.total) return { fecha: r.fecha, total: v };
+          return best;
+        },
+        { fecha: null, total: 0 }
+      );
+
+      const ticketProm = ordenes ? total / ordenes : 0;
+
+      const fmtFecha = (f) =>
+        isNaN(Date.parse(f)) ? f : new Date(f).toLocaleDateString("es-EC");
+      const rangoTxt = rango ? `${rango.desde} a ${rango.hasta}` : "";
+
+      el.innerHTML = `
+    <ul class="insight-list">
+      <li><span>Rango</span><strong>${rangoTxt}</strong></li>
+      <li><span>Total facturado</span><strong>${money.format(total)}</strong></li>
+      <li><span>Días con venta</span><strong>${diasConVenta}</strong></li>
+      <li><span>Promedio por día con venta</span><strong>${money.format(promedioDia)}</strong></li>
+      <li><span>Mejor día</span><strong>${mejor.fecha ? `${fmtFecha(mejor.fecha)} — ${money.format(mejor.total)}` : "—"}</strong></li>
+      <li><span>Ticket promedio</span><strong>${money.format(ticketProm)}</strong></li>
+    </ul>
+  `;
     }
   </script>
 
   <!-- ===== Estilos ===== -->
   <style>
-    :root{
+    :root {
       --container: 1200px;
       --bg: #f8fafc;
       --card: #fff;
@@ -271,63 +511,362 @@ async function exportCSV(){
       --red: #ef4444;
     }
 
-    .page{ padding:24px 0 40px; background:var(--bg); }
-    .container{ max-width:var(--container); margin:0 auto; padding:0 20px; }
-    .muted{ color:var(--muted); }
-
-    .navbar{
-      position: sticky; top:0; z-index:50;
-      background: linear-gradient(135deg,var(--blue-700) 0%,var(--blue-500) 100%);
-      color:#fff; box-shadow:0 6px 18px rgba(2,6,23,.12);
+    .page {
+      padding: 24px 0 40px;
+      background: var(--bg);
     }
-    .navbar .container{ display:flex; align-items:center; gap:16px; padding:10px 20px; }
-    .brand{ display:inline-flex; align-items:center; gap:10px; color:#fff; text-decoration:none; font-weight:700; }
-    .logo-circle{ width:36px; height:36px; display:grid; place-items:center; border-radius:50%; background:rgba(255,255,255,.15); box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
-    .brand-text{ color:#fff; }
-    .user-menu{ margin-left:auto; display:inline-flex; gap:12px; align-items:center; }
-    .user-chip{ padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); color:#fff; font-weight:700; font-size:.875rem; }
+    .container {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .muted {
+      color: var(--muted);
+    }
 
-    #btnLogout{ background:var(--red); color:#fff; border:0; border-radius:999px; padding:8px 14px; font-weight:700; box-shadow:0 6px 14px rgba(239,68,68,.22); cursor:pointer; transition:transform .12s,box-shadow .12s; }
-    #btnLogout:hover{ transform:translateY(-1px); box-shadow:0 10px 22px rgba(239,68,68,.28); }
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: linear-gradient(
+        135deg,
+        var(--blue-700) 0%,
+        var(--blue-500) 100%
+      );
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(2, 6, 23, 0.12);
+    }
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 20px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .logo-circle {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+    }
+    .brand-text {
+      color: #fff;
+    }
+    .user-menu {
+      margin-left: auto;
+      display: inline-flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .user-chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
 
-    .header-row{ display:flex; justify-content:space-between; align-items:flex-end; gap:16px; margin:8px 0 14px; flex-wrap:wrap; }
-    .header-row h1{ margin:0 0 6px; font-size:2rem; font-weight:800; color:#0f172a; }
-    .actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    #btnLogout {
+      background: var(--red);
+      color: #fff;
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-weight: 700;
+      box-shadow: 0 6px 14px rgba(239, 68, 68, 0.22);
+      cursor: pointer;
+      transition:
+        transform 0.12s,
+        box-shadow 0.12s;
+    }
+    #btnLogout:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(239, 68, 68, 0.28);
+    }
 
-    .btn{ border:0; border-radius:10px; padding:10px 14px; font-weight:600; cursor:pointer; font-size:.9rem; }
-    .btn-orange{ background:var(--orange); color:#fff; }
-    .btn-outline{ background:#fff; border:1px solid var(--border); color:var(--text); }
-    .input{ border:1px solid var(--border); border-radius:10px; padding:10px 12px; min-width:200px; font-size:.9rem; background:#fff; color:var(--text); }
-    .input:focus{ outline:none; border-color:var(--blue-500); box-shadow:0 0 0 3px rgba(59,130,246,.15); }
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      margin: 8px 0 14px;
+      flex-wrap: wrap;
+    }
+    .header-row h1 {
+      margin: 0 0 6px;
+      font-size: 2rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
 
-    .stats-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px; margin:14px 0 24px; }
-    .kpi-card{ background:#fff; border:1px solid var(--border); border-radius:14px; padding:18px; display:flex; align-items:center; gap:14px; box-shadow:0 8px 22px rgba(2,6,23,.06); }
-    .kpi-card.kpi-orange{ border-left:4px solid var(--orange); }
-    .kpi-card.kpi-green{  border-left:4px solid var(--green); }
-    .kpi-card.kpi-amber{  border-left:4px solid var(--amber); }
-    .kpi-card.kpi-blue{   border-left:4px solid var(--blue); }
-    .kpi-icon{ font-size:28px; opacity:.85; }
-    .kpi-value{ margin:0; font-size:1.5rem; font-weight:800; color:#0f172a; }
-    .kpi-label{ margin:2px 0 0; color:var(--muted); font-weight:600; font-size:.85rem; }
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn-orange {
+      background: var(--orange);
+      color: #fff;
+    }
+    .btn-outline {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .input {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      min-width: 200px;
+      font-size: 0.9rem;
+      background: #fff;
+      color: var(--text);
+    }
+    .input:focus {
+      outline: none;
+      border-color: var(--blue-500);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
 
-    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-    @media (max-width: 900px){ .grid2{ grid-template-columns:1fr; } }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin: 14px 0 24px;
+    }
+    .kpi-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 8px 22px rgba(2, 6, 23, 0.06);
+    }
+    .kpi-card.kpi-orange {
+      border-left: 4px solid var(--orange);
+    }
+    .kpi-card.kpi-green {
+      border-left: 4px solid var(--green);
+    }
+    .kpi-card.kpi-amber {
+      border-left: 4px solid var(--amber);
+    }
+    .kpi-card.kpi-blue {
+      border-left: 4px solid var(--blue);
+    }
+    .kpi-icon {
+      font-size: 28px;
+      opacity: 0.85;
+    }
+    .kpi-value {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .kpi-label {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
 
-    .card{ background:var(--card); border:1px solid var(--border); border-radius:14px; box-shadow:0 8px 22px rgba(2,6,23,.06); overflow:hidden; }
-    .card-head{ display:flex; align-items:center; justify-content:space-between; padding:16px 18px; background:#fafbfc; border-bottom:1px solid var(--border-2); }
-    .card-head h3{ margin:0; font-size:1.125rem; font-weight:700; color:#0f172a; }
-    .card-body{ padding:16px 18px 18px; }
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 900px) {
+      .grid2 {
+        grid-template-columns: 1fr;
+      }
+    }
 
-    .table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:10px; }
-    .table-wrap table{ width:100%; border-collapse:collapse; background:#fff; }
-    .table-wrap thead th{ background:#f8fafc; color:#0f172a; font-weight:700; font-size:.82rem; letter-spacing:.02em; text-transform:uppercase; text-align:left; padding:14px 12px; border-bottom:2px solid var(--border); }
-    .table-wrap tbody td{ padding:14px 12px; border-bottom:1px solid var(--border-2); font-size:.95rem; }
-    .table-wrap tbody tr:hover{ background:#f6f9ff; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 8px 22px rgba(2, 6, 23, 0.06);
+      overflow: hidden;
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      background: #fafbfc;
+      border-bottom: 1px solid var(--border-2);
+    }
+    .card-head h3 {
+      margin: 0;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .card-body {
+      padding: 16px 18px 18px;
+    }
 
-    .bars{ display:grid; grid-auto-rows:30px; gap:10px; padding:12px; }
-    .bar{ display:flex; gap:10px; align-items:center; }
-    .bar .label{ min-width:96px; font-size:12px; color:#64748b; white-space:nowrap; }
-    .bar .track{ flex:1; height:10px; background:#f1f5f9; border-radius:999px; overflow:hidden; }
-    .bar .fill{ height:10px; background:var(--orange); border-radius:999px; }
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .table-wrap table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+    .table-wrap thead th {
+      background: #f8fafc;
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      text-align: left;
+      padding: 14px 12px;
+      border-bottom: 2px solid var(--border);
+    }
+    .table-wrap tbody td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border-2);
+      font-size: 0.95rem;
+    }
+    .table-wrap tbody tr:hover {
+      background: #f6f9ff;
+    }
+
+    /* ===== Nuevo: contenedor de charts ===== */
+    .chart-box {
+      height: 300px;
+      width: 100%;
+      position: relative;
+    }
+    @media (min-width: 1200px) {
+      .chart-box {
+        height: 340px;
+      }
+    }
+
+    /* Mantengo tus estilos de barras originales por si quieres volver a usarlos */
+    .bars {
+      display: grid;
+      grid-auto-rows: 30px;
+      gap: 10px;
+      padding: 12px;
+    }
+    .bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .bar .label {
+      min-width: 96px;
+      font-size: 12px;
+      color: #64748b;
+      white-space: nowrap;
+    }
+    .bar .track {
+      flex: 1;
+      height: 10px;
+      background: #f1f5f9;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar .fill {
+      height: 10px;
+      background: var(--orange);
+      border-radius: 999px;
+    }
+    #cPieServicios {
+      max-height: 260px;
+    }
+    .chart-box canvas {
+      filter: drop-shadow(0 2px 6px rgba(2, 6, 23, 0.06));
+      border-radius: 10px;
+    }
   </style>
+  <style is:global>
+  .insight-box{
+    margin-top: 16px;
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    box-shadow: 0 4px 14px rgba(2,6,23,.06);
+    transition: all .2s ease-in-out;
+  }
+  .insight-box:hover{
+    box-shadow: 0 6px 20px rgba(2,6,23,.1);
+    transform: translateY(-1px);
+  }
+
+  .insight-list{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 24px;
+    margin: 0; padding: 0; list-style: none;
+  }
+  @media (max-width: 768px){
+    .insight-list{ grid-template-columns: 1fr; }
+  }
+
+  .insight-list li{
+    display: flex;
+    flex-direction: column;
+    background: #f9fafb;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-2);
+    position: relative;
+  }
+  .insight-list li::before{
+    content: "◆";
+    position: absolute;
+    left: -8px; top: 14px;
+    font-size: 10px;
+    color: var(--orange);
+  }
+
+  .insight-list span{
+    color: var(--muted);
+    font-size: .85rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .insight-list strong{
+    color: var(--text);
+    font-weight: 800;
+    font-size: 1rem;
+  }
+  .insight-list li::before{
+  content: none;
+}
+
+</style>
+
 </Layout>
