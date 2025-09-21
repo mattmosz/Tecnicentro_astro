@@ -196,10 +196,22 @@ import Layout from "../../layouts/Layout.astro";
       const desde = document.getElementById("fDesde").value;
       const hasta = document.getElementById("fHasta").value;
 
+      // Validar que las fechas estén en orden correcto
+      if (desde && hasta && new Date(desde) > new Date(hasta)) {
+        alert("La fecha 'Desde' debe ser anterior a la fecha 'Hasta'");
+        return;
+      }
+
       const url = new URL("/api/reportes", location.origin);
       if (desde) url.searchParams.set("desde", desde);
       if (hasta) url.searchParams.set("hasta", hasta);
       url.searchParams.set("_ts", Date.now()); // ← cache buster
+
+      // Mostrar indicador de carga
+      document.getElementById("kTotal").textContent = "Cargando...";
+      document.getElementById("kOT").textContent = "...";
+      document.getElementById("kClientes").textContent = "...";
+      document.getElementById("kTopSrv").textContent = "...";
 
       let data = { resumen: {}, ventas_dia: [], top_servicios: [] };
       try {
@@ -209,9 +221,24 @@ import Layout from "../../layouts/Layout.astro";
         });
         if (r.status === 401) return _hardLogout();
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        data = await r.json();
+        const response = await r.json();
+        
+        if (response.success !== false) {
+          data = response;
+        } else {
+          console.error("Error en la respuesta:", response.message);
+          alert("Error al cargar los reportes: " + (response.message || "Error desconocido"));
+          return;
+        }
       } catch (err) {
         console.error("Reporte: error consultando API", err);
+        alert("Error de conexión al cargar los reportes. Verifique su conexión a internet.");
+        // Restaurar valores por defecto en caso de error
+        document.getElementById("kTotal").textContent = money.format(0);
+        document.getElementById("kOT").textContent = "0";
+        document.getElementById("kClientes").textContent = "0";
+        document.getElementById("kTopSrv").textContent = "—";
+        return;
       }
 
       const { resumen = {}, ventas_dia = [], top_servicios = [] } = data;
@@ -239,6 +266,17 @@ import Layout from "../../layouts/Layout.astro";
       const desde = document.getElementById("fDesde").value;
       const hasta = document.getElementById("fHasta").value;
 
+      // Validar fechas
+      if (desde && hasta && new Date(desde) > new Date(hasta)) {
+        alert("La fecha 'Desde' debe ser anterior a la fecha 'Hasta'");
+        return;
+      }
+
+      const btnExport = document.getElementById("btnExport");
+      const originalText = btnExport.textContent;
+      btnExport.textContent = "Exportando...";
+      btnExport.disabled = true;
+
       const url = new URL("/api/reportes/export", location.origin);
       if (desde) url.searchParams.set("desde", desde);
       if (hasta) url.searchParams.set("hasta", hasta);
@@ -253,17 +291,32 @@ import Layout from "../../layouts/Layout.astro";
           cache: "no-store",
         });
         if (r.status === 401) return _hardLogout();
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        if (!r.ok) {
+          throw new Error(`Error ${r.status}: ${r.statusText}`);
+        }
 
         const blob = await r.blob();
+        if (blob.size === 0) {
+          alert("No hay datos para exportar en el período seleccionado");
+          return;
+        }
+
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = "reportes.csv";
+        const fechaStr = desde && hasta ? `${desde}_a_${hasta}` : new Date().toISOString().slice(0, 10);
+        a.download = `reportes_tecnicentro_${fechaStr}.csv`;
         a.click();
         URL.revokeObjectURL(a.href);
+        
+        // Mostrar mensaje de éxito
+        alert("Reporte exportado exitosamente");
+        
       } catch (err) {
         console.error("Export CSV: error", err);
-        alert("No se pudo exportar");
+        alert(`No se pudo exportar el reporte: ${err.message}`);
+      } finally {
+        btnExport.textContent = originalText;
+        btnExport.disabled = false;
       }
     }
     // Paleta corporativa para todos los charts
@@ -279,8 +332,8 @@ import Layout from "../../layouts/Layout.astro";
     /* ===== Render (tabla) ===== */
     function renderTopServicios(items) {
       const wrap = document.getElementById("topServicios");
-      if (!items.length) {
-        wrap.innerHTML = '<div class="muted">Sin datos</div>';
+      if (!items || !items.length) {
+        wrap.innerHTML = '<div class="muted">No hay servicios registrados en el período seleccionado</div>';
         return;
       }
       const total = items.reduce((a, b) => a + (+b.total || 0), 0) || 1;
@@ -300,8 +353,8 @@ import Layout from "../../layouts/Layout.astro";
           .map(
             (s) => `
           <tr>
-            <td>${s.nombre}</td>
-            <td>${s.cantidad}</td>
+            <td>${s.nombre || 'Sin nombre'}</td>
+            <td>${s.cantidad || 0}</td>
             <td>${money.format(+s.total || 0)}</td>
             <td>${(((+s.total || 0) / total) * 100).toFixed(1)}%</td>
           </tr>`
@@ -316,9 +369,10 @@ import Layout from "../../layouts/Layout.astro";
       const empty = document.getElementById("ventasEmpty");
       const ctx = document.getElementById("cVentas");
 
-      if (!rows.length) {
+      if (!rows || !rows.length) {
         destroyCharts();
         empty.style.display = "block";
+        empty.textContent = "No hay datos de ventas en el período seleccionado";
         return;
       }
       empty.style.display = "none";
@@ -372,8 +426,37 @@ import Layout from "../../layouts/Layout.astro";
 
     function renderTopServiciosChart(items) {
       const ctx = document.getElementById("cTopServicios");
-      const sorted = (items || []).slice().sort((a, b) => b.total - a.total);
-      const labels = sorted.map((i) => i.nombre);
+      
+      if (!items || !items.length) {
+        if (topChart) {
+          topChart.destroy();
+          topChart = null;
+        }
+        // Crear un mensaje en el canvas
+        const canvasParent = ctx.parentElement;
+        let noDataMsg = canvasParent.querySelector('.no-data-message');
+        if (!noDataMsg) {
+          noDataMsg = document.createElement('div');
+          noDataMsg.className = 'no-data-message muted';
+          noDataMsg.style.textAlign = 'center';
+          noDataMsg.style.padding = '20px';
+          canvasParent.appendChild(noDataMsg);
+        }
+        noDataMsg.textContent = 'No hay servicios para mostrar en el período seleccionado';
+        ctx.style.display = 'none';
+        return;
+      }
+
+      // Remover mensaje de no datos si existe
+      const canvasParent = ctx.parentElement;
+      const noDataMsg = canvasParent.querySelector('.no-data-message');
+      if (noDataMsg) {
+        noDataMsg.remove();
+      }
+      ctx.style.display = 'block';
+
+      const sorted = items.slice().sort((a, b) => (b.total || 0) - (a.total || 0));
+      const labels = sorted.map((i) => i.nombre || 'Sin nombre');
       const values = sorted.map((i) => Number(i.total || 0));
 
       if (topChart) topChart.destroy();
@@ -416,10 +499,36 @@ import Layout from "../../layouts/Layout.astro";
     let pieChart = null;
     function renderPieServicios(items) {
       const ctx = document.getElementById("cPieServicios");
-      if (pieChart) pieChart.destroy();
-      if (!items.length) return;
+      if (pieChart) {
+        pieChart.destroy();
+        pieChart = null;
+      }
+      
+      if (!items || !items.length) {
+        // Crear un mensaje en el canvas
+        const canvasParent = ctx.parentElement;
+        let noDataMsg = canvasParent.querySelector('.no-data-pie-message');
+        if (!noDataMsg) {
+          noDataMsg = document.createElement('div');
+          noDataMsg.className = 'no-data-pie-message muted';
+          noDataMsg.style.textAlign = 'center';
+          noDataMsg.style.padding = '20px';
+          canvasParent.appendChild(noDataMsg);
+        }
+        noDataMsg.textContent = 'No hay datos para el gráfico circular';
+        ctx.style.display = 'none';
+        return;
+      }
 
-      const labels = items.map((i) => i.nombre);
+      // Remover mensaje de no datos si existe
+      const canvasParent = ctx.parentElement;
+      const noDataMsg = canvasParent.querySelector('.no-data-pie-message');
+      if (noDataMsg) {
+        noDataMsg.remove();
+      }
+      ctx.style.display = 'block';
+
+      const labels = items.map((i) => i.nombre || 'Sin nombre');
       const values = items.map((i) => Number(i.total || 0));
 
       pieChart = new Chart(ctx, {
