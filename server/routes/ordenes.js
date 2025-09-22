@@ -101,8 +101,14 @@ router.post('/', verifyToken, async (req, res) => {
 
   } catch (error) {
     await connection.rollback();
-    console.error('Error al crear orden:', error);
-    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    console.error('Error completo al crear orden:', error);
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error interno del servidor',
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   } finally {
     connection.release();
   }

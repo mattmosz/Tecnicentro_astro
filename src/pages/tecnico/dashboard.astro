@@ -56,9 +56,7 @@ import Layout from "../../layouts/Layout.astro";
       <section class="section">
         <div class="quick">
           <div class="quick-left">
-            <button id="nuevaOrdenBtn" class="btn btn-success">
-              <span class="btn-ico">➕</span> Nueva Orden
-            </button>
+            <button class="btn btn-orange" id="btnNuevo">Nueva Orden</button>
             <div class="plate-search">
               <input
                 id="placaQuick"
@@ -127,136 +125,70 @@ import Layout from "../../layouts/Layout.astro";
   <!-- Toast -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <!-- MODAL Nueva Orden -->
-  <div id="nuevaOrdenModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Crear nueva orden</h3>
-        <button class="modal-close" aria-label="Cerrar">×</button>
+  <!-- Modal para crear orden -->
+  <div id="ordenModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="modalTitle">Nueva Orden de Trabajo</h3>
+        <button class="icon" type="button" id="closeModal">✖</button>
       </div>
-
       <div class="modal-body">
-        <form id="nuevaOrdenForm">
-          <!-- Buscar vehículo -->
-          <div class="form-row">
-            <div class="form-group grow">
-              <label for="placaVehiculo">Placa del vehículo</label>
-              <div class="input-wrap">
-                <span class="input-ico">🚘</span>
-                <input
-                  id="placaVehiculo"
-                  class="form-control"
-                  placeholder="ABC-1234"
-                />
-              </div>
-            </div>
-            <div class="form-group">
-              <label>&nbsp;</label>
+        <form id="ordenForm">
+          <div class="grid2">
+            <label>
+              Cliente *
+              <select name="id_cliente" id="clienteSelect" required class="input">
+                <option value="">Seleccionar cliente</option>
+              </select>
+            </label>
+            <label>
+              Vehículo *
+              <select
+                name="id_vehiculo"
+                id="vehiculoSelect"
+                required
+                class="input"
+                disabled
+              >
+                <option value="">Primero seleccione un cliente</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            Observaciones
+            <textarea
+              name="observaciones"
+              class="input"
+              rows="3"
+              placeholder="Observaciones sobre el vehículo o trabajo a realizar"
+            ></textarea>
+          </label>
+
+          <div class="servicios-section">
+            <div class="section-header">
+              <h4>Servicios a Realizar</h4>
               <button
                 type="button"
-                id="buscarVehiculoBtn"
-                class="btn btn-outline">Buscar</button
+                id="btnAgregarServicio"
+                class="btn btn-small btn-outline">+ Agregar Servicio</button
               >
             </div>
-          </div>
-
-          <div id="vehiculoInfo" class="veh-card" style="display:none;">
-            <div class="veh-left">
-              <div class="veh-line">
-                <strong>Marca:</strong>
-                <span id="vehMarca"></span>
-              </div>
-              <div class="veh-line">
-                <strong>Modelo:</strong>
-                <span id="vehModelo"></span>
-              </div>
-              <div class="veh-line">
-                <strong>Placa:</strong>
-                <span id="vehPlaca"></span>
+            <div id="serviciosContainer">
+              <div class="no-servicios" id="noServiciosMsg">
+                <p>No hay servicios agregados. Haz clic en "Agregar Servicio" para comenzar.</p>
               </div>
             </div>
-            <div class="veh-right">
-              <div class="veh-line">
-                <strong>Cliente:</strong>
-                <span id="vehCliente"></span>
-              </div>
-              <div class="veh-line">
-                <strong>Teléfono:</strong>
-                <span id="vehTelefono"></span>
+            <div class="total-section" id="totalSection" style="display: none;">
+              <div class="total-general">
+                <strong>Total General: $<span id="totalGeneral">0.00</span></strong>
               </div>
             </div>
-          </div>
-
-          <div class="form-group">
-            <label for="observaciones">Observaciones</label>
-            <textarea
-              id="observaciones"
-              rows="3"
-              class="form-control"
-              placeholder="Notas iniciales, síntomas, etc."></textarea>
-          </div>
-
-          <!-- Servicios -->
-          <h4 class="subtle-title">Servicios y repuestos</h4>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="tipoServicio">Tipo</label>
-              <select id="tipoServicio" class="form-control">
-                <option value="">Todos</option>
-                <option value="servicio">Mano de obra</option>
-                <option value="repuesto">Repuestos</option>
-                <option value="lubricante">Lubricantes</option>
-              </select>
-            </div>
-            <div class="form-group grow">
-              <label for="buscarServicio">Buscar</label>
-              <div class="input-wrap">
-                <span class="input-ico">🔎</span>
-                <input
-                  id="buscarServicio"
-                  class="form-control"
-                  placeholder="Código o descripción"
-                />
-              </div>
-              <div
-                id="serviciosEncontrados"
-                class="results"
-                style="display:none;"
-              >
-              </div>
-            </div>
-          </div>
-
-          <div class="table-wrap soft">
-            <table class="table" id="serviciosAgregados">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Descripción</th>
-                  <th style="width:110px">Cantidad</th>
-                  <th>Precio</th>
-                  <th>Subtotal</th>
-                  <th style="width:64px">—</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-              <tfoot>
-                <tr>
-                  <td colspan="4" class="t-right"><strong>Total</strong></td>
-                  <td><strong id="totalOrden">$0.00</strong></td>
-                  <td></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          <div class="modal-actions">
-            <button type="submit" class="btn btn-success"
-              ><span class="btn-ico">💾</span> Crear Orden</button
-            >
-            <button type="button" class="btn modal-close">Cancelar</button>
           </div>
         </form>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" type="button" id="cancelarModal">Cancelar</button>
+        <button class="btn btn-orange" type="submit" form="ordenForm">Guardar</button>
       </div>
     </div>
   </div>
@@ -1597,9 +1529,446 @@ import Layout from "../../layouts/Layout.astro";
       background: #e5e7eb;
       color: #111827;
     }
+
+    /* ====== MODAL SIMPLE Y FUNCIONAL ====== */
+    #ordenModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+    }
+    
+    #ordenModal[open], 
+    #ordenModal.show {
+      display: flex !important;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #ordenModal .modal {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      max-width: 700px;
+      width: 95vw;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    #ordenModal .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f9fafb;
+      border-radius: 12px 12px 0 0;
+    }
+    #ordenModal .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      max-height: 60vh;
+      background: white;
+      flex: 1;
+    }
+    
+    #ordenModal #serviciosContainer {
+      max-width: 100%;
+      overflow-x: hidden;
+      width: 100%;
+    }
+    
+    #ordenModal #serviciosContainer * {
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+    
+    #ordenModal .input,
+    #ordenModal select.input {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    
+    #ordenModal .no-servicios {
+      text-align: center;
+      padding: 2rem;
+      color: #6b7280;
+      background: #f9fafb;
+      border: 2px dashed #d1d5db;
+      border-radius: 0.5rem;
+      margin: 1rem 0;
+    }
+    
+    #ordenModal .no-servicios p {
+      margin: 0;
+      font-style: italic;
+    }
+    
+    #ordenModal .subtotal-row {
+      text-align: right;
+      padding: 0.25rem 1rem 0.5rem;
+      color: #6b7280;
+    }
+    
+    #ordenModal .total-section {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f3f4f6;
+      border-radius: 0.5rem;
+      border-top: 2px solid #10b981;
+    }
+    
+    #ordenModal .total-general {
+      text-align: right;
+      font-size: 1.125rem;
+      color: #374151;
+    }
+    
+    #ordenModal .text-muted {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+    #ordenModal .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      padding: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
+      border-radius: 0 0 12px 12px;
+    }
+    #ordenModal .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    #ordenModal .servicios-section {
+      margin-top: 1.5rem;
+    }
+    #ordenModal .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    #ordenModal .section-header h4 {
+      margin: 0;
+      color: #374151;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    
+    #ordenModal #btnAgregarServicio {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    
+    #ordenModal #btnAgregarServicio:hover {
+      background: #059669;
+    }
+    #ordenModal .servicio-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      margin-bottom: 0.75rem;
+      background: #f9fafb;
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    
+    /* Layout simplificado - siempre en columnas para evitar overflow */
+    #ordenModal .servicio-item .servicio-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: flex-end;
+      width: 100%;
+      min-width: 0; /* Importante para prevenir overflow en flex */
+    }
+    
+    #ordenModal .servicio-item .servicio-select-field {
+      flex: 1;
+      min-width: 200px;
+      max-width: 100%;
+    }
+    
+    #ordenModal .servicio-item .cantidad-field {
+      flex: 0 0 80px;
+      min-width: 80px;
+      max-width: 80px;
+    }
+    
+    #ordenModal .servicio-item .precio-field {
+      flex: 0 0 100px;
+      min-width: 100px;
+      max-width: 100px;
+    }
+    
+    #ordenModal .servicio-item .accion-field {
+      flex: 0 0 auto;
+      width: auto;
+    }
+    
+    /* Responsive: en pantallas pequeñas, hacer que todo sea en columna */
+    @media (max-width: 600px) {
+      #ordenModal .servicio-item .servicio-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      #ordenModal .servicio-item .servicio-select-field,
+      #ordenModal .servicio-item .cantidad-field,
+      #ordenModal .servicio-item .precio-field {
+        flex: none;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+      }
+      
+      #ordenModal .accion-field {
+        align-self: center;
+        padding-top: 0.5rem;
+      }
+    }
+    
+    #ordenModal .servicio-item .btn-eliminar {
+      white-space: nowrap;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      border-color: #ef4444;
+      color: #ef4444;
+      background: white;
+    }
+    
+    #ordenModal .servicio-item .btn-eliminar:hover {
+      background: #ef4444;
+      color: white;
+    }
+    
+    /* Estilos para campos individuales */
+    #ordenModal .servicio-select-field,
+    #ordenModal .cantidad-field, 
+    #ordenModal .precio-field,
+    #ordenModal .accion-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    #ordenModal .servicio-select-field label,
+    #ordenModal .cantidad-field label,
+    #ordenModal .precio-field label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #6b7280;
+      margin: 0;
+    }
+    
+    #ordenModal .accion-field {
+      justify-content: flex-end;
+      padding-top: 1rem;
+    }
+    #ordenModal label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-weight: 500;
+      color: #374151;
+    }
+    #ordenModal .input, 
+    #ordenModal select.input,
+    #ordenModal textarea.input {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      background: white;
+      color: #374151;
+    }
+    #ordenModal .input:focus,
+    #ordenModal select.input:focus,
+    #ordenModal textarea.input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px #3b82f6;
+    }
+    #ordenModal .icon {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.25rem;
+      border-radius: 0.25rem;
+      color: #6b7280;
+    }
+    #ordenModal .icon:hover {
+      background: #f3f4f6;
+      color: #374151;
+    }
+    #ordenModal .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.15s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    #ordenModal .btn-orange {
+      background: #ea580c;
+      color: white;
+    }
+    #ordenModal .btn-orange:hover {
+      background: #dc2626;
+    }
+    #ordenModal .btn-outline {
+      background: transparent;
+      border: 1px solid #d1d5db;
+      color: #374151;
+    }
+    #ordenModal .btn-outline:hover {
+      background: #f9fafb;
+    }
+    #ordenModal .btn-small {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+    }
+    #ordenModal h3, #ordenModal h4 {
+      margin: 0;
+      color: #1f2937;
+    }
   </style>
   <script>
     //@ts-nocheck
+    
+    // ===== FUNCIONES GLOBALES PARA SERVICIOS =====
+    // Definir funciones globalmente antes de cualquier otra cosa
+    
+    window.cargarPrecioServicio = function(selectElement, index) {
+      console.log(`🔍 Cargando precio para servicio en índice ${index}`);
+      const selectedOption = selectElement.options[selectElement.selectedIndex];
+      const precio = selectedOption.getAttribute('data-precio') || '0';
+      const precioInput = document.getElementById(`precio_${index}`);
+      
+      console.log(`💰 Servicio seleccionado: ${selectedOption.text}, Precio: $${precio}`);
+      
+      if (precioInput) {
+        precioInput.value = parseFloat(precio).toFixed(2);
+        console.log(`✅ Precio establecido en input: ${precioInput.value}`);
+        window.calcularSubtotal(index);
+      } else {
+        console.error(`❌ No se encontró el input precio_${index}`);
+      }
+    };
+    
+    window.calcularSubtotal = function(index) {
+      console.log(`🧮 Calculando subtotal para índice ${index}`);
+      const cantidadInput = document.getElementById(`cantidad_${index}`);
+      const precioInput = document.getElementById(`precio_${index}`);
+      const subtotalDiv = document.getElementById(`subtotal_${index}`);
+      
+      if (cantidadInput && precioInput && subtotalDiv) {
+        const cantidad = parseFloat(cantidadInput.value) || 0;
+        const precio = parseFloat(precioInput.value) || 0;
+        const subtotal = cantidad * precio;
+        
+        console.log(`📊 Cantidad: ${cantidad}, Precio: ${precio}, Subtotal: ${subtotal}`);
+        
+        const subtotalSpan = subtotalDiv.querySelector('.subtotal-amount');
+        if (subtotalSpan) {
+          subtotalSpan.textContent = subtotal.toFixed(2);
+        }
+        
+        // Mostrar subtotal si hay valores
+        if (cantidad > 0 && precio > 0) {
+          subtotalDiv.style.display = 'block';
+        } else {
+          subtotalDiv.style.display = 'none';
+        }
+        
+        window.calcularTotalGeneral();
+      } else {
+        console.error(`❌ No se encontraron elementos para índice ${index}:`, {
+          cantidad: !!cantidadInput,
+          precio: !!precioInput,
+          subtotal: !!subtotalDiv
+        });
+      }
+    };
+    
+    window.calcularTotalGeneral = function() {
+      console.log("💰 Calculando total general...");
+      const subtotalSpans = document.querySelectorAll('#serviciosContainer .subtotal-amount');
+      let total = 0;
+      
+      subtotalSpans.forEach((span, index) => {
+        const valor = parseFloat(span.textContent) || 0;
+        console.log(`  Subtotal ${index + 1}: $${valor}`);
+        total += valor;
+      });
+      
+      console.log(`💰 Total calculado: $${total.toFixed(2)}`);
+      
+      // Mostrar total en el modal
+      const totalElement = document.getElementById('totalGeneral');
+      if (totalElement) {
+        totalElement.textContent = total.toFixed(2);
+      } else {
+        console.error("❌ No se encontró elemento totalGeneral");
+      }
+    };
+    
+    window.eliminarServicio = function(button) {
+      const servicioItem = button.closest('.servicio-item');
+      servicioItem.remove();
+      
+      // Mostrar mensaje si no hay servicios
+      const container = document.getElementById("serviciosContainer");
+      const serviciosRestantes = container.querySelectorAll('.servicio-item');
+      const noServiciosMsg = document.getElementById("noServiciosMsg");
+      const totalSection = document.getElementById("totalSection");
+      
+      if (serviciosRestantes.length === 0) {
+        if (noServiciosMsg) {
+          noServiciosMsg.style.display = "block";
+        }
+        if (totalSection) {
+          totalSection.style.display = "none";
+        }
+      } else {
+        // Recalcular total después de eliminar
+        window.calcularTotalGeneral();
+      }
+    };
+    
+    // ===== VARIABLES GLOBALES =====
+    let servicios = [];
+    let servicioIndex = 0;
+    
     document.addEventListener("DOMContentLoaded", () => {
       // ---------- AUTH ----------
       const token = localStorage.getItem("token");
@@ -1628,9 +1997,17 @@ import Layout from "../../layouts/Layout.astro";
       // ---------- UI refs ----------
       const toast = document.getElementById("toast");
 
-      const nuevaOrdenBtn = document.getElementById("nuevaOrdenBtn");
-      const nuevaOrdenModal = document.getElementById("nuevaOrdenModal");
-      const modalCloseBtns = nuevaOrdenModal.querySelectorAll(".modal-close");
+      const btnNuevo = document.getElementById("btnNuevo");
+      const ordenModal = document.getElementById("ordenModal");
+      const closeModal = document.getElementById("closeModal");
+      const ordenForm = document.getElementById("ordenForm");
+
+      // Verificar elementos DOM
+      console.log("🔍 Verificando elementos DOM:");
+      console.log("btnNuevo:", !!btnNuevo);
+      console.log("ordenModal:", !!ordenModal);
+      console.log("closeModal:", !!closeModal);
+      console.log("ordenForm:", !!ordenForm);
 
       const placaQuick = document.getElementById("placaQuick");
       const buscarQuickBtn = document.getElementById("buscarQuickBtn");
@@ -1639,29 +2016,9 @@ import Layout from "../../layouts/Layout.astro";
       const ordenesTbody = document.querySelector("#tablaOrdenes tbody");
       const emptyOrders = document.getElementById("emptyOrders");
 
-      // modal refs
-      const placaVehiculo = document.getElementById("placaVehiculo");
-      const buscarVehiculoBtn = document.getElementById("buscarVehiculoBtn");
-      const vehBox = document.getElementById("vehiculoInfo");
-      const vehMarca = document.getElementById("vehMarca");
-      const vehModelo = document.getElementById("vehModelo");
-      const vehPlaca = document.getElementById("vehPlaca");
-      const vehCliente = document.getElementById("vehCliente");
-      const vehTelefono = document.getElementById("vehTelefono");
-
-      const tipoServicio = document.getElementById("tipoServicio");
-      const buscarServicio = document.getElementById("buscarServicio");
-      const serviciosEncontrados = document.getElementById(
-        "serviciosEncontrados"
-      );
-      const serviciosTbody = document.querySelector(
-        "#serviciosAgregados tbody"
-      );
-      const totalOrdenEl = document.getElementById("totalOrden");
-
       // ---------- state ----------
-      let vehiculoSeleccionado = null;
-      let serviciosSeleccionados = [];
+      let clientes = [];
+      let vehiculos = [];
       let todasLasOrdenes = [];
       let filtroEstado = "todas";
 
@@ -1693,23 +2050,84 @@ import Layout from "../../layouts/Layout.astro";
       };
 
       // ---------- nueva orden (modal) ----------
-      nuevaOrdenBtn.addEventListener("click", () => {
-        nuevaOrdenModal.style.display = "flex";
-        placaVehiculo.focus();
+      if (btnNuevo) {
+        btnNuevo.addEventListener("click", async () => {
+          console.log("🔄 Click en Nueva Orden detectado");
+          
+          if (!ordenModal) {
+            console.error("❌ Modal no encontrado");
+            return;
+          }
+          
+          console.log("🔄 Abriendo modal nueva orden...");
+          
+          // Limpiar formulario
+          if (ordenForm) {
+            ordenForm.reset();
+          }
+          limpiarServicios();
+          
+          // Mostrar modal usando el CSS correcto
+          try {
+            ordenModal.style.display = "flex";
+            ordenModal.classList.add("show");
+            ordenModal.setAttribute("open", "");
+            console.log("✅ Modal mostrado con display:flex y clase show");
+          } catch (error) {
+            console.error("❌ Error mostrando modal:", error);
+          }
+          
+          // Cargar datos
+          console.log("🔄 Cargando clientes y servicios...");
+          await loadClientes();
+          await loadServicios();
+        });
+      } else {
+        console.error("❌ Botón Nueva Orden no encontrado");
+      }
+
+      if (closeModal) {
+        closeModal.addEventListener("click", () => {
+          console.log("🔄 Cerrando modal...");
+          ordenModal.style.display = "none";
+          ordenModal.classList.remove("show");
+          ordenModal.removeAttribute("open");
+        });
+      }
+
+      // Botón cancelar alternativo
+      const cancelarModal = document.getElementById("cancelarModal");
+      if (cancelarModal) {
+        cancelarModal.addEventListener("click", () => {
+          console.log("🔄 Cancelando modal...");
+          ordenModal.style.display = "none";
+          ordenModal.classList.remove("show");
+          ordenModal.removeAttribute("open");
+        });
+      }
+
+      // Cerrar modal al hacer clic en el fondo
+      if (ordenModal) {
+        ordenModal.addEventListener("click", (e) => {
+          if (e.target === ordenModal) {
+            console.log("🔄 Cerrando modal por click en fondo...");
+            ordenModal.style.display = "none";
+            ordenModal.classList.remove("show");
+            ordenModal.removeAttribute("open");
+          }
+        });
+      }
+
+      // Event listener para cambio de cliente
+      document.getElementById("clienteSelect").addEventListener("change", (e) => {
+        const id_cliente = e.target.value;
+        loadVehiculos(id_cliente);
       });
-      modalCloseBtns.forEach((b) =>
-        b.addEventListener("click", () => {
-          nuevaOrdenModal.style.display = "none";
-        })
-      );
 
-      document
-        .getElementById("nuevaOrdenForm")
-        .addEventListener("submit", crearOrden);
-
-      buscarVehiculoBtn.addEventListener("click", buscarVehiculo);
-      buscarServicio.addEventListener("input", debounce(buscarServicios, 280));
-      tipoServicio.addEventListener("change", buscarServicios);
+      // Event listener para agregar servicio
+      document.getElementById("btnAgregarServicio").addEventListener("click", () => {
+        agregarServicio();
+      });
 
       // botones filtros
       document.querySelectorAll(".pill").forEach((p) => {
@@ -1736,6 +2154,7 @@ import Layout from "../../layouts/Layout.astro";
 
       // ---------- carga inicial ----------
       cargarMisOrdenes();
+      loadServicios(); // Cargar servicios al inicio
 
       // ---------- funciones de datos ----------
       async function cargarMisOrdenes() {
@@ -2082,6 +2501,374 @@ import Layout from "../../layouts/Layout.astro";
           clearTimeout(id);
           id = setTimeout(() => fn(...args), t);
         };
+      }
+
+      // ---------- FUNCIONES DEL MODAL ADMIN ADAPTADAS ----------
+      async function loadClientes() {
+        console.log("🔄 Cargando clientes...");
+        const token = localStorage.getItem("token");
+        try {
+          const response = await fetch("/api/clientes/all", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const result = await response.json();
+          console.log("📋 Respuesta clientes:", result);
+          if (result.success) {
+            clientes = result.data || [];
+            console.log("✅ Clientes cargados:", clientes.length);
+            populateClientesSelect();
+          } else {
+            console.error("❌ Error en respuesta clientes:", result.message);
+          }
+        } catch (error) {
+          console.error("❌ Error cargando clientes:", error);
+        }
+      }
+
+      async function loadVehiculos(id_cliente = null) {
+        const token = localStorage.getItem("token");
+        if (!id_cliente) {
+          const select = document.getElementById("vehiculoSelect");
+          select.innerHTML = '<option value="">Primero seleccione un cliente</option>';
+          select.disabled = true;
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/vehiculos/cliente/${id_cliente}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const result = await response.json();
+          if (result.success) {
+            vehiculos = result.data || [];
+            populateVehiculosSelect();
+          }
+        } catch (error) {
+          console.error("Error cargando vehículos:", error);
+        }
+      }
+
+      async function loadServicios() {
+        const token = localStorage.getItem("token");
+        try {
+          console.log("🔄 Cargando servicios...");
+          const response = await fetch("/api/servicios", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const result = await response.json();
+          console.log("📡 Respuesta de servicios:", result);
+          
+          if (result.success) {
+            servicios = result.data || [];
+            console.log(`✅ ${servicios.length} servicios cargados`);
+            if (servicios.length > 0) {
+              console.log("🏷️ Primeros 3 servicios:", servicios.slice(0, 3));
+            }
+          } else {
+            console.error("❌ Error en respuesta de servicios:", result);
+          }
+        } catch (error) {
+          console.error("❌ Error cargando servicios:", error);
+        }
+      }
+
+      function populateClientesSelect() {
+        console.log("🔄 Poblando select de clientes...");
+        const select = document.getElementById("clienteSelect");
+        if (!select) {
+          console.error("❌ No se encontró el select clienteSelect");
+          return;
+        }
+        
+        select.innerHTML = '<option value="">Seleccionar cliente</option>';
+
+        clientes.forEach((cliente) => {
+          const option = document.createElement("option");
+          option.value = cliente.id;
+          
+          let nombre;
+          if (cliente.tipo === "particular") {
+            // Para clientes particulares, usar nombres y apellidos
+            const nombres = cliente.nombres || "";
+            const apellidos = cliente.apellidos || "";
+            nombre = `${nombres} ${apellidos}`.trim();
+          } else {
+            // Para instituciones, usar razón social
+            nombre = cliente.razon_social || "Sin nombre";
+          }
+          
+          option.textContent = `${nombre} (${cliente.identificacion})`;
+          select.appendChild(option);
+        });
+        console.log("✅ Select poblado con", clientes.length, "clientes");
+      }
+
+      function populateVehiculosSelect() {
+        const select = document.getElementById("vehiculoSelect");
+
+        if (vehiculos.length === 0) {
+          select.innerHTML = '<option value="">No hay vehículos registrados para este cliente</option>';
+          select.disabled = true;
+          return;
+        }
+
+        select.innerHTML = '<option value="">Seleccionar vehículo</option>';
+        select.disabled = false;
+
+        vehiculos.forEach((vehiculo) => {
+          const option = document.createElement("option");
+          option.value = vehiculo.id;
+          option.textContent = `${vehiculo.placa} - ${vehiculo.marca}`;
+          select.appendChild(option);
+        });
+      }
+
+      function agregarServicio() {
+        const container = document.getElementById("serviciosContainer");
+        const noServiciosMsg = document.getElementById("noServiciosMsg");
+        const totalSection = document.getElementById("totalSection");
+        
+        // Ocultar mensaje de "no servicios" al agregar el primero
+        if (noServiciosMsg) {
+          noServiciosMsg.style.display = "none";
+        }
+        
+        // Mostrar sección de total
+        if (totalSection) {
+          totalSection.style.display = "block";
+        }
+        
+        const div = document.createElement("div");
+        div.className = "servicio-item";
+        
+        console.log("🔧 Generando HTML para servicio...");
+        console.log("📊 Servicios disponibles:", servicios.length);
+        if (servicios.length > 0) {
+          console.log("🏷️ Primer servicio de ejemplo:", servicios[0]);
+        }
+        
+        div.innerHTML = `
+          <div class="servicio-row">
+            <div class="servicio-select-field">
+              <label>Servicio</label>
+              <select name="servicios[${servicioIndex}][id_servicio]" class="input servicio-select" onchange="window.cargarPrecioServicio(this, ${servicioIndex})" required>
+                <option value="">Seleccionar servicio</option>
+                ${servicios.map(s => `<option value="${s.id}" data-precio="${s.precio_unitario || 0}">${s.codigo} - ${s.descripcion}</option>`).join('')}
+              </select>
+            </div>
+            <div class="cantidad-field">
+              <label>Cant.</label>
+              <input 
+                type="number" 
+                name="servicios[${servicioIndex}][cantidad]" 
+                id="cantidad_${servicioIndex}"
+                placeholder="1" 
+                class="input" 
+                min="1" 
+                value="1" 
+                onchange="window.calcularSubtotal(${servicioIndex})"
+                required
+              />
+            </div>
+            <div class="precio-field">
+              <label>Precio</label>
+              <input 
+                type="number" 
+                name="servicios[${servicioIndex}][precio_unitario]" 
+                id="precio_${servicioIndex}"
+                placeholder="0.00" 
+                class="input" 
+                step="0.01" 
+                min="0" 
+                onchange="window.calcularSubtotal(${servicioIndex})"
+                required
+              />
+            </div>
+            <div class="accion-field">
+              <button type="button" class="btn btn-outline btn-small btn-eliminar" onclick="window.eliminarServicio(this)">
+                ✖
+              </button>
+            </div>
+          </div>
+          <div class="subtotal-row" id="subtotal_${servicioIndex}" style="display: none;">
+            <small class="text-muted">Subtotal: $<span class="subtotal-amount">0.00</span></small>
+          </div>
+        `;
+        
+        container.appendChild(div);
+        servicioIndex++;
+        
+        console.log(`✅ Servicio agregado con índice ${servicioIndex - 1}`);
+        // Verificar que los elementos se crearon correctamente
+        setTimeout(() => {
+          const cantidadInput = document.getElementById(`cantidad_${servicioIndex - 1}`);
+          const precioInput = document.getElementById(`precio_${servicioIndex - 1}`);
+          const subtotalDiv = document.getElementById(`subtotal_${servicioIndex - 1}`);
+          console.log("🔍 Elementos creados:", {
+            cantidad: !!cantidadInput,
+            precio: !!precioInput,
+            subtotal: !!subtotalDiv
+          });
+        }, 100);
+      }
+
+      function eliminarServicio(button) {
+        const servicioItem = button.closest('.servicio-item');
+        servicioItem.remove();
+        
+        // Mostrar mensaje si no hay servicios
+        const container = document.getElementById("serviciosContainer");
+        const serviciosRestantes = container.querySelectorAll('.servicio-item');
+        const noServiciosMsg = document.getElementById("noServiciosMsg");
+        const totalSection = document.getElementById("totalSection");
+        
+        if (serviciosRestantes.length === 0) {
+          if (noServiciosMsg) {
+            noServiciosMsg.style.display = "block";
+          }
+          if (totalSection) {
+            totalSection.style.display = "none";
+          }
+        } else {
+          // Recalcular total después de eliminar
+          calcularTotalGeneral();
+        }
+      }
+      
+      // Hacer función global
+      window.eliminarServicio = eliminarServicio;
+
+      function limpiarServicios() {
+        document.getElementById("serviciosContainer").innerHTML = `
+          <div class="no-servicios" id="noServiciosMsg">
+            <p>No hay servicios agregados. Haz clic en "Agregar Servicio" para comenzar.</p>
+          </div>
+        `;
+        
+        // Ocultar sección de total
+        const totalSection = document.getElementById("totalSection");
+        if (totalSection) {
+          totalSection.style.display = "none";
+        }
+        
+        servicioIndex = 0;
+      }
+
+      // Formulario de orden actualizado
+      if (ordenForm) {
+        ordenForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          console.log("🔄 Enviando formulario de orden...");
+
+          const clienteSel = document.getElementById("clienteSelect");
+          const vehiculoSel = document.getElementById("vehiculoSelect");
+
+          const id_cliente = clienteSel?.value ? Number(clienteSel.value) : NaN;
+          const id_vehiculo = vehiculoSel?.value ? Number(vehiculoSel.value) : NaN;
+          const observaciones = ordenForm.observaciones.value?.trim() || "";
+
+          if (!Number.isFinite(id_cliente)) {
+            showToast("Selecciona un cliente.");
+            return;
+          }
+          if (!Number.isFinite(id_vehiculo)) {
+            showToast("Selecciona un vehículo.");
+            return;
+          }
+
+          // Construir detalle de servicios
+          const rows = Array.from(document.querySelectorAll("#serviciosContainer .servicio-item"));
+          const detalle = rows
+            .map((row) => {
+              const sel = row.querySelector('select[name^="servicios"]');
+              const qty = row.querySelector('input[name*="[cantidad]"]');
+              const prc = row.querySelector('input[name*="[precio_unitario]"]');
+              const id_servicio = sel?.value ? Number(sel.value) : NaN;
+              const cantidad = qty?.value ? Number(qty.value) : NaN;
+              const precio_unitario = prc?.value ? Number(prc.value) : NaN;
+              
+              if (
+                Number.isFinite(id_servicio) && id_servicio > 0 &&
+                Number.isFinite(cantidad) && cantidad > 0 &&
+                Number.isFinite(precio_unitario) && precio_unitario >= 0
+              ) {
+                return {
+                  id_servicio,
+                  cantidad,
+                  precio_unitario,
+                };
+              }
+              return null;
+            })
+            .filter(Boolean);
+
+          if (!detalle.length) {
+            showToast("Agrega al menos un servicio con cantidad y precio.");
+            return;
+          }
+
+          console.log("📊 Datos de la orden:", {
+            id_vehiculo,
+            observaciones,
+            servicios: detalle,
+          });
+
+          const payload = {
+            id_vehiculo,
+            observaciones,
+            servicios: detalle,
+          };
+
+          const token = localStorage.getItem("token");
+
+          try {
+            console.log("📡 Enviando orden al servidor...");
+            const r = await fetch("/api/ordenes", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(payload),
+            });
+
+            console.log("📡 Respuesta del servidor:", r.status);
+
+            let j = null;
+            try {
+              j = await r.json();
+              console.log("📋 Datos de respuesta:", j);
+            } catch (error) {
+              console.error("❌ Error parseando JSON:", error);
+              j = null;
+            }
+
+            if (!r.ok || !j?.success) {
+              console.error("❌ Error API", r.status, j);
+              const msg = (j && (j.message || j.error)) || `HTTP ${r.status}`;
+              showToast("Error al guardar la orden: " + msg);
+              return;
+            }
+
+            console.log("✅ Orden creada exitosamente:", j.numero_orden);
+            
+            // Cerrar modal
+            ordenModal.style.display = "none";
+            ordenModal.classList.remove("show");
+            ordenModal.removeAttribute("open");
+            
+            // Actualizar vista
+            console.log("🔄 Actualizando vista...");
+            await cargarMisOrdenes();
+            
+            showToast(`Orden ${j.numero_orden} creada exitosamente`);
+
+          } catch (err) {
+            console.error("❌ Error guardando orden", err);
+            showToast("Error de red al guardar la orden");
+          }
+        });
       }
     });
   </script>
