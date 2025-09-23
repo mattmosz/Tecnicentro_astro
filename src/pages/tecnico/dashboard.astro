@@ -57,15 +57,6 @@ import Layout from "../../layouts/Layout.astro";
         <div class="quick">
           <div class="quick-left">
             <button class="btn btn-orange" id="btnNuevo">Nueva Orden</button>
-            <div class="plate-search">
-              <input
-                id="placaQuick"
-                type="text"
-                placeholder="Buscar por placa…"
-              />
-              <button id="buscarQuickBtn" class="btn btn-outline">Buscar</button
-              >
-            </div>
           </div>
           <div class="quick-right">
             <div class="filters" role="tablist" aria-label="Estados">
@@ -137,7 +128,12 @@ import Layout from "../../layouts/Layout.astro";
           <div class="grid2">
             <label>
               Cliente *
-              <select name="id_cliente" id="clienteSelect" required class="input">
+              <select
+                name="id_cliente"
+                id="clienteSelect"
+                required
+                class="input"
+              >
                 <option value="">Seleccionar cliente</option>
               </select>
             </label>
@@ -175,20 +171,108 @@ import Layout from "../../layouts/Layout.astro";
             </div>
             <div id="serviciosContainer">
               <div class="no-servicios" id="noServiciosMsg">
-                <p>No hay servicios agregados. Haz clic en "Agregar Servicio" para comenzar.</p>
+                <p>
+                  No hay servicios agregados. Haz clic en "Agregar Servicio"
+                  para comenzar.
+                </p>
               </div>
             </div>
             <div class="total-section" id="totalSection" style="display: none;">
               <div class="total-general">
-                <strong>Total General: $<span id="totalGeneral">0.00</span></strong>
+                <strong
+                  >Total General: $<span id="totalGeneral">0.00</span></strong
+                >
               </div>
             </div>
           </div>
         </form>
       </div>
       <div class="modal-foot">
-        <button class="btn btn-outline" type="button" id="cancelarModal">Cancelar</button>
-        <button class="btn btn-orange" type="submit" form="ordenForm">Guardar</button>
+        <button class="btn btn-outline" type="button" id="cancelarModal"
+          >Cancelar</button
+        >
+        <button class="btn btn-orange" type="submit" form="ordenForm"
+          >Guardar</button
+        >
+      </div>
+    </div>
+  </div>
+  <!-- Modal DETALLE DE ORDEN -->
+  <div id="detalleModal">
+    <div class="modal det">
+      <div class="modal-head det-head">
+        <div class="det-title">
+          <span class="det-ico">🔧</span>
+          <div>
+            <h3>Detalle de Orden</h3>
+            <small id="detNum" class="det-num">#—</small>
+          </div>
+        </div>
+
+        <div class="det-head-actions">
+          <span id="detEstado" class="badge">—</span>
+          <button class="icon" type="button" id="detCloseBtn">✖</button>
+        </div>
+      </div>
+
+      <div class="modal-body det-body">
+        <!-- Meta en cards -->
+        <div class="det-grid">
+          <div class="det-card">
+            <div class="det-label">Cliente</div>
+            <div id="detCliente" class="det-value">—</div>
+          </div>
+          <div class="det-card">
+            <div class="det-label">Vehículo</div>
+            <div id="detVehiculo" class="det-value">—</div>
+          </div>
+          <div class="det-card">
+            <div class="det-label">Fecha</div>
+            <div id="detFecha" class="det-value">—</div>
+          </div>
+          <div class="det-card obs">
+            <div class="det-label">Obs.</div>
+            <div id="detObs" class="det-value">—</div>
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-wrap soft det-table">
+          <table
+            class="table"
+            id="detTable"
+            aria-describedby="Detalle de servicios"
+          >
+            <thead>
+              <tr>
+                <th style="width:140px">Código</th>
+                <th>Descripción</th>
+                <th class="t-right" style="width:100px">Cant.</th>
+                <th class="t-right" style="width:120px">Precio</th>
+                <th class="t-right" style="width:140px">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody><!-- rows dinámicas --></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Barra de totales fija -->
+      <div class="det-totalbar">
+        <div class="det-totalline">
+          <span>Total</span>
+          <strong id="detTotal">$0.00</strong>
+        </div>
+      </div>
+
+      <div class="modal-foot det-foot">
+        <button class="btn btn-outline" id="detCloseBtn2">Cerrar</button>
+        <a
+          class="btn btn-orange"
+          id="detImprimirBtn"
+          target="_blank"
+          rel="noopener">Imprimir</a
+        >
       </div>
     </div>
   </div>
@@ -1541,14 +1625,14 @@ import Layout from "../../layouts/Layout.astro";
       background: rgba(0, 0, 0, 0.5);
       z-index: 1000;
     }
-    
-    #ordenModal[open], 
+
+    #ordenModal[open],
     #ordenModal.show {
       display: flex !important;
       justify-content: center;
       align-items: center;
     }
-    
+
     #ordenModal .modal {
       background: white;
       border-radius: 12px;
@@ -1577,25 +1661,25 @@ import Layout from "../../layouts/Layout.astro";
       background: white;
       flex: 1;
     }
-    
+
     #ordenModal #serviciosContainer {
       max-width: 100%;
       overflow-x: hidden;
       width: 100%;
     }
-    
+
     #ordenModal #serviciosContainer * {
       box-sizing: border-box;
       max-width: 100%;
     }
-    
+
     #ordenModal .input,
     #ordenModal select.input {
       width: 100%;
       max-width: 100%;
       box-sizing: border-box;
     }
-    
+
     #ordenModal .no-servicios {
       text-align: center;
       padding: 2rem;
@@ -1605,18 +1689,18 @@ import Layout from "../../layouts/Layout.astro";
       border-radius: 0.5rem;
       margin: 1rem 0;
     }
-    
+
     #ordenModal .no-servicios p {
       margin: 0;
       font-style: italic;
     }
-    
+
     #ordenModal .subtotal-row {
       text-align: right;
       padding: 0.25rem 1rem 0.5rem;
       color: #6b7280;
     }
-    
+
     #ordenModal .total-section {
       margin-top: 1rem;
       padding: 1rem;
@@ -1624,13 +1708,13 @@ import Layout from "../../layouts/Layout.astro";
       border-radius: 0.5rem;
       border-top: 2px solid #10b981;
     }
-    
+
     #ordenModal .total-general {
       text-align: right;
       font-size: 1.125rem;
       color: #374151;
     }
-    
+
     #ordenModal .text-muted {
       color: #6b7280;
       font-size: 0.875rem;
@@ -1667,7 +1751,7 @@ import Layout from "../../layouts/Layout.astro";
       font-size: 1rem;
       font-weight: 600;
     }
-    
+
     #ordenModal #btnAgregarServicio {
       background: #10b981;
       color: white;
@@ -1678,7 +1762,7 @@ import Layout from "../../layouts/Layout.astro";
       font-weight: 500;
       transition: background-color 0.2s;
     }
-    
+
     #ordenModal #btnAgregarServicio:hover {
       background: #059669;
     }
@@ -1696,7 +1780,7 @@ import Layout from "../../layouts/Layout.astro";
       max-width: 100%;
       box-sizing: border-box;
     }
-    
+
     /* Layout simplificado - siempre en columnas para evitar overflow */
     #ordenModal .servicio-item .servicio-row {
       display: flex;
@@ -1706,37 +1790,37 @@ import Layout from "../../layouts/Layout.astro";
       width: 100%;
       min-width: 0; /* Importante para prevenir overflow en flex */
     }
-    
+
     #ordenModal .servicio-item .servicio-select-field {
       flex: 1;
       min-width: 200px;
       max-width: 100%;
     }
-    
+
     #ordenModal .servicio-item .cantidad-field {
       flex: 0 0 80px;
       min-width: 80px;
       max-width: 80px;
     }
-    
+
     #ordenModal .servicio-item .precio-field {
       flex: 0 0 100px;
       min-width: 100px;
       max-width: 100px;
     }
-    
+
     #ordenModal .servicio-item .accion-field {
       flex: 0 0 auto;
       width: auto;
     }
-    
+
     /* Responsive: en pantallas pequeñas, hacer que todo sea en columna */
     @media (max-width: 600px) {
       #ordenModal .servicio-item .servicio-row {
         flex-direction: column;
         align-items: stretch;
       }
-      
+
       #ordenModal .servicio-item .servicio-select-field,
       #ordenModal .servicio-item .cantidad-field,
       #ordenModal .servicio-item .precio-field {
@@ -1745,13 +1829,13 @@ import Layout from "../../layouts/Layout.astro";
         max-width: 100%;
         min-width: 0;
       }
-      
+
       #ordenModal .accion-field {
         align-self: center;
         padding-top: 0.5rem;
       }
     }
-    
+
     #ordenModal .servicio-item .btn-eliminar {
       white-space: nowrap;
       padding: 0.25rem 0.5rem;
@@ -1760,22 +1844,22 @@ import Layout from "../../layouts/Layout.astro";
       color: #ef4444;
       background: white;
     }
-    
+
     #ordenModal .servicio-item .btn-eliminar:hover {
       background: #ef4444;
       color: white;
     }
-    
+
     /* Estilos para campos individuales */
     #ordenModal .servicio-select-field,
-    #ordenModal .cantidad-field, 
+    #ordenModal .cantidad-field,
     #ordenModal .precio-field,
     #ordenModal .accion-field {
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
     }
-    
+
     #ordenModal .servicio-select-field label,
     #ordenModal .cantidad-field label,
     #ordenModal .precio-field label {
@@ -1784,7 +1868,7 @@ import Layout from "../../layouts/Layout.astro";
       color: #6b7280;
       margin: 0;
     }
-    
+
     #ordenModal .accion-field {
       justify-content: flex-end;
       padding-top: 1rem;
@@ -1796,7 +1880,7 @@ import Layout from "../../layouts/Layout.astro";
       font-weight: 500;
       color: #374151;
     }
-    #ordenModal .input, 
+    #ordenModal .input,
     #ordenModal select.input,
     #ordenModal textarea.input {
       padding: 0.5rem 0.75rem;
@@ -1857,135 +1941,1002 @@ import Layout from "../../layouts/Layout.astro";
       padding: 0.25rem 0.5rem;
       font-size: 0.875rem;
     }
-    #ordenModal h3, #ordenModal h4 {
+    #ordenModal h3,
+    #ordenModal h4 {
       margin: 0;
       color: #1f2937;
     }
   </style>
+  <style is:global>
+    /* ======== Técnico: Mis Órdenes – ajustes visuales dedicados ======== */
+    .section .card {
+      border: 1px solid #eef2f7;
+    }
+
+    /* Cabezal + herramientas */
+    .card-head {
+      gap: 12px;
+    }
+    .card-tools .input {
+      height: 40px;
+      min-width: 260px;
+      background: #fff;
+    }
+
+    /* Tabla compacta y ancho completo */
+    #ordenesContainer .table {
+      width: 100%;
+      table-layout: auto;
+    }
+    #ordenesContainer thead th {
+      padding: 12px 14px;
+    }
+    #ordenesContainer tbody td {
+      padding: 12px 14px;
+      vertical-align: middle;
+    }
+
+    /* Columna acciones fija y bonita */
+    #ordenesContainer th:last-child,
+    #ordenesContainer td:last-child {
+      width: 180px;
+    }
+    .btn-sm {
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+    }
+    .btn-ghost {
+      border-color: #e5e7eb;
+    }
+    .btn-ghost:hover {
+      box-shadow: var(--ring);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-blue), #567bd6);
+      color: #fff;
+      border: 0;
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: #fff;
+      border: 0;
+    }
+
+    /* Quita “aire” inferior que marcaste */
+    #ordenesContainer .card-body {
+      padding-bottom: 10px;
+    }
+    .section:last-of-type {
+      margin-bottom: 0;
+    }
+    .page {
+      padding-bottom: 24px;
+    }
+
+    /* Estados (badges) con mejor contraste */
+    .badge {
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .badge-info {
+      background: #eef2ff;
+      color: #3730a3;
+    }
+    .badge-warning {
+      background: #fff7ed;
+      color: #9a3412;
+    }
+    .badge-primary {
+      background: #eff6ff;
+      color: #1e3a8a;
+    }
+    .badge-success {
+      background: #ecfdf5;
+      color: #065f46;
+    }
+
+    /* ====== Detalle: layout y look ====== */
+    #detalleModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(2, 6, 23, 0.45);
+      align-items: center;
+      justify-content: center;
+    }
+    #detalleModal.show {
+      display: flex;
+    }
+    #detalleModal .modal.det {
+      background: #fff;
+      width: min(920px, 96vw);
+      max-height: 92vh;
+      border-radius: 16px;
+      box-shadow: 0 24px 60px rgba(2, 6, 23, 0.24);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .det-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      border-bottom: 1px solid #eef2f7;
+      background: linear-gradient(180deg, #fafcff, #fff);
+    }
+    .det-title {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .det-ico {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-blue), #5b7df0);
+      color: #fff;
+      font-size: 20px;
+      box-shadow: var(--ring);
+    }
+    .det-title h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .det-num {
+      color: #64748b;
+      font-weight: 800;
+    }
+    .det-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Meta cards */
+    .det-body {
+      padding: 16px 18px 0;
+    }
+    .det-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 18px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 680px) {
+      .det-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .det-card {
+      background: #fbfcfe;
+      border: 1px solid #eef2f7;
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .det-label {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 4px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .det-value {
+      color: #0f172a;
+      word-break: break-word;
+    }
+
+    /* Tabla */
+    .det-table {
+      border-radius: 12px;
+      border: 1px solid #eef2f7;
+      background: #fff;
+      overflow: hidden;
+    }
+    .det-table thead th {
+      top: 0;
+      background: #f8fafc;
+      border-bottom: 1px solid #eef2f7;
+      box-shadow: 0 1px 0 rgba(2, 6, 23, 0.04);
+    }
+    .det-table tbody tr:nth-child(odd) td {
+      background: #fff;
+    }
+    .det-table tbody tr:nth-child(even) td {
+      background: #fcfdff;
+    }
+    .det-table tbody tr:hover td {
+      background: #f7fafc;
+    }
+
+    /* Total bar sticky */
+    .det-totalbar {
+      position: sticky;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), #fff);
+      border-top: 1px solid #eef2f7;
+      padding: 10px 16px;
+      backdrop-filter: blur(3px);
+    }
+    .det-totalline {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 14px;
+    }
+    .det-totalline span {
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .det-totalline strong {
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Footer acciones */
+    .det-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 12px 16px;
+      border-top: 1px solid #eef2f7;
+      background: #fff;
+    }
+
+    /* Badges estado (coinciden con tus clases) */
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .badge-warning {
+      background: #fff7ed;
+      color: #9a3412;
+    }
+    .badge-primary {
+      background: #eff6ff;
+      color: #1e3a8a;
+    }
+    .badge-success {
+      background: #ecfdf5;
+      color: #065f46;
+    }
+
+    /* Impresión limpia solo del modal */
+    @media print {
+      body > *:not(#detalleModal) {
+        display: none !important;
+      }
+      #detalleModal {
+        position: static;
+        display: block;
+        background: #fff;
+      }
+      #detalleModal .modal.det {
+        box-shadow: none;
+        max-height: none;
+        width: auto;
+      }
+      .det-head .icon {
+        display: none;
+      }
+      .det-foot {
+        display: none;
+      }
+      .det-totalbar {
+        position: static;
+      }
+    }
+    /* ===== Detalle Orden – Light & Responsive ===== */
+
+    /* Contenedor */
+    #detalleModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.85); /* fondo claro translúcido */
+      align-items: center;
+      justify-content: center;
+    }
+    #detalleModal.show {
+      display: flex;
+    }
+
+    /* Caja modal */
+    #detalleModal .modal.det {
+      background: #fff;
+      width: min(920px, 96vw);
+      max-height: 92vh;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: det-pop 0.18s ease-out;
+    }
+    @keyframes det-pop {
+      from {
+        transform: scale(0.97);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Header */
+    .det-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 18px;
+      background: #fafafa;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .det-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .det-ico {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .det-num {
+      color: #475569;
+      font-weight: 800;
+    }
+
+    /* Estado */
+    #detEstado.badge {
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .badge-warning {
+      background: #fff7ed;
+      color: #9a3412;
+    }
+    .badge-primary {
+      background: #eff6ff;
+      color: #1e3a8a;
+    }
+    .badge-success {
+      background: #ecfdf5;
+      color: #065f46;
+    }
+
+    /* Meta info en grid */
+    .det-body {
+      padding: 16px 18px;
+    }
+    .det-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px 18px;
+      margin-bottom: 14px;
+    }
+    .det-card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .det-label {
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+    .det-value {
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    /* Tabla */
+    .det-table {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .det-table thead th {
+      background: #f8fafc;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 10px;
+      font-size: 13px;
+    }
+    .det-table tbody td {
+      padding: 10px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .det-table tbody tr:nth-child(even) td {
+      background: #fdfdfd;
+    }
+    .det-table tbody tr:hover td {
+      background: #f9fafb;
+    }
+
+    /* Total */
+    .det-totalbar {
+      border-top: 1px solid #e5e7eb;
+      background: #fff;
+      padding: 12px 18px;
+    }
+    .det-totalline {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .det-totalline strong {
+      font-size: 16px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: #f1f5f9;
+    }
+
+    /* Footer */
+    .det-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 14px 18px;
+      border-top: 1px solid #e5e7eb;
+      background: #fafafa;
+    }
+    .det-foot .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    .det-foot .btn-outline {
+      border: 1px solid #d1d5db;
+      background: #fff;
+    }
+    .det-foot .btn-orange {
+      background: #f97316;
+      color: #fff;
+      border: 0;
+    }
+
+    /* Close button */
+    #detCloseBtn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.15s;
+    }
+    #detCloseBtn:hover {
+      background: #f3f4f6;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .det-title h3 {
+        font-size: 16px;
+      }
+      .det-totalbar {
+        padding: 10px 14px;
+      }
+      .det-foot {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .det-foot .btn {
+        width: 100%;
+      }
+    }
+    /* Observaciones ocupa todo el ancho */
+    .det-card.obs {
+      grid-column: 1 / -1; /* se extiende a toda la fila */
+      min-height: 80px; /* espacio mínimo */
+      background: #fdfdfd; /* un poco más claro */
+    }
+
+    /* Texto de observaciones */
+    .det-card.obs .det-value {
+      white-space: pre-wrap; /* respeta saltos de línea */
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    /* Sección de Acciones rápidas */
+    .quick {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem; /* separa de los KPIs */
+      margin-bottom: 1rem; /* separa de "Mis Órdenes" */
+      flex-wrap: wrap; /* para móviles */
+      gap: 1rem;
+    }
+
+    .quick-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem; /* espacio entre botón y buscador */
+    }
+
+    #btnNuevo {
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    /* Ajusta filtros a la derecha con separación */
+    .quick-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .filters {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Responsive: en pantallas chicas */
+    @media (max-width: 768px) {
+      .quick {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .quick-left,
+      .quick-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+      #btnNuevo {
+        width: 100%;
+      }
+    }
+    /* Botones de acciones en la tabla */
+    .table .btn {
+      padding: 0.35rem 0.9rem;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.2s ease-in-out;
+    }
+
+    /* Botón "Ver" */
+    .table .btn-ghost {
+      background-color: #f3f6ff; /* tono suave */
+      color: #1e40af; /* azul */
+      border: 1px solid #d0d7f9;
+    }
+
+    .table .btn-ghost:hover {
+      background-color: #e0e7ff; /* hover más marcado */
+      color: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+
+    #ordenesContainer tbody tr {
+      transition:
+        background 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+    #ordenesContainer tbody tr:nth-child(even) td {
+      background: #fbfcfe;
+    }
+    #ordenesContainer tbody tr:hover td {
+      background: #f7f9ff;
+      box-shadow:
+        inset 0 1px 0 rgba(2, 6, 23, 0.04),
+        inset 0 -1px 0 rgba(2, 6, 23, 0.04);
+    }
+    /* Chip de acción */
+    .table .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #f3f6ff;
+      color: #1e40af;
+      border: 1px solid #d0d7f9;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .table .btn-ghost::before {
+      content: "👁";
+      font-size: 0.95em;
+    }
+    .table .btn-ghost:hover {
+      background: #e6ecff;
+      border-color: #1d4ed8;
+      color: #1d4ed8;
+    }
+    .filters .pill {
+      position: relative;
+      outline: none;
+      transition: transform 0.05s ease;
+    }
+    .filters .pill:active {
+      transform: translateY(1px) scale(0.99);
+    }
+    .filters .pill:focus-visible {
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.22);
+    }
+
+    .card-tools .input {
+      padding-left: 2.2rem;
+      background: #fff
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238aa0c8' viewBox='0 0 16 16'><path d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85h-.017zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/></svg>")
+        no-repeat 10px center;
+      background-size: 16px;
+      transition:
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
+    }
+    .card-tools .input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    .kpi-card {
+      transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(2, 6, 23, 0.1);
+    }
+    .kpi-value {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .badge {
+      position: relative;
+      padding-left: 18px;
+    }
+    .badge::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .badge-warning::before {
+      background: #ea580c;
+    }
+    .badge-primary::before {
+      background: #2563eb;
+    }
+    .badge-success::before {
+      background: #16a34a;
+    }
+
+    @media (max-width: 680px) {
+      #ordenesContainer table thead {
+        display: none;
+      }
+      #ordenesContainer table,
+      #ordenesContainer tbody,
+      #ordenesContainer tr,
+      #ordenesContainer td {
+        display: block;
+        width: 100%;
+      }
+      #ordenesContainer tbody tr {
+        margin: 10px 0;
+        border: 1px solid #eef2f7;
+        border-radius: 12px;
+        background: #fff;
+        padding: 10px 12px;
+      }
+      #ordenesContainer td {
+        border: 0;
+        padding: 8px 0;
+        position: relative;
+      }
+      #ordenesContainer td::before {
+        content: attr(data-th);
+        display: block;
+        font-size: 12px;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 2px;
+        font-weight: 800;
+      }
+    }
+    .btn.btn-orange {
+      box-shadow: 0 8px 20px rgba(234, 88, 12, 0.18);
+      transition:
+        transform 0.06s ease,
+        box-shadow 0.12s ease;
+    }
+    .btn.btn-orange:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(234, 88, 12, 0.25);
+    }
+    .btn.btn-orange:active {
+      transform: translateY(0);
+    }
+    .page {
+      background: linear-gradient(#f6f8fc, #f7f9fc);
+    }
+    .section .card {
+      background: #fff;
+      backdrop-filter: saturate(110%);
+    }
+    :focus-visible {
+      outline: 3px solid rgba(59, 130, 246, 0.45);
+      outline-offset: 2px;
+      border-radius: 10px;
+    }
+    #ordenesContainer td:last-child .actions {
+      display: inline-flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* ==== PRINT: Header más ancho y badge sin puntito ==== */
+    @media print {
+      /* Aire horizontal en la franja superior del modal */
+      #detalleModal .det-head {
+        padding: 18px 32px !important; /* más padding a los lados */
+        margin: 6px 0 12px !important; /* separa del contenido */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 16px !important;
+      }
+
+      /* Por si algún estilo usa list-style / markers en ese header */
+      #detalleModal .det-head,
+      #detalleModal .det-head * {
+        list-style: none !important;
+        background-image: none !important;
+      }
+
+      /* Badge de estado: SIN pseudo-elementos ni “bolita” */
+      #detalleModal #detEstado,
+      #detalleModal #detEstado::before,
+      #detalleModal #detEstado::after {
+        content: none !important; /* elimina cualquier pseudo (el punto) */
+        box-shadow: none !important;
+        background-image: none !important;
+      }
+
+      /* Estilo limpio del badge al imprimir */
+      #detalleModal #detEstado {
+        display: inline-block !important;
+        background: #e5e7eb !important;
+        color: #111827 !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 6px !important;
+        padding: 4px 10px !important;
+        font-weight: 700 !important;
+        line-height: 1.2 !important;
+        vertical-align: middle !important;
+      }
+
+      /* Que el grupo de acciones quede a la derecha con aire */
+      #detalleModal .det-head .det-head-actions {
+        margin-left: auto !important;
+        gap: 12px !important;
+      }
+
+      /* Mejora el contraste de impresión (colores fieles) */
+      #detalleModal,
+      #detalleModal * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+
+    /* ==== MODAL DETALLE (pantalla): quitar el puntito del badge ==== */
+    #detalleModal .det-head .badge,
+    #detalleModal .det-head #detEstado {
+      position: relative !important;
+      background-image: none !important;
+    }
+
+    /* apaga cualquier pseudo-elemento que dibuje la “bolita” */
+    #detalleModal .det-head .badge::before,
+    #detalleModal .det-head .badge::after,
+    #detalleModal .det-head #detEstado::before,
+    #detalleModal .det-head #detEstado::after,
+    #detalleModal .det-head .badge-success::before,
+    #detalleModal .det-head .badge-success::after {
+      content: none !important;
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      border: 0 !important;
+      background: none !important;
+      box-shadow: none !important;
+    }
+
+    /* look consistente del badge en pantalla */
+    #detalleModal .det-head #detEstado {
+      padding: 5px 10px !important;
+      border-radius: 8px !important;
+      line-height: 1.2 !important;
+      font-weight: 700 !important;
+    }
+
+    /* opcional: asegura separación con el botón ✖ */
+    #detalleModal .det-head .det-head-actions {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      margin-left: auto !important;
+    }
+
+    /* ====== Fix: ícono de búsqueda no se sobrepone al texto ====== */
+    .card-head .card-tools {
+      position: relative;
+    }
+
+    /* Aumenta el padding para dejar espacio a la lupa */
+    .card-head .card-tools .input {
+      padding-left: 44px !important; /* 40–48px según el tamaño del icono */
+      box-sizing: border-box;
+    }
+
+    /* Coloca cualquier svg/i (la lupa) correctamente dentro del input */
+    .card-head .card-tools svg,
+    .card-head .card-tools i,
+    .card-head .card-tools .icon {
+      position: absolute;
+      left: 16px; /* separa del borde izquierdo */
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none; /* que no bloquee el click en el input */
+      opacity: 0.65; /* tono sutil */
+    }
+
+    /* Opcional: placeholder más clarito */
+    .card-head .card-tools .input::placeholder {
+      color: #94a3b8;
+    }
+    .card-head .card-tools .input {
+      padding-left: 44px !important;
+      background-position: 14px 50% !important; /* mueve la lupa a la izquierda */
+      background-repeat: no-repeat !important;
+    }
+  </style>
+
   <script>
     //@ts-nocheck
-    
-    // ===== FUNCIONES GLOBALES PARA SERVICIOS =====
-    // Definir funciones globalmente antes de cualquier otra cosa
-    
-    window.cargarPrecioServicio = function(selectElement, index) {
-      console.log(`🔍 Cargando precio para servicio en índice ${index}`);
+    // ===== Helpers numéricos globales =====
+    window.parseDec = function (value) {
+      if (value == null) return NaN;
+      const s = String(value)
+        .trim()
+        .replace(/\s/g, "")
+        .replace(/[^\d,.\-]/g, "")
+        .replace(/,/g, ".");
+      return Number(s);
+    };
+    window.format2 = function (n) {
+      return Number.isFinite(n) ? n.toFixed(2) : "0.00";
+    };
+    // Alias simple que usas abajo
+    window.toNum = function (v) {
+      return window.parseDec(v);
+    };
+
+    /* ============================
+     *  FUNCIONES GLOBALES (modal servicios)
+     * ============================ */
+    window.cargarPrecioServicio = function (selectElement, index) {
       const selectedOption = selectElement.options[selectElement.selectedIndex];
-      const precio = selectedOption.getAttribute('data-precio') || '0';
+      const precioRaw =
+        selectedOption?.dataset?.precio ??
+        selectedOption.getAttribute("data-precio") ??
+        "0";
+      const precioNum = window.parseDec(precioRaw);
       const precioInput = document.getElementById(`precio_${index}`);
-      
-      console.log(`💰 Servicio seleccionado: ${selectedOption.text}, Precio: $${precio}`);
-      
       if (precioInput) {
-        precioInput.value = parseFloat(precio).toFixed(2);
-        console.log(`✅ Precio establecido en input: ${precioInput.value}`);
+        precioInput.value = window.format2(precioNum);
         window.calcularSubtotal(index);
-      } else {
-        console.error(`❌ No se encontró el input precio_${index}`);
       }
     };
-    
-    window.calcularSubtotal = function(index) {
-      console.log(`🧮 Calculando subtotal para índice ${index}`);
+
+    window.calcularSubtotal = function (index) {
       const cantidadInput = document.getElementById(`cantidad_${index}`);
       const precioInput = document.getElementById(`precio_${index}`);
       const subtotalDiv = document.getElementById(`subtotal_${index}`);
-      
-      if (cantidadInput && precioInput && subtotalDiv) {
-        const cantidad = parseFloat(cantidadInput.value) || 0;
-        const precio = parseFloat(precioInput.value) || 0;
-        const subtotal = cantidad * precio;
-        
-        console.log(`📊 Cantidad: ${cantidad}, Precio: ${precio}, Subtotal: ${subtotal}`);
-        
-        const subtotalSpan = subtotalDiv.querySelector('.subtotal-amount');
-        if (subtotalSpan) {
-          subtotalSpan.textContent = subtotal.toFixed(2);
-        }
-        
-        // Mostrar subtotal si hay valores
-        if (cantidad > 0 && precio > 0) {
-          subtotalDiv.style.display = 'block';
-        } else {
-          subtotalDiv.style.display = 'none';
-        }
-        
-        window.calcularTotalGeneral();
-      } else {
-        console.error(`❌ No se encontraron elementos para índice ${index}:`, {
-          cantidad: !!cantidadInput,
-          precio: !!precioInput,
-          subtotal: !!subtotalDiv
-        });
-      }
+      if (!cantidadInput || !precioInput || !subtotalDiv) return;
+
+      const cantidad = window.parseDec(cantidadInput.value) || 0;
+      const precio = window.parseDec(precioInput.value) || 0;
+      const subtotal = cantidad * precio;
+
+      const subtotalSpan = subtotalDiv.querySelector(".subtotal-amount");
+      if (subtotalSpan) subtotalSpan.textContent = window.format2(subtotal);
+
+      subtotalDiv.style.display = cantidad > 0 && precio > 0 ? "block" : "none";
+      window.calcularTotalGeneral();
     };
-    
-    window.calcularTotalGeneral = function() {
-      console.log("💰 Calculando total general...");
-      const subtotalSpans = document.querySelectorAll('#serviciosContainer .subtotal-amount');
+
+    window.calcularTotalGeneral = function () {
+      const subtotalSpans = document.querySelectorAll(
+        "#serviciosContainer .subtotal-amount"
+      );
       let total = 0;
-      
-      subtotalSpans.forEach((span, index) => {
-        const valor = parseFloat(span.textContent) || 0;
-        console.log(`  Subtotal ${index + 1}: $${valor}`);
-        total += valor;
-      });
-      
-      console.log(`💰 Total calculado: $${total.toFixed(2)}`);
-      
-      // Mostrar total en el modal
-      const totalElement = document.getElementById('totalGeneral');
-      if (totalElement) {
-        totalElement.textContent = total.toFixed(2);
-      } else {
-        console.error("❌ No se encontró elemento totalGeneral");
-      }
+      subtotalSpans.forEach(
+        (span) => (total += window.parseDec(span.textContent) || 0)
+      );
+      const totalElement = document.getElementById("totalGeneral");
+      if (totalElement) totalElement.textContent = total.toFixed(2);
     };
-    
-    window.eliminarServicio = function(button) {
-      const servicioItem = button.closest('.servicio-item');
-      servicioItem.remove();
-      
-      // Mostrar mensaje si no hay servicios
+
+    window.eliminarServicio = function (button) {
+      const servicioItem = button.closest(".servicio-item");
+      if (servicioItem) servicioItem.remove();
+
       const container = document.getElementById("serviciosContainer");
-      const serviciosRestantes = container.querySelectorAll('.servicio-item');
+      const serviciosRestantes = container.querySelectorAll(".servicio-item");
       const noServiciosMsg = document.getElementById("noServiciosMsg");
       const totalSection = document.getElementById("totalSection");
-      
+
       if (serviciosRestantes.length === 0) {
-        if (noServiciosMsg) {
-          noServiciosMsg.style.display = "block";
-        }
-        if (totalSection) {
-          totalSection.style.display = "none";
-        }
+        if (noServiciosMsg) noServiciosMsg.style.display = "block";
+        if (totalSection) totalSection.style.display = "none";
+        window.calcularTotalGeneral();
       } else {
-        // Recalcular total después de eliminar
         window.calcularTotalGeneral();
       }
     };
-    
-    // ===== VARIABLES GLOBALES =====
-    let servicios = [];
-    let servicioIndex = 0;
-    
+
+    /* ============================
+     *  APP TÉCNICO
+     * ============================ */
     document.addEventListener("DOMContentLoaded", () => {
       // ---------- AUTH ----------
       const token = localStorage.getItem("token");
       const userStr = localStorage.getItem("user");
-      if (!token || !userStr) return hardLogout();
-
-      const user = JSON.parse(userStr);
-      if (user.rol !== "tecnico") return hardLogout();
-      document.getElementById("userName").textContent =
-        `${user.nombre} ${user.apellido ?? ""}`.trim();
-
-      // logout robusto
       function hardLogout() {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         location.replace("/");
       }
+      if (!token || !userStr) return hardLogout();
+      const user = JSON.parse(userStr);
+      if (user.rol !== "tecnico") return hardLogout();
+      document.getElementById("userName").textContent =
+        `${user.nombre} ${user.apellido ?? ""}`.trim();
       window.logout = hardLogout;
       document.addEventListener("click", (ev) => {
         const btn = ev.target.closest("#logoutBtn");
@@ -1996,21 +2947,11 @@ import Layout from "../../layouts/Layout.astro";
 
       // ---------- UI refs ----------
       const toast = document.getElementById("toast");
-
       const btnNuevo = document.getElementById("btnNuevo");
       const ordenModal = document.getElementById("ordenModal");
       const closeModal = document.getElementById("closeModal");
+      const cancelarModal = document.getElementById("cancelarModal");
       const ordenForm = document.getElementById("ordenForm");
-
-      // Verificar elementos DOM
-      console.log("🔍 Verificando elementos DOM:");
-      console.log("btnNuevo:", !!btnNuevo);
-      console.log("ordenModal:", !!ordenModal);
-      console.log("closeModal:", !!closeModal);
-      console.log("ordenForm:", !!ordenForm);
-
-      const placaQuick = document.getElementById("placaQuick");
-      const buscarQuickBtn = document.getElementById("buscarQuickBtn");
 
       const buscarOrdenInput = document.getElementById("buscarOrdenInput");
       const ordenesTbody = document.querySelector("#tablaOrdenes tbody");
@@ -2019,6 +2960,9 @@ import Layout from "../../layouts/Layout.astro";
       // ---------- state ----------
       let clientes = [];
       let vehiculos = [];
+      let servicios = []; // <- usamos ESTA variable
+      let servicioIndex = 0;
+
       let todasLasOrdenes = [];
       let filtroEstado = "todas";
 
@@ -2035,101 +2979,67 @@ import Layout from "../../layouts/Layout.astro";
         setTimeout(() => toast.classList.remove("show"), 3000);
       };
 
+      const normEstado = (s = "") => {
+        const v = s.toLowerCase().trim();
+        if (
+          [
+            "pendiente",
+            "nuevo",
+            "abierta",
+            "por atender",
+            "registrada",
+          ].includes(v)
+        )
+          return "pendiente";
+        if (["en proceso", "proceso", "working", "atendiendo"].includes(v))
+          return "en proceso";
+        if (
+          [
+            "completado",
+            "entregado",
+            "cerrada",
+            "finalizada",
+            "facturada",
+            "facturada parcial",
+          ].includes(v)
+        )
+          return "completado";
+        return v || "pendiente";
+      };
       const badge = (estado = "") => {
-        switch (estado.toLowerCase()) {
-          case "pendiente":
-            return "badge badge-warning";
-          case "en proceso":
-            return "badge badge-primary";
-          case "completado":
-          case "entregado":
-            return "badge badge-success";
-          default:
-            return "badge badge-primary";
-        }
+        const n = normEstado(estado);
+        if (n === "pendiente") return "badge badge-warning";
+        if (n === "en proceso") return "badge badge-primary";
+        if (n === "completado") return "badge badge-success";
+        return "badge badge-info";
       };
 
-      // ---------- nueva orden (modal) ----------
+      // ---------- Modal Nueva Orden ----------
       if (btnNuevo) {
         btnNuevo.addEventListener("click", async () => {
-          console.log("🔄 Click en Nueva Orden detectado");
-          
-          if (!ordenModal) {
-            console.error("❌ Modal no encontrado");
-            return;
-          }
-          
-          console.log("🔄 Abriendo modal nueva orden...");
-          
-          // Limpiar formulario
-          if (ordenForm) {
-            ordenForm.reset();
-          }
+          ordenForm?.reset();
           limpiarServicios();
-          
-          // Mostrar modal usando el CSS correcto
-          try {
-            ordenModal.style.display = "flex";
-            ordenModal.classList.add("show");
-            ordenModal.setAttribute("open", "");
-            console.log("✅ Modal mostrado con display:flex y clase show");
-          } catch (error) {
-            console.error("❌ Error mostrando modal:", error);
-          }
-          
-          // Cargar datos
-          console.log("🔄 Cargando clientes y servicios...");
+          ordenModal.style.display = "flex";
+          ordenModal.classList.add("show");
+          ordenModal.setAttribute("open", "");
           await loadClientes();
-          await loadServicios();
-        });
-      } else {
-        console.error("❌ Botón Nueva Orden no encontrado");
-      }
-
-      if (closeModal) {
-        closeModal.addEventListener("click", () => {
-          console.log("🔄 Cerrando modal...");
-          ordenModal.style.display = "none";
-          ordenModal.classList.remove("show");
-          ordenModal.removeAttribute("open");
+          await loadServicios(); // <- garantiza que 'servicios' tenga datos
         });
       }
-
-      // Botón cancelar alternativo
-      const cancelarModal = document.getElementById("cancelarModal");
-      if (cancelarModal) {
-        cancelarModal.addEventListener("click", () => {
-          console.log("🔄 Cancelando modal...");
-          ordenModal.style.display = "none";
-          ordenModal.classList.remove("show");
-          ordenModal.removeAttribute("open");
-        });
-      }
-
-      // Cerrar modal al hacer clic en el fondo
+      if (closeModal) closeModal.addEventListener("click", cerrarModal);
+      if (cancelarModal) cancelarModal.addEventListener("click", cerrarModal);
       if (ordenModal) {
         ordenModal.addEventListener("click", (e) => {
-          if (e.target === ordenModal) {
-            console.log("🔄 Cerrando modal por click en fondo...");
-            ordenModal.style.display = "none";
-            ordenModal.classList.remove("show");
-            ordenModal.removeAttribute("open");
-          }
+          if (e.target === ordenModal) cerrarModal();
         });
       }
+      function cerrarModal() {
+        ordenModal.style.display = "none";
+        ordenModal.classList.remove("show");
+        ordenModal.removeAttribute("open");
+      }
 
-      // Event listener para cambio de cliente
-      document.getElementById("clienteSelect").addEventListener("change", (e) => {
-        const id_cliente = e.target.value;
-        loadVehiculos(id_cliente);
-      });
-
-      // Event listener para agregar servicio
-      document.getElementById("btnAgregarServicio").addEventListener("click", () => {
-        agregarServicio();
-      });
-
-      // botones filtros
+      // Filtros de estado (pills)
       document.querySelectorAll(".pill").forEach((p) => {
         p.addEventListener("click", () => {
           document
@@ -2140,23 +3050,13 @@ import Layout from "../../layouts/Layout.astro";
           pintarOrdenes();
         });
       });
-
-      // búsqueda rápida por placa arriba
-      buscarQuickBtn.addEventListener("click", async () => {
-        const placa = (placaQuick.value || "").trim();
-        if (!placa) return;
-        await buscarVehiculo(placa, true); // muestra en modal
-        nuevaOrdenModal.style.display = "flex";
-      });
-
-      // búsqueda en tabla
       buscarOrdenInput.addEventListener("input", pintarOrdenes);
 
-      // ---------- carga inicial ----------
+      // Cargar datos iniciales
       cargarMisOrdenes();
-      loadServicios(); // Cargar servicios al inicio
+      loadServicios();
 
-      // ---------- funciones de datos ----------
+      /* ========= API helpers ========= */
       async function cargarMisOrdenes() {
         try {
           const r = await fetch(
@@ -2182,10 +3082,10 @@ import Layout from "../../layouts/Layout.astro";
           (o) => new Date(o.fecha_ingreso).toDateString() === hoy
         ).length;
         const enProc = list.filter(
-          (o) => (o.estado || "").toLowerCase() === "en proceso"
+          (o) => normEstado(o.estado) === "en proceso"
         ).length;
-        const comp = list.filter((o) =>
-          ["completado", "entregado"].includes((o.estado || "").toLowerCase())
+        const comp = list.filter(
+          (o) => normEstado(o.estado) === "completado"
         ).length;
 
         document.getElementById("kpiAsignadas").textContent =
@@ -2195,15 +3095,51 @@ import Layout from "../../layouts/Layout.astro";
           fmt.format(comp);
       }
 
+      function accionesHTML(o) {
+        const n = normEstado(o.estado);
+        const btnVer = `<button class="btn btn-ghost btn-sm" onclick="verDetalleOrden(${o.id})">Ver</button>`;
+        if (n === "pendiente") {
+          return `<div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn btn-primary btn-sm" onclick="cambiarEstado(${o.id}, 'en proceso')">Iniciar</button>
+                ${btnVer}
+              </div>`;
+        }
+        if (n === "en proceso") {
+          return `<div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn btn-success btn-sm" onclick="cambiarEstado(${o.id}, 'completado')">Finalizar</button>
+                ${btnVer}
+              </div>`;
+        }
+        return `<div style="display:flex;gap:6px;flex-wrap:wrap">${btnVer}</div>`;
+      }
+
+      window.cambiarEstado = async function (id, nuevo) {
+        try {
+          const r = await fetch(`/api/ordenes/${id}/estado`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ estado: nuevo }),
+          });
+          const j = await r.json();
+          if (!r.ok || !j?.success)
+            throw new Error(j?.message || "Error al cambiar estado");
+          showToast(`Estado actualizado a "${nuevo}"`);
+          await cargarMisOrdenes();
+        } catch (e) {
+          console.error(e);
+          showToast("No se pudo actualizar el estado");
+        }
+      };
+
       function pintarOrdenes() {
         const q = (buscarOrdenInput.value || "").toLowerCase().trim();
         let list = [...todasLasOrdenes];
 
-        if (filtroEstado !== "todas") {
-          list = list.filter(
-            (o) => (o.estado || "").toLowerCase() === filtroEstado
-          );
-        }
+        if (filtroEstado !== "todas")
+          list = list.filter((o) => normEstado(o.estado) === filtroEstado);
         if (q) {
           list = list.filter(
             (o) =>
@@ -2216,324 +3152,189 @@ import Layout from "../../layouts/Layout.astro";
         ordenesTbody.innerHTML = list
           .map(
             (o) => `
-          <tr>
-            <td>${o.numero_orden}</td>
-            <td>${new Date(o.fecha_ingreso).toLocaleString()}</td>
-            <td>${o.marca} ${o.modelo} (${o.placa})</td>
-            <td>${o.cliente_nombre}</td>
-            <td><span class="${badge(o.estado)}">${o.estado}</span></td>
-            <td>
-              <button class="btn btn-outline btn-sm" onclick="verDetalleOrden(${o.id})">Ver</button>
-            </td>
-          </tr>
-        `
+        <tr>
+          <td>${o.numero_orden}</td>
+          <td>${new Date(o.fecha_ingreso).toLocaleString()}</td>
+          <td>${o.marca} ${o.modelo} (${o.placa})</td>
+          <td>${o.cliente_nombre}</td>
+          <td><span class="${badge(o.estado)}">${normEstado(o.estado)}</span></td>
+          <td>${accionesHTML(o)}</td>
+        </tr>`
           )
           .join("");
-
         emptyOrders.style.display = list.length ? "none" : "grid";
       }
 
-      // ---------- buscar vehículo ----------
-      async function buscarVehiculo(forcedPlaca = null, desdeQuick = false) {
-        const placa = (forcedPlaca ?? placaVehiculo.value).trim();
-        if (!placa) return;
+      // Abre / cierra modal de detalle
+      function openDetModal() {
+        document.getElementById("detalleModal").classList.add("show");
+      }
+      function closeDetModal() {
+        document.getElementById("detalleModal").classList.remove("show");
+      }
+      document
+        .getElementById("detCloseBtn")
+        ?.addEventListener("click", closeDetModal);
+      document
+        .getElementById("detCloseBtn2")
+        ?.addEventListener("click", closeDetModal);
+      document
+        .getElementById("detalleModal")
+        ?.addEventListener("click", (e) => {
+          if (e.target.id === "detalleModal") closeDetModal();
+        });
 
-        try {
-          const r = await fetch(
-            `http://localhost:3001/api/vehiculos/buscar/${encodeURIComponent(placa)}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          const data = await r.json();
-          if (data?.success && (data.data?.length || 0) > 0) {
-            vehiculoSeleccionado = data.data[0];
-            vehMarca.textContent = vehiculoSeleccionado.marca;
-            vehModelo.textContent = vehiculoSeleccionado.modelo;
-            vehPlaca.textContent = vehiculoSeleccionado.placa;
-            vehCliente.textContent = vehiculoSeleccionado.cliente_nombre;
-            vehTelefono.textContent = vehiculoSeleccionado.telefono || "N/D";
-            vehBox.style.display = "flex";
-            if (desdeQuick) {
-              placaVehiculo.value = placa;
-            }
-          } else {
-            vehBox.style.display = "none";
-            vehiculoSeleccionado = null;
-            showToast("Vehículo no encontrado");
-          }
-        } catch (e) {
-          console.error(e);
-          showToast("Error al buscar vehículo");
-        }
+      function badgeClass(e) {
+        const n =
+          typeof normEstado === "function"
+            ? normEstado(e)
+            : (e || "").toLowerCase();
+        if (n === "pendiente") return "badge badge-warning";
+        if (n === "en proceso") return "badge badge-primary";
+        if (n === "completado") return "badge badge-success";
+        return "badge";
       }
 
-      // ---------- buscar servicios ----------
-      async function buscarServicios() {
-        const termino = (buscarServicio.value || "").trim();
-        const tipo = (tipoServicio.value || "").trim();
-
-        let url = "http://localhost:3001/api/servicios";
-        if (tipo && termino)
-          url = `http://localhost:3001/api/servicios/buscar/${encodeURIComponent(termino)}`;
-        else if (tipo)
-          url = `http://localhost:3001/api/servicios/tipo/${encodeURIComponent(tipo)}`;
-        else if (termino)
-          url = `http://localhost:3001/api/servicios/buscar/${encodeURIComponent(termino)}`;
-
-        try {
-          const r = await fetch(url, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const data = await r.json();
-          if (!data?.success)
-            return (serviciosEncontrados.style.display = "none");
-
-          const arr = data.data || [];
-          if (!arr.length) {
-            serviciosEncontrados.style.display = "none";
-            return;
-          }
-
-          serviciosEncontrados.innerHTML = arr
-            .map(
-              (s) => `
-            <div class="result-item" onclick='agregarServicio(${JSON.stringify(s).replace(/"/g, "&quot;")})'>
-              <div>
-                <strong>${s.codigo}</strong> - ${s.descripcion}
-                <div class="result-meta">Tipo: ${s.tipo}</div>
-              </div>
-              <div>${money.format(s.precio_unitario || 0)}</div>
-            </div>
-          `
-            )
-            .join("");
-          serviciosEncontrados.style.display = "block";
-        } catch (e) {
-          console.error(e);
-        }
-      }
-
-      // expuesto para inline
-      window.agregarServicio = function (s) {
-        if (serviciosSeleccionados.find((x) => x.id === s.id)) {
-          showToast("Ya está agregado");
-          return;
-        }
-        const item = { ...s, cantidad: 1, subtotal: s.precio_unitario || 0 };
-        serviciosSeleccionados.push(item);
-        serviciosEncontrados.style.display = "none";
-        buscarServicio.value = "";
-        pintarServicios();
-      };
-
-      window.removerServicio = function (i) {
-        serviciosSeleccionados.splice(i, 1);
-        pintarServicios();
-      };
-
-      window.incQty = function (i) {
-        serviciosSeleccionados[i].cantidad += 1;
-        serviciosSeleccionados[i].subtotal =
-          (serviciosSeleccionados[i].precio_unitario || 0) *
-          serviciosSeleccionados[i].cantidad;
-        pintarServicios();
-      };
-
-      window.decQty = function (i) {
-        if (serviciosSeleccionados[i].cantidad <= 1) return;
-        serviciosSeleccionados[i].cantidad -= 1;
-        serviciosSeleccionados[i].subtotal =
-          (serviciosSeleccionados[i].precio_unitario || 0) *
-          serviciosSeleccionados[i].cantidad;
-        pintarServicios();
-      };
-
-      function pintarServicios() {
-        serviciosTbody.innerHTML = serviciosSeleccionados
-          .map(
-            (s, i) => `
-          <tr>
-            <td>${s.codigo}</td>
-            <td>${s.descripcion}</td>
-            <td>
-              <div class="qty-wrap">
-                <button class="qty-btn" onclick="decQty(${i})">−</button>
-                <span class="qty">${s.cantidad}</span>
-                <button class="qty-btn" onclick="incQty(${i})">+</button>
-              </div>
-            </td>
-            <td>${money.format(s.precio_unitario || 0)}</td>
-            <td>${money.format(s.subtotal || 0)}</td>
-            <td><button class="btn btn-outline" onclick="removerServicio(${i})">✕</button></td>
-          </tr>
-        `
-          )
-          .join("");
-
-        const total = serviciosSeleccionados.reduce(
-          (a, b) => a + (b.subtotal || 0),
-          0
-        );
-        totalOrdenEl.textContent = money.format(total);
-      }
-
-      // ---------- crear orden ----------
-      async function crearOrden(ev) {
-        ev.preventDefault();
-        if (!vehiculoSeleccionado)
-          return showToast("Busca y selecciona un vehículo");
-        if (!serviciosSeleccionados.length)
-          return showToast("Agrega al menos un servicio");
-
-        const ordenData = {
-          id_vehiculo: vehiculoSeleccionado.id,
-          observaciones: (
-            document.getElementById("observaciones").value || ""
-          ).trim(),
-          servicios: serviciosSeleccionados.map((s) => ({
-            id_servicio: s.id,
-            cantidad: s.cantidad,
-            precio_unitario: s.precio_unitario,
-          })),
-        };
-
-        try {
-          const r = await fetch("http://localhost:3001/api/ordenes", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(ordenData),
-          });
-          const data = await r.json();
-          if (!data?.success) {
-            showToast(data?.message || "No se pudo crear la orden");
-            return;
-          }
-
-          nuevaOrdenModal.style.display = "none";
-          // reset UI
-          document.getElementById("nuevaOrdenForm").reset();
-          vehiculoSeleccionado = null;
-          serviciosSeleccionados = [];
-          vehBox.style.display = "none";
-          pintarServicios();
-          showToast(`Orden #${data.numero_orden} creada correctamente`);
-          cargarMisOrdenes();
-        } catch (e) {
-          console.error(e);
-          showToast("Error al crear la orden");
-        }
-      }
-
-      // ---------- ver detalle ----------
       window.verDetalleOrden = async function (ordenId) {
         try {
+          const token = localStorage.getItem("token");
           const r = await fetch(
             `http://localhost:3001/api/ordenes/${ordenId}/detalle`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
           );
-          const data = await r.json();
-          if (!data?.success) return;
+          const dj = await r.json();
+          if (!dj?.success) {
+            showToast("No se pudo obtener el detalle");
+            return;
+          }
+          const items = dj.data || [];
 
-          const detalle = (data.data || [])
-            .map(
-              (d) =>
-                `${d.codigo} - ${d.descripcion} (x${d.cantidad})  ${money.format(d.precio_unitario)}  →  ${money.format(d.subtotal)}`
-            )
-            .join("\n");
+          let cab = null;
+          try {
+            const r2 = await fetch(
+              `http://localhost:3001/api/ordenes/${ordenId}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+            const j2 = await r2.json();
+            if (j2?.success) cab = j2.data || null;
+          } catch {}
 
-          // toast largo: usa alert estilizada simple
-          showToast("Detalle obtenido. Revisa la consola.");
-          console.log("Detalle de orden #" + ordenId + "\n\n" + detalle);
-        } catch (e) {
-          console.error(e);
+          document.getElementById("detNum").textContent = cab?.numero_orden
+            ? `#${cab.numero_orden}`
+            : `#${ordenId}`;
+          document.getElementById("detCliente").textContent =
+            cab?.cliente_nombre || "—";
+          document.getElementById("detVehiculo").textContent = cab
+            ? `${cab.marca || ""} ${cab.modelo || ""} (${cab.placa || ""})`.trim()
+            : "—";
+          document.getElementById("detFecha").textContent = cab?.fecha_ingreso
+            ? new Date(cab.fecha_ingreso).toLocaleString()
+            : "—";
+          const detEstado = document.getElementById("detEstado");
+          detEstado.className = badgeClass(cab?.estado || "pendiente");
+          detEstado.textContent = cab?.estado
+            ? normEstado(cab.estado)
+            : "pendiente";
+          document.getElementById("detObs").textContent =
+            cab?.observaciones || "—";
+
+          const detPrintBtn = document.getElementById("detImprimirBtn");
+          if (detPrintBtn) {
+            detPrintBtn.removeAttribute("target");
+            detPrintBtn.setAttribute("href", "#");
+            detPrintBtn.onclick = (e) => {
+              e.preventDefault();
+              window.print();
+            };
+          }
+
+          const tbody = document.querySelector("#detTable tbody");
+          const moneyFmt = (v) =>
+            new Intl.NumberFormat("es-EC", {
+              style: "currency",
+              currency: "USD",
+            }).format(v || 0);
+          let total = 0;
+          tbody.innerHTML = items
+            .map((it) => {
+              const sub =
+                Number(it.cantidad || 0) * Number(it.precio_unitario || 0) ||
+                Number(it.subtotal || 0) ||
+                0;
+              total += sub;
+              return `
+          <tr>
+            <td>${it.codigo || ""}</td>
+            <td>${it.descripcion || ""}</td>
+            <td class="t-right">${Number(it.cantidad || 0)}</td>
+            <td class="t-right">${moneyFmt(Number(it.precio_unitario || 0))}</td>
+            <td class="t-right">${moneyFmt(sub)}</td>
+          </tr>`;
+            })
+            .join("");
+          document.getElementById("detTotal").textContent = moneyFmt(total);
+          openDetModal();
+        } catch (err) {
+          console.error(err);
+          showToast("No se pudo mostrar el detalle");
         }
       };
 
-      (function () {
-        if (!serviciosEncontrados) return;
-
-        // header contenedor
-        const header = document.createElement("div");
-        header.className = "results-header";
-        header.innerHTML = `<span>CÓDIGO · DESCRIPCIÓN</span>`;
-
-        // botón X
-        const closeBtn = document.createElement("button");
-        closeBtn.type = "button";
-        closeBtn.className = "results-close";
-        closeBtn.setAttribute("aria-label", "Cerrar resultados");
-        closeBtn.textContent = "✕";
-        header.appendChild(closeBtn);
-
-        // cerrar al click
-        closeBtn.addEventListener("click", () => {
-          serviciosEncontrados.style.display = "none";
+      /* ========= MODAL: carga de selects y agregar servicios ========= */
+      document
+        .getElementById("clienteSelect")
+        .addEventListener("change", (e) => {
+          const id_cliente = e.target.value;
+          loadVehiculos(id_cliente);
+        });
+      document
+        .getElementById("btnAgregarServicio")
+        .addEventListener("click", () => {
+          agregarServicio();
         });
 
-        // cerrar con Escape
-        document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape") serviciosEncontrados.style.display = "none";
-        });
-
-        // siempre se inserta arriba aunque se regenere innerHTML
-        const ensureHeader = () => {
-          if (!serviciosEncontrados.querySelector(".results-header")) {
-            serviciosEncontrados.prepend(header);
-          }
-        };
-
-        const mo = new MutationObserver(ensureHeader);
-        mo.observe(serviciosEncontrados, { childList: true });
-
-        ensureHeader();
-      })();
-
-      // ---------- utils ----------
-      function debounce(fn, t = 300) {
-        let id;
-        return (...args) => {
-          clearTimeout(id);
-          id = setTimeout(() => fn(...args), t);
-        };
-      }
-
-      // ---------- FUNCIONES DEL MODAL ADMIN ADAPTADAS ----------
       async function loadClientes() {
-        console.log("🔄 Cargando clientes...");
-        const token = localStorage.getItem("token");
         try {
           const response = await fetch("/api/clientes/all", {
             headers: { Authorization: `Bearer ${token}` },
           });
           const result = await response.json();
-          console.log("📋 Respuesta clientes:", result);
           if (result.success) {
             clientes = result.data || [];
-            console.log("✅ Clientes cargados:", clientes.length);
             populateClientesSelect();
-          } else {
-            console.error("❌ Error en respuesta clientes:", result.message);
           }
         } catch (error) {
-          console.error("❌ Error cargando clientes:", error);
+          console.error("Error cargando clientes:", error);
         }
+      }
+      function populateClientesSelect() {
+        const select = document.getElementById("clienteSelect");
+        if (!select) return;
+        select.innerHTML = '<option value="">Seleccionar cliente</option>';
+        clientes.forEach((c) => {
+          const opt = document.createElement("option");
+          opt.value = c.id;
+          const nombre =
+            c.tipo === "particular"
+              ? `${c.nombres || ""} ${c.apellidos || ""}`.trim()
+              : c.razon_social || "Sin nombre";
+          opt.textContent = `${nombre} (${c.identificacion})`;
+          select.appendChild(opt);
+        });
       }
 
       async function loadVehiculos(id_cliente = null) {
-        const token = localStorage.getItem("token");
+        const select = document.getElementById("vehiculoSelect");
         if (!id_cliente) {
-          const select = document.getElementById("vehiculoSelect");
-          select.innerHTML = '<option value="">Primero seleccione un cliente</option>';
+          select.innerHTML =
+            '<option value="">Primero seleccione un cliente</option>';
           select.disabled = true;
           return;
         }
-
         try {
           const response = await fetch(`/api/vehiculos/cliente/${id_cliente}`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -2541,7 +3342,21 @@ import Layout from "../../layouts/Layout.astro";
           const result = await response.json();
           if (result.success) {
             vehiculos = result.data || [];
-            populateVehiculosSelect();
+            if (vehiculos.length === 0) {
+              select.innerHTML =
+                '<option value="">No hay vehículos registrados para este cliente</option>';
+              select.disabled = true;
+            } else {
+              select.disabled = false;
+              select.innerHTML =
+                '<option value="">Seleccionar vehículo</option>';
+              vehiculos.forEach((v) => {
+                const opt = document.createElement("option");
+                opt.value = v.id;
+                opt.textContent = `${v.placa} - ${v.marca}`;
+                select.appendChild(opt);
+              });
+            }
           }
         } catch (error) {
           console.error("Error cargando vehículos:", error);
@@ -2549,256 +3364,165 @@ import Layout from "../../layouts/Layout.astro";
       }
 
       async function loadServicios() {
-        const token = localStorage.getItem("token");
         try {
-          console.log("🔄 Cargando servicios...");
           const response = await fetch("/api/servicios", {
             headers: { Authorization: `Bearer ${token}` },
           });
           const result = await response.json();
-          console.log("📡 Respuesta de servicios:", result);
-          
           if (result.success) {
-            servicios = result.data || [];
-            console.log(`✅ ${servicios.length} servicios cargados`);
-            if (servicios.length > 0) {
-              console.log("🏷️ Primeros 3 servicios:", servicios.slice(0, 3));
-            }
-          } else {
-            console.error("❌ Error en respuesta de servicios:", result);
+            servicios = (result.data || []).map((s) => ({
+              id: s.id,
+              codigo: s.codigo,
+              descripcion: s.descripcion,
+              // sanea por si viene con coma
+              precio_unitario: window.parseDec(s.precio_unitario || 0),
+            }));
+            // opcional: también en window si lo usas en otra parte
+            window.servicios = servicios;
           }
         } catch (error) {
-          console.error("❌ Error cargando servicios:", error);
+          console.error("Error cargando servicios:", error);
+          servicios = [];
+          window.servicios = [];
         }
       }
 
-      function populateClientesSelect() {
-        console.log("🔄 Poblando select de clientes...");
-        const select = document.getElementById("clienteSelect");
-        if (!select) {
-          console.error("❌ No se encontró el select clienteSelect");
-          return;
-        }
-        
-        select.innerHTML = '<option value="">Seleccionar cliente</option>';
-
-        clientes.forEach((cliente) => {
-          const option = document.createElement("option");
-          option.value = cliente.id;
-          
-          let nombre;
-          if (cliente.tipo === "particular") {
-            // Para clientes particulares, usar nombres y apellidos
-            const nombres = cliente.nombres || "";
-            const apellidos = cliente.apellidos || "";
-            nombre = `${nombres} ${apellidos}`.trim();
-          } else {
-            // Para instituciones, usar razón social
-            nombre = cliente.razon_social || "Sin nombre";
-          }
-          
-          option.textContent = `${nombre} (${cliente.identificacion})`;
-          select.appendChild(option);
-        });
-        console.log("✅ Select poblado con", clientes.length, "clientes");
-      }
-
-      function populateVehiculosSelect() {
-        const select = document.getElementById("vehiculoSelect");
-
-        if (vehiculos.length === 0) {
-          select.innerHTML = '<option value="">No hay vehículos registrados para este cliente</option>';
-          select.disabled = true;
-          return;
-        }
-
-        select.innerHTML = '<option value="">Seleccionar vehículo</option>';
-        select.disabled = false;
-
-        vehiculos.forEach((vehiculo) => {
-          const option = document.createElement("option");
-          option.value = vehiculo.id;
-          option.textContent = `${vehiculo.placa} - ${vehiculo.marca}`;
-          select.appendChild(option);
-        });
-      }
-
-      function agregarServicio() {
+      // ====== AGREGAR SERVICIO ======
+      window.agregarServicio = function () {
         const container = document.getElementById("serviciosContainer");
         const noServiciosMsg = document.getElementById("noServiciosMsg");
         const totalSection = document.getElementById("totalSection");
-        
-        // Ocultar mensaje de "no servicios" al agregar el primero
-        if (noServiciosMsg) {
-          noServiciosMsg.style.display = "none";
+
+        if (noServiciosMsg) noServiciosMsg.style.display = "none";
+        if (totalSection) totalSection.style.display = "block";
+
+        // Si aún no hay datos, evita crear fila vacía
+        if (!Array.isArray(servicios) || servicios.length === 0) {
+          showToast(
+            "No hay servicios disponibles. Reintenta en unos segundos."
+          );
+          return;
         }
-        
-        // Mostrar sección de total
-        if (totalSection) {
-          totalSection.style.display = "block";
-        }
-        
+
+        const idx = servicioIndex++;
         const div = document.createElement("div");
         div.className = "servicio-item";
-        
-        console.log("🔧 Generando HTML para servicio...");
-        console.log("📊 Servicios disponibles:", servicios.length);
-        if (servicios.length > 0) {
-          console.log("🏷️ Primer servicio de ejemplo:", servicios[0]);
-        }
-        
-        div.innerHTML = `
-          <div class="servicio-row">
-            <div class="servicio-select-field">
-              <label>Servicio</label>
-              <select name="servicios[${servicioIndex}][id_servicio]" class="input servicio-select" onchange="window.cargarPrecioServicio(this, ${servicioIndex})" required>
-                <option value="">Seleccionar servicio</option>
-                ${servicios.map(s => `<option value="${s.id}" data-precio="${s.precio_unitario || 0}">${s.codigo} - ${s.descripcion}</option>`).join('')}
-              </select>
-            </div>
-            <div class="cantidad-field">
-              <label>Cant.</label>
-              <input 
-                type="number" 
-                name="servicios[${servicioIndex}][cantidad]" 
-                id="cantidad_${servicioIndex}"
-                placeholder="1" 
-                class="input" 
-                min="1" 
-                value="1" 
-                onchange="window.calcularSubtotal(${servicioIndex})"
-                required
-              />
-            </div>
-            <div class="precio-field">
-              <label>Precio</label>
-              <input 
-                type="number" 
-                name="servicios[${servicioIndex}][precio_unitario]" 
-                id="precio_${servicioIndex}"
-                placeholder="0.00" 
-                class="input" 
-                step="0.01" 
-                min="0" 
-                onchange="window.calcularSubtotal(${servicioIndex})"
-                required
-              />
-            </div>
-            <div class="accion-field">
-              <button type="button" class="btn btn-outline btn-small btn-eliminar" onclick="window.eliminarServicio(this)">
-                ✖
-              </button>
-            </div>
-          </div>
-          <div class="subtotal-row" id="subtotal_${servicioIndex}" style="display: none;">
-            <small class="text-muted">Subtotal: $<span class="subtotal-amount">0.00</span></small>
-          </div>
-        `;
-        
-        container.appendChild(div);
-        servicioIndex++;
-        
-        console.log(`✅ Servicio agregado con índice ${servicioIndex - 1}`);
-        // Verificar que los elementos se crearon correctamente
-        setTimeout(() => {
-          const cantidadInput = document.getElementById(`cantidad_${servicioIndex - 1}`);
-          const precioInput = document.getElementById(`precio_${servicioIndex - 1}`);
-          const subtotalDiv = document.getElementById(`subtotal_${servicioIndex - 1}`);
-          console.log("🔍 Elementos creados:", {
-            cantidad: !!cantidadInput,
-            precio: !!precioInput,
-            subtotal: !!subtotalDiv
-          });
-        }, 100);
-      }
 
-      function eliminarServicio(button) {
-        const servicioItem = button.closest('.servicio-item');
-        servicioItem.remove();
-        
-        // Mostrar mensaje si no hay servicios
-        const container = document.getElementById("serviciosContainer");
-        const serviciosRestantes = container.querySelectorAll('.servicio-item');
-        const noServiciosMsg = document.getElementById("noServiciosMsg");
-        const totalSection = document.getElementById("totalSection");
-        
-        if (serviciosRestantes.length === 0) {
-          if (noServiciosMsg) {
-            noServiciosMsg.style.display = "block";
-          }
-          if (totalSection) {
-            totalSection.style.display = "none";
-          }
-        } else {
-          // Recalcular total después de eliminar
-          calcularTotalGeneral();
-        }
-      }
-      
-      // Hacer función global
-      window.eliminarServicio = eliminarServicio;
+        const optionsHtml = (window.servicios || [])
+          .map((s) => {
+            const raw = s?.precio_unitario ?? 0;
+            // sanea a número con punto
+            const p = window.parseDec
+              ? window.parseDec(raw)
+              : Number(String(raw).replace(",", "."));
+            const precio = Number.isFinite(p) ? p : 0;
+            return `<option value="${s.id}" data-precio="${precio}">
+            ${s.codigo} - ${s.descripcion}
+          </option>`;
+          })
+          .join("");
+
+        div.innerHTML = `
+      <div class="servicio-row">
+        <div class="servicio-select-field">
+          <label>Servicio</label>
+          <select name="servicios[${idx}][id_servicio]" class="input servicio-select"
+            onchange="window.cargarPrecioServicio(this, ${idx})" required>
+            <option value="">Seleccionar servicio</option>
+            ${optionsHtml}
+          </select>
+        </div>
+        <div class="cantidad-field">
+          <label>Cant.</label>
+          <input type="number" name="servicios[${idx}][cantidad]" id="cantidad_${idx}"
+            placeholder="1" class="input" min="1" value="1"
+            onchange="window.calcularSubtotal(${idx})" required />
+        </div>
+        <div class="precio-field">
+          <label>Precio</label>
+          <input type="number" name="servicios[${idx}][precio_unitario]" id="precio_${idx}"
+            placeholder="0.00" class="input" step="0.01" min="0"
+            onchange="window.calcularSubtotal(${idx})" required />
+        </div>
+        <div class="accion-field">
+          <button type="button" class="btn btn-outline btn-small btn-eliminar"
+            onclick="window.eliminarServicio(this)">✖</button>
+        </div>
+      </div>
+      <div class="subtotal-row" id="subtotal_${idx}" style="display:none;">
+        <small class="text-muted">Subtotal: $<span class="subtotal-amount">0.00</span></small>
+      </div>
+    `;
+        container.appendChild(div);
+      };
 
       function limpiarServicios() {
         document.getElementById("serviciosContainer").innerHTML = `
-          <div class="no-servicios" id="noServiciosMsg">
-            <p>No hay servicios agregados. Haz clic en "Agregar Servicio" para comenzar.</p>
-          </div>
-        `;
-        
-        // Ocultar sección de total
+      <div class="no-servicios" id="noServiciosMsg">
+        <p>No hay servicios agregados. Haz clic en "Agregar Servicio" para comenzar.</p>
+      </div>`;
         const totalSection = document.getElementById("totalSection");
-        if (totalSection) {
-          totalSection.style.display = "none";
-        }
-        
+        if (totalSection) totalSection.style.display = "none";
         servicioIndex = 0;
+        const totalElement = document.getElementById("totalGeneral");
+        if (totalElement) totalElement.textContent = "0.00";
       }
 
-      // Formulario de orden actualizado
+      // ---------- Crear orden ----------
       if (ordenForm) {
         ordenForm.addEventListener("submit", async (e) => {
           e.preventDefault();
-          console.log("🔄 Enviando formulario de orden...");
 
           const clienteSel = document.getElementById("clienteSelect");
           const vehiculoSel = document.getElementById("vehiculoSelect");
 
           const id_cliente = clienteSel?.value ? Number(clienteSel.value) : NaN;
-          const id_vehiculo = vehiculoSel?.value ? Number(vehiculoSel.value) : NaN;
-          const observaciones = ordenForm.observaciones.value?.trim() || "";
+          const id_vehiculo = vehiculoSel?.value
+            ? Number(vehiculoSel.value)
+            : NaN;
+          const observaciones = ordenForm.observaciones?.value?.trim() || "";
 
-          if (!Number.isFinite(id_cliente)) {
-            showToast("Selecciona un cliente.");
-            return;
-          }
-          if (!Number.isFinite(id_vehiculo)) {
-            showToast("Selecciona un vehículo.");
-            return;
-          }
+          if (!Number.isFinite(id_cliente))
+            return showToast("Selecciona un cliente.");
+          if (!Number.isFinite(id_vehiculo))
+            return showToast("Selecciona un vehículo.");
 
-          // Construir detalle de servicios
-          const rows = Array.from(document.querySelectorAll("#serviciosContainer .servicio-item"));
+          // --- construir detalle desde el DOM (con alias y subtotal)
+          const rows = Array.from(
+            document.querySelectorAll("#serviciosContainer .servicio-item")
+          );
           const detalle = rows
             .map((row) => {
               const sel = row.querySelector('select[name^="servicios"]');
               const qty = row.querySelector('input[name*="[cantidad]"]');
               const prc = row.querySelector('input[name*="[precio_unitario]"]');
+
               const id_servicio = sel?.value ? Number(sel.value) : NaN;
-              const cantidad = qty?.value ? Number(qty.value) : NaN;
-              const precio_unitario = prc?.value ? Number(prc.value) : NaN;
-              
-              if (
-                Number.isFinite(id_servicio) && id_servicio > 0 &&
-                Number.isFinite(cantidad) && cantidad > 0 &&
-                Number.isFinite(precio_unitario) && precio_unitario >= 0
-              ) {
-                return {
-                  id_servicio,
-                  cantidad,
-                  precio_unitario,
-                };
-              }
-              return null;
+              const cantidad = window.parseDec
+                ? window.parseDec(qty?.value)
+                : Number(qty?.value);
+              const precio_unitario = window.parseDec
+                ? window.parseDec(prc?.value)
+                : Number(prc?.value);
+
+              const ok =
+                Number.isFinite(id_servicio) &&
+                id_servicio > 0 &&
+                Number.isFinite(cantidad) &&
+                cantidad > 0 &&
+                Number.isFinite(precio_unitario) &&
+                precio_unitario >= 0;
+
+              if (!ok) return null;
+
+              const subtotal = cantidad * precio_unitario;
+              return {
+                id_servicio,
+                cantidad,
+                precio_unitario, // nombre A
+                precio: precio_unitario, // alias B (por compatibilidad)
+                subtotal,
+              };
             })
             .filter(Boolean);
 
@@ -2807,22 +3531,23 @@ import Layout from "../../layouts/Layout.astro";
             return;
           }
 
-          console.log("📊 Datos de la orden:", {
-            id_vehiculo,
-            observaciones,
-            servicios: detalle,
-          });
+          // total de la orden
+          const total = detalle.reduce((a, d) => a + (d.subtotal || 0), 0);
 
+          // --- payload alineado con el admin
           const payload = {
+            id_cliente, // ya calculado arriba en tu código
             id_vehiculo,
+            id_tecnico: null, // o el que corresponda si lo manejas aquí
+            estado: "pendiente",
             observaciones,
-            servicios: detalle,
+            total,
+            servicios: detalle, // alias 1
+            detalle_servicios: detalle, // alias 2
+            detalle: detalle, // alias 3
           };
 
-          const token = localStorage.getItem("token");
-
           try {
-            console.log("📡 Enviando orden al servidor...");
             const r = await fetch("/api/ordenes", {
               method: "POST",
               headers: {
@@ -2833,39 +3558,44 @@ import Layout from "../../layouts/Layout.astro";
               body: JSON.stringify(payload),
             });
 
-            console.log("📡 Respuesta del servidor:", r.status);
-
             let j = null;
             try {
               j = await r.json();
-              console.log("📋 Datos de respuesta:", j);
-            } catch (error) {
-              console.error("❌ Error parseando JSON:", error);
-              j = null;
-            }
+            } catch {}
 
             if (!r.ok || !j?.success) {
-              console.error("❌ Error API", r.status, j);
               const msg = (j && (j.message || j.error)) || `HTTP ${r.status}`;
               showToast("Error al guardar la orden: " + msg);
               return;
             }
 
-            console.log("✅ Orden creada exitosamente:", j.numero_orden);
-            
-            // Cerrar modal
-            ordenModal.style.display = "none";
-            ordenModal.classList.remove("show");
-            ordenModal.removeAttribute("open");
-            
-            // Actualizar vista
-            console.log("🔄 Actualizando vista...");
-            await cargarMisOrdenes();
-            
-            showToast(`Orden ${j.numero_orden} creada exitosamente`);
+            try {
+              if (!j.data?.estado)
+                j.data = { ...(j.data || {}), estado: "pendiente" };
+            } catch {}
 
+            // (opcional) notifica inbox admin como ya lo tenías
+            try {
+              await fetch("/api/inbox/admin/ordenes", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  id_orden: j.id || j.data?.id,
+                  motivo: "por_facturar",
+                }),
+              });
+            } catch (e) {
+              console.warn("No se pudo notificar a la bandeja del admin:", e);
+            }
+
+            cerrarModal();
+            await cargarMisOrdenes();
+            showToast(`Orden ${j.numero_orden || ""} creada exitosamente`);
           } catch (err) {
-            console.error("❌ Error guardando orden", err);
+            console.error("Error guardando orden", err);
             showToast("Error de red al guardar la orden");
           }
         });
