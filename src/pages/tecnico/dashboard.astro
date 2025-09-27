@@ -3238,7 +3238,7 @@ import Layout from "../../layouts/Layout.astro";
 
       window.cambiarEstado = async function (id, nuevo) {
         try {
-          const r = await fetch(`/api/ordenes/${id}/estado`, {
+          const r = await fetch(`http://localhost:3001/api/ordenes/${id}/estado`, {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
@@ -3671,7 +3671,7 @@ import Layout from "../../layouts/Layout.astro";
           };
 
           try {
-            const r = await fetch("/api/ordenes", {
+            const r = await fetch("http://localhost:3001/api/ordenes", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

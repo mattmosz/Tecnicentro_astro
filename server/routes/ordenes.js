@@ -26,8 +26,11 @@ async function generarNumeroOrden() {
   const mes = String(fecha.getMonth() + 1).padStart(2, '0');
   const prefijo = `ORD-${año}${mes}-`;
   
+  // Usar SQL para obtener directamente el máximo número secuencial
   const [result] = await db.execute(
-    'SELECT MAX(CAST(SUBSTRING(numero_orden, 9) AS UNSIGNED)) as ultimo FROM ordenes_servicio WHERE numero_orden LIKE ?',
+    `SELECT MAX(CAST(SUBSTRING_INDEX(numero_orden, '-', -1) AS UNSIGNED)) as ultimo 
+     FROM ordenes_servicio 
+     WHERE numero_orden LIKE ?`,
     [`${prefijo}%`]
   );
   
@@ -101,14 +104,8 @@ router.post('/', verifyToken, async (req, res) => {
 
   } catch (error) {
     await connection.rollback();
-    console.error('Error completo al crear orden:', error);
-    console.error('Stack trace:', error.stack);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error interno del servidor',
-      details: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
+    console.error('Error al crear orden:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
   } finally {
     connection.release();
   }
