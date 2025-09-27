@@ -356,4 +356,52 @@ router.delete('/:id', verifyToken, async (req, res) => {
   }
 });
 
+// Cambiar estado de una orden
+router.patch('/:id/estado', verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado } = req.body;
+
+    if (!estado || !['pendiente', 'facturada'].includes(estado)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Estado inválido. Solo se permiten: pendiente, facturada' 
+      });
+    }
+
+    // Verificar que la orden existe
+    const [orden] = await db.execute(
+      'SELECT id, id_tecnico FROM ordenes_servicio WHERE id = ?',
+      [id]
+    );
+
+    if (orden.length === 0) {
+      return res.status(404).json({ success: false, message: 'Orden no encontrada' });
+    }
+
+    // Si es técnico, verificar que sea su orden
+    if (req.user.rol === 'tecnico' && orden[0].id_tecnico !== req.user.id) {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'No tienes permisos para modificar esta orden' 
+      });
+    }
+
+    // Actualizar el estado
+    await db.execute(
+      'UPDATE ordenes_servicio SET estado = ? WHERE id = ?',
+      [estado, id]
+    );
+
+    res.json({ 
+      success: true, 
+      message: `Estado cambiado a ${estado} exitosamente` 
+    });
+
+  } catch (error) {
+    console.error('Error al cambiar estado:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
 export default router;

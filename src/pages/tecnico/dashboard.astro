@@ -35,13 +35,7 @@ import Layout from "../../layouts/Layout.astro";
               <p class="kpi-label">Asignadas hoy</p>
             </div>
           </article>
-          <article class="kpi-card kpi-amber">
-            <div class="kpi-icon">⚙️</div>
-            <div>
-              <h3 id="kpiProceso" class="kpi-value">0</h3>
-              <p class="kpi-label">En proceso</p>
-            </div>
-          </article>
+
           <article class="kpi-card kpi-green">
             <div class="kpi-icon">✅</div>
             <div>
@@ -62,8 +56,7 @@ import Layout from "../../layouts/Layout.astro";
             <div class="filters" role="tablist" aria-label="Estados">
               <button class="pill active" data-estado="todas">Todas</button>
               <button class="pill" data-estado="pendiente">Pendiente</button>
-              <button class="pill" data-estado="en proceso">En proceso</button>
-              <button class="pill" data-estado="completado">Completada</button>
+              <button class="pill" data-estado="facturada">Facturada</button>
             </div>
           </div>
         </div>
@@ -3114,26 +3107,14 @@ import Layout from "../../layouts/Layout.astro";
           ].includes(v)
         )
           return "pendiente";
-        if (["en proceso", "proceso", "working", "atendiendo"].includes(v))
-          return "en proceso";
-        if (
-          [
-            "completado",
-            "entregado",
-            "cerrada",
-            "finalizada",
-            "facturada",
-            "facturada parcial",
-          ].includes(v)
-        )
-          return "completado";
+        if (["facturada"].includes(v))
+          return "facturada";
         return v || "pendiente";
       };
       const badge = (estado = "") => {
         const n = normEstado(estado);
         if (n === "pendiente") return "badge badge-warning";
-        if (n === "en proceso") return "badge badge-primary";
-        if (n === "completado") return "badge badge-success";
+        if (n === "facturada") return "badge badge-success";
         return "badge badge-info";
       };
 
@@ -3204,18 +3185,14 @@ import Layout from "../../layouts/Layout.astro";
         const asignadasHoy = list.filter(
           (o) => new Date(o.fecha_ingreso).toDateString() === hoy
         ).length;
-        const enProc = list.filter(
-          (o) => normEstado(o.estado) === "en proceso"
-        ).length;
-        const comp = list.filter(
-          (o) => normEstado(o.estado) === "completado"
+        const facturadas = list.filter(
+          (o) => normEstado(o.estado) === "facturada"
         ).length;
 
         document.getElementById("kpiAsignadas").textContent =
           fmt.format(asignadasHoy);
-        document.getElementById("kpiProceso").textContent = fmt.format(enProc);
         document.getElementById("kpiCompletadas").textContent =
-          fmt.format(comp);
+          fmt.format(facturadas);
       }
 
       function accionesHTML(o) {
@@ -3223,13 +3200,7 @@ import Layout from "../../layouts/Layout.astro";
         const btnVer = `<button class="btn btn-ghost btn-sm" onclick="verDetalleOrden(${o.id})">Ver</button>`;
         if (n === "pendiente") {
           return `<div style="display:flex;gap:6px;flex-wrap:wrap">
-                <button class="btn btn-primary btn-sm" onclick="cambiarEstado(${o.id}, 'en proceso')">Iniciar</button>
-                ${btnVer}
-              </div>`;
-        }
-        if (n === "en proceso") {
-          return `<div style="display:flex;gap:6px;flex-wrap:wrap">
-                <button class="btn btn-success btn-sm" onclick="cambiarEstado(${o.id}, 'completado')">Finalizar</button>
+                <button class="btn btn-success btn-sm" onclick="cambiarEstado(${o.id}, 'facturada')">Completar</button>
                 ${btnVer}
               </div>`;
         }
@@ -3313,8 +3284,7 @@ import Layout from "../../layouts/Layout.astro";
             ? normEstado(e)
             : (e || "").toLowerCase();
         if (n === "pendiente") return "badge badge-warning";
-        if (n === "en proceso") return "badge badge-primary";
-        if (n === "completado") return "badge badge-success";
+        if (n === "facturada") return "badge badge-success";
         return "badge";
       }
 
