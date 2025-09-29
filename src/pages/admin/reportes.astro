@@ -976,6 +976,107 @@ import Layout from "../../layouts/Layout.astro";
   content: none;
 }
 
+/* ===== Top servicios — responsive definitivo ===== */
+
+/* ——— Escritorio / tablets ——— */
+#topServicios.table-wrap thead th,
+#topServicios.table-wrap tbody td {
+  padding: 12px 14px;
+}
+
+#topServicios.table-wrap thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f8fafc;
+  border-bottom: 2px solid var(--border);
+}
+
+/* cebra + separadores visibles */
+#topServicios.table-wrap tbody tr:nth-child(odd) { background: #fbfdff; }
+#topServicios.table-wrap tbody tr { border-bottom: 1px solid var(--border-2); }
+#topServicios.table-wrap tbody tr:last-child { border-bottom: 0; }
+
+/* alineación y números tabulares */
+#topServicios.table-wrap thead th:nth-child(2),
+#topServicios.table-wrap thead th:nth-child(3),
+#topServicios.table-wrap thead th:nth-child(4),
+#topServicios.table-wrap tbody td:nth-child(2),
+#topServicios.table-wrap tbody td:nth-child(3),
+#topServicios.table-wrap tbody td:nth-child(4) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* nombres largos con elipsis en desktop */
+#topServicios.table-wrap tbody td:first-child {
+  max-width: 520px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ——— MÓVIL: < 720px -> tarjetas ——— */
+@media (max-width: 720px) {
+  /* tabla -> bloques */
+  #topServicios.table-wrap table,
+  #topServicios.table-wrap thead,
+  #topServicios.table-wrap tbody,
+  #topServicios.table-wrap tr,
+  #topServicios.table-wrap th,
+  #topServicios.table-wrap td { display: block; }
+
+  /* ocultar header */
+  #topServicios.table-wrap thead {
+    position: absolute; left: -9999px; top: -9999px;
+  }
+
+  /* cada fila = tarjeta con sombra, borde y separación */
+  #topServicios.table-wrap tbody tr {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin: 12px 0;
+    box-shadow: 0 4px 12px rgba(2,6,23,.06);
+  }
+
+  /* cada celda en dos columnas: etiqueta/valor */
+  #topServicios.table-wrap tbody td {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border: 0;
+    border-top: 1px dashed var(--border-2);
+  }
+  #topServicios.table-wrap tbody td:first-child { border-top: 0; }
+
+  /* etiquetas visibles generadas por CSS */
+  #topServicios.table-wrap tbody td:nth-child(1)::before { content: "Servicio";  color: var(--muted); font-weight: 600; }
+  #topServicios.table-wrap tbody td:nth-child(2)::before { content: "Veces";     color: var(--muted); font-weight: 600; }
+  #topServicios.table-wrap tbody td:nth-child(3)::before { content: "Ingresos";  color: var(--muted); font-weight: 600; }
+  #topServicios.table-wrap tbody td:nth-child(4)::before { content: "% del total"; color: var(--muted); font-weight: 600; }
+
+  /* servicio en varias líneas (sin elipsis en móvil) */
+  #topServicios.table-wrap tbody td:first-child {
+    white-space: normal;
+    max-width: none;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* valores a la derecha */
+  #topServicios.table-wrap tbody td:nth-child(2),
+  #topServicios.table-wrap tbody td:nth-child(3),
+  #topServicios.table-wrap tbody td:nth-child(4) {
+    justify-self: end;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+
 </style>
 
 </Layout>
