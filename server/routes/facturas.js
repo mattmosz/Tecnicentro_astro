@@ -27,20 +27,47 @@ const requireAdmin = (req, res, next) => {
   next();
 };
 
-// Generar número de factura
-async function generarNumeroFactura() {
+// Generar número de factura único
+async function generarNumeroFactura(connection = null) {
   const fecha = new Date();
   const año = fecha.getFullYear();
   const mes = String(fecha.getMonth() + 1).padStart(2, '0');
   const prefijo = `FAC-${año}${mes}-`;
   
-  const [result] = await db.execute(
-    'SELECT MAX(CAST(SUBSTRING(numero_factura, 9) AS UNSIGNED)) as ultimo FROM facturas WHERE numero_factura LIKE ?',
-    [`${prefijo}%`]
-  );
+  const dbConn = connection || db;
   
-  const siguiente = (result[0].ultimo || 0) + 1;
-  return `${prefijo}${String(siguiente).padStart(4, '0')}`;
+  try {
+    // Generar un número único basado en timestamp para evitar duplicados
+    const timestamp = Date.now();
+    const numeroBase = timestamp % 10000; // Últimos 4 dígitos del timestamp
+    
+    // Verificar números desde este punto hacia arriba
+    for (let i = numeroBase; i < numeroBase + 1000; i++) {
+      const numeroFactura = `${prefijo}${String(i).padStart(4, '0')}`;
+      
+      // Verificar que no exista
+      const [existe] = await dbConn.execute(
+        'SELECT numero_factura FROM facturas WHERE numero_factura = ?',
+        [numeroFactura]
+      );
+      
+      if (existe.length === 0) {
+        console.log(`Número de factura generado: ${numeroFactura}`);
+        return numeroFactura;
+      }
+    }
+    
+    // Si no encuentra ninguno disponible, usar un número aleatorio alto
+    const numeroAleatorio = Math.floor(Math.random() * 9000) + 1000;
+    const numeroFactura = `${prefijo}${String(numeroAleatorio).padStart(4, '0')}`;
+    
+    console.log(`Número de factura aleatorio generado: ${numeroFactura}`);
+    return numeroFactura;
+    
+  } catch (error) {
+    console.error('Error generando número de factura:', error);
+    throw error;
+  }
 }
 
 // Crear factura desde una orden
@@ -89,8 +116,8 @@ router.post('/desde-orden/:ordenId', verifyToken, requireAdmin, async (req, res)
     const iva = subtotal * 0.15; // 15% IVA
     const total = subtotal + iva;
 
-    // Generar número de factura
-    const numero_factura = await generarNumeroFactura();
+    // Generar número de factura con la conexión de transacción
+    const numero_factura = await generarNumeroFactura(connection);
 
     // Crear la factura
     const [facturaResult] = await connection.execute(
